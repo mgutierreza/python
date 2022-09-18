@@ -4,7 +4,7 @@ from consulta import crearSPConsultaDatos
 from insercion import crearSPInserciónDatos
 from actualizacion import crearSPActualizacionDatos
 from borrado import crearSPEliminacionDatos
-from obtenerIRepository import generarArchivoIRepository
+from obtenerRepositorio import generarArchivoRepository
 
 #Creación de Objetos de Base de Datos
 #crearSPConsultaDatos("AcdCampus")
@@ -15,7 +15,7 @@ from obtenerIRepository import generarArchivoIRepository
 
 #Creación de Objetos de Aplicación
 #generarArchivoEntity("AcdCampus")
-generarArchivoIRepository("AcdCampus")
+generarArchivoRepository("AcdCampus")
 
 
 

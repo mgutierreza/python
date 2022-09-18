@@ -10,10 +10,12 @@ def obtenerMetaDataCampos(nombreTabla):
     conexionAzure = pyo.connect(conexionAzure)
     print('Conexión Abierta')
     
-    sql = "SELECT COLUMN_NAME nombreCampo, upper(DATA_TYPE) tipoDato, isnull(CHARACTER_MAXIMUM_LENGTH,0) tamanhoCampo "
-    sql = sql + "FROM information_schema.columns "
-    sql = sql + "WHERE table_name = '" + nombreTabla + "' "
-    sql = sql + "ORDER BY ORDINAL_POSITION;"
+    sql = "SELECT a.COLUMN_NAME nombreCampo, upper(a.DATA_TYPE) tipoDato, isnull(a.CHARACTER_MAXIMUM_LENGTH,0) tamanhoCampo, ISNULL(c.CONSTRAINT_TYPE, 'CAMPO') tipoCampo "
+    sql = sql + "FROM information_schema.columns a "
+    sql = sql + "LEFT JOIN information_schema.key_column_usage b ON a.COLUMN_NAME = b.COLUMN_NAME AND a.TABLE_NAME = b.TABLE_NAME AND a.TABLE_SCHEMA = b.TABLE_SCHEMA "
+    sql = sql + "LEFT JOIN information_schema.table_constraints c ON b.CONSTRAINT_NAME = c.CONSTRAINT_NAME AND b.TABLE_NAME = c.TABLE_NAME AND b.TABLE_SCHEMA = c.TABLE_SCHEMA "
+    sql = sql + "WHERE a.table_name = '" + nombreTabla + "' "
+    sql = sql + "ORDER BY a.ORDINAL_POSITION;"
     df = pd.read_sql(sql, conexionAzure)
 
     conexionAzure.close()
