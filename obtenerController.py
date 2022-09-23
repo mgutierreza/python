@@ -1,24 +1,20 @@
 import pyodbc as pyo
 import pandas as pd
+import os
 from os import remove
 from consultaDatos import obtenerMetaDataClavePrincipal
+from crearArchivo import generarArchivo
 
 TAB = "\t"
 ENTER = "\n"
 
 def generarArchivoController(nombreTabla):
-    clase = ""
     cabeceraClase = generarCabeceraClase()
     claseController = generarClaseController(nombreTabla)
-    nombreClase = generarNombreClase(nombreTabla)
-    nombreArchivo = generarNombreArchivo(nombreClase)
-    clase = cabeceraClase + claseController 
+    nombreArchivo = generarNombreClase(nombreTabla)
+    contenidoArchivo = cabeceraClase + claseController 
+    generarArchivo(nombreTabla, nombreArchivo, contenidoArchivo)
     
-    #remove(nombreArchivoProcedimientoAlmacenado)
-    f = open (nombreArchivo,'w')
-    f.write(clase)
-    f.close()
-
     return 
 
 def generarCabeceraClase():
@@ -30,6 +26,7 @@ def generarCabeceraClase():
     cabeceraClase = cabeceraClase + "using System.Collections.Generic;" + ENTER
     cabeceraClase = cabeceraClase + "using System.Linq;" + ENTER
     cabeceraClase = cabeceraClase + "using System.Threading.Tasks;" + 2*ENTER
+
     return cabeceraClase
 
     
@@ -233,7 +230,3 @@ def generarMetodoDelete(nombreTabla):
 
 def generarNombreClase(nombreTabla):
     return nombreTabla + "Controller"
-
-def generarNombreArchivo(nombreClase):
-    nombreClase = nombreClase + ".cs"
-    return nombreClase
