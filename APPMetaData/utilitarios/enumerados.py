@@ -1,9 +1,10 @@
-from enum import Enum
+from enum import Enum, unique
 
+@unique
 class tipoObjeto(Enum):
     BaseDatos = 1
     Aplicacion = 2
-
+@unique
 class claseObjeto(Enum):
     entity = 1
     exception = 2

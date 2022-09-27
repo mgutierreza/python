@@ -1,21 +1,20 @@
 import pyodbc as pyo
 import pandas as pd
-from ..utilitarios.util import generarRutaArchivo, generarNombreArchivo, generarArchivo, generarExtensionArchivo
-from ..utilitarios.enumerados import tipoObjeto, claseObjeto
-
+from utilitarios import generarRutaArchivo, generarNombreArchivo, generarArchivo, generarExtensionArchivo
+from utilitarios import tipoObjeto, claseObjeto
 from obtenerConexionBD import consultaDatos
 from utilitarios import util
 
 TAB = "\t"
 ENTER = "\n"
 
-def generarArchivoSelect(nombreTabla):
-    rutayNombreArchivo = generarRutaArchivo(nombreTabla, tipoObjeto.BaseDatos)
+def generarProcedimientoAlmacenadoSelect(nombreTabla):
+    rutaArchivo = generarRutaArchivo(nombreTabla, tipoObjeto.BaseDatos)
     nombreArchivo = generarNombreArchivo(nombreTabla, claseObjeto.select)
-    extensionArchivo = generarExtensionArchivo(nombreArchivo, tipoObjeto.BaseDatos)
+    extensionArchivo = generarExtensionArchivo(tipoObjeto.BaseDatos)
     contenidoArchivo = generarProcedimientoAlmacenado(nombreTabla)
     
-    generarArchivo(rutayNombreArchivo, nombreArchivo + extensionArchivo, contenidoArchivo)
+    generarArchivo(rutaArchivo, nombreArchivo + extensionArchivo, contenidoArchivo)
 
     return
 
@@ -118,7 +117,7 @@ def generarFiltroConsulta(nombreTabla):
     lineaFiltroCodigoProcedimientoAlmacenado = 4*TAB + "WHERE"
 
     for i in dfClave.index:
-        lineaFiltroCodigoProcedimientoAlmacenado += 2*TAB + nombreTabla + "."+ dfClave["nombreCampo"][i] + TAB + "=" + TAB + "@" + dfClave["nombreCampo"][i] + ENTER
+        lineaFiltroCodigoProcedimientoAlmacenado += nombreTabla + "."+ dfClave["nombreCampo"][i] + TAB + "=" + TAB + "@" + dfClave["nombreCampo"][i] + ENTER
     
     return lineaFiltroCodigoProcedimientoAlmacenado
 

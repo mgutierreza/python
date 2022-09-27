@@ -1,6 +1,6 @@
 import os
 from os import remove
-from enumerados import tipoObjeto, claseObjeto
+from .enumerados import *
 
 def extraerUltimoCaracter(texto):
     last_char_index = texto.rfind(",")
@@ -14,9 +14,9 @@ def generarRutaArchivo(nombreTabla, tipoObjeto):
     rutaCreacionArchivo = "d:\\Clases\\"
 
     if (tipoObjeto.BaseDatos):
-        rutaCreacionArchivo = rutaCreacionArchivo + nombreTabla + "\\APP"
+        rutaCreacionArchivo = rutaCreacionArchivo + nombreTabla + "\\BD"
     else:
-        rutaCreacionArchivo = rutaCreacionArchivo +nombreTabla + "\\BD"
+        rutaCreacionArchivo = rutaCreacionArchivo +nombreTabla + "\\AP"
 
     if (not os.path.isdir(rutaCreacionArchivo)):
         os.makedirs(rutaCreacionArchivo)
@@ -28,56 +28,55 @@ def generarNombreArchivo(nombreTablaBaseDatos, claseObjeto):
 
     nombreArchivo = ""
 
-    if(claseObjeto.entity):
+    if(claseObjeto == claseObjeto.entity):
         nombreArchivo = nombreTablaBaseDatos + "Entity"
-    elif(claseObjeto.exception):
+    elif(claseObjeto == claseObjeto.exception):
         nombreArchivo = nombreTablaBaseDatos + "Exception"
-    elif(claseObjeto.filter):
+    elif(claseObjeto == claseObjeto.filter):
         nombreArchivo = nombreTablaBaseDatos + "Filter"
-    elif(claseObjeto.filterType):
+    elif(claseObjeto == claseObjeto.filterType):
         nombreArchivo = nombreTablaBaseDatos + "FilterType"
-    elif(claseObjeto.request):
+    elif(claseObjeto == claseObjeto.request):
         nombreArchivo = nombreTablaBaseDatos + "Request"
-    elif(claseObjeto.response):
+    elif(claseObjeto == claseObjeto.response):
         nombreArchivo = nombreTablaBaseDatos + "Response"
-    elif(claseObjeto.requestValidation):
+    elif(claseObjeto == claseObjeto.requestValidation):
         nombreArchivo = nombreTablaBaseDatos + "RequestValidation"
-    elif(claseObjeto.service):
+    elif(claseObjeto == claseObjeto.service):
         nombreArchivo = nombreTablaBaseDatos + "Service"
-    elif(claseObjeto.repository):
+    elif(claseObjeto == claseObjeto.repository):
         nombreArchivo = nombreTablaBaseDatos + "Repository"
-    elif(claseObjeto.iRepository):
+    elif(claseObjeto == claseObjeto.iRepository):
         nombreArchivo = "I" + nombreTablaBaseDatos + "Repository"
-    elif(claseObjeto.domain):
+    elif(claseObjeto == claseObjeto.domain):
         nombreArchivo = nombreTablaBaseDatos + "Domain"
-    elif(claseObjeto.controller):
+    elif(claseObjeto == claseObjeto.controller):
         nombreArchivo = nombreTablaBaseDatos + "Controller"
-    elif(claseObjeto.select):
+    elif(claseObjeto == claseObjeto.select):
         nombreArchivo = nombreTablaBaseDatos + "_Get"
-    elif(claseObjeto.insert):
+    elif(claseObjeto == claseObjeto.insert):
         nombreArchivo = nombreTablaBaseDatos + "_Insert"
-    elif(claseObjeto.delete):
+    elif(claseObjeto == claseObjeto.delete):
         nombreArchivo = nombreTablaBaseDatos + "_Delete"
-    elif(claseObjeto.update):
+    elif(claseObjeto == claseObjeto.update):
         nombreArchivo = nombreTablaBaseDatos + "_Update"
     else:
         nombreArchivo = nombreArchivo
 	    
     return nombreArchivo
 
-def generarExtensionArchivo(nombreArchivo, tipoObjeto):
-    
+def generarExtensionArchivo(tipoObjeto):
     extensionArchivo = ".cs"
+
     if (tipoObjeto.BaseDatos):
         extensionArchivo = ".sql"
 
-    return nombreArchivo + extensionArchivo
+    return extensionArchivo
 
 def generarArchivo(rutaArchivo, nombreArchivo, contenidoArchivo):
-
     rutayNombreArchivo = rutaArchivo + "\\" + nombreArchivo
 
-    if (os.path.isdir(rutaArchivo)):
+    if (os.path.isdir(rutayNombreArchivo)):
         remove(rutayNombreArchivo)
 
     f = open (rutayNombreArchivo,'w')
