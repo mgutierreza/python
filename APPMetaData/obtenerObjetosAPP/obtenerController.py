@@ -2,8 +2,8 @@ import pyodbc as pyo
 import pandas as pd
 import os
 from os import remove
-from consultaDatos import obtenerMetaDataClavePrincipal
-from crearArchivo import generarArchivo
+from ..obtenerConexionBD.consultaDatos import obtenerMetaDataClavePrincipal
+from ..utilitarios.util import generarArchivo
 
 TAB = "\t"
 ENTER = "\n"

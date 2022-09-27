@@ -1,24 +1,62 @@
 import pyodbc as pyo
 import pandas as pd
-from ..obtenerConexionBD import consultaDatos
-from ..utilitarios import util
-from os import remove
+from ..utilitarios.util import generarRutaArchivo, generarNombreArchivo, generarArchivo, generarExtensionArchivo
+from ..utilitarios.enumerados import tipoObjeto, claseObjeto
+
+from obtenerConexionBD import consultaDatos
+from utilitarios import util
 
 TAB = "\t"
 ENTER = "\n"
 
-def generarNombreProcedimientoAlmacenado(nombreTabla):
-    return nombreTabla + "_Get"
-
-
-def generarNombreArchivoProcedimientoAlmacenado(nombreProcimientoAlmacenado):
-    return nombreProcimientoAlmacenado + ".sql"
-
+def generarArchivoSelect(nombreTabla):
+    rutayNombreArchivo = generarRutaArchivo(nombreTabla, tipoObjeto.BaseDatos)
+    nombreArchivo = generarNombreArchivo(nombreTabla, claseObjeto.select)
+    extensionArchivo = generarExtensionArchivo(nombreArchivo, tipoObjeto.BaseDatos)
+    contenidoArchivo = generarProcedimientoAlmacenado(nombreTabla)
     
+    generarArchivo(rutayNombreArchivo, nombreArchivo + extensionArchivo, contenidoArchivo)
+
+    return
+
+def generarProcedimientoAlmacenado(nombreTabla):
+    procedimientoAlmacenado = ""
+
+    procedimientoAlmacenado += generarLibreriasProcedimientoAlmacenado()
+    procedimientoAlmacenado += generarCabeceraProcedimientoAlmacenado(nombreTabla)
+    procedimientoAlmacenado += generarCuerpoProcedimientoAlmacenado(nombreTabla)
+
+    return procedimientoAlmacenado
+
+def generarLibreriasProcedimientoAlmacenado():
+    libreriasProcedimientoAlmacenado = ""
+    libreriasProcedimientoAlmacenado += "SET ANSI_NULLS ON" + ENTER 
+    libreriasProcedimientoAlmacenado += "GO" + ENTER 
+    libreriasProcedimientoAlmacenado += "SET QUOTED_IDENTIFIER ON" + ENTER
+    libreriasProcedimientoAlmacenado += "GO" + 2*ENTER
+
+    return libreriasProcedimientoAlmacenado
+
 def generarCabeceraProcedimientoAlmacenado(nombreTabla):
-    libreriaProcedimientoAlmacenado = "SET ANSI_NULLS ON" + ENTER + "GO" + ENTER + "SET QUOTED_IDENTIFIER ON" + ENTER + "GO" + 2*ENTER
     cabeceraProcedimientoAlmacenado = ""
-    parametrosEntradaProcedimientoAlmacenado = ""
+    
+    cabeceraProcedimientoAlmacenado += "CREATE PROCEDURE dbo." + generarNombreArchivo(nombreTabla, claseObjeto.select) + ENTER 
+    cabeceraProcedimientoAlmacenado += "(" + ENTER
+    cabeceraProcedimientoAlmacenado += generarParametrosEntradaProcedimientoAlmacenado(nombreTabla)
+    cabeceraProcedimientoAlmacenado += ")" + ENTER
+    cabeceraProcedimientoAlmacenado += "AS" + ENTER 
+
+    return cabeceraProcedimientoAlmacenado
+
+def generarCuerpoProcedimientoAlmacenado(nombreTabla):
+    cuerpoProcedimientoAlmacenado = TAB + "BEGIN" + ENTER
+    cuerpoProcedimientoAlmacenado += generarCondicionalProcedimientoAlmacenado(nombreTabla)
+    cuerpoProcedimientoAlmacenado += TAB + "END" + ENTER
+
+    return cuerpoProcedimientoAlmacenado
+
+def generarParametrosEntradaProcedimientoAlmacenado(nombreTabla):
+    parametrosEntrada = ""
 
     df = consultaDatos.obtenerMetaDataClavePrincipal(nombreTabla)
     numeroRegistroDiccionario = len(df)
@@ -26,72 +64,61 @@ def generarCabeceraProcedimientoAlmacenado(nombreTabla):
     for i in df.index:
         if (numeroRegistroDiccionario > 1):
             if (df["tipoDato"][i] == 'INT'):
-                parametrosEntradaProcedimientoAlmacenado = parametrosEntradaProcedimientoAlmacenado + 2*TAB + "@"+ df["nombreCampo"][i] + TAB + df["tipoDato"][i] + " = 0,"
+                parametrosEntrada += + 2*TAB + "@"+ df["nombreCampo"][i] + TAB + df["tipoDato"][i] + " = 0,"
             else:
-                parametrosEntradaProcedimientoAlmacenado = parametrosEntradaProcedimientoAlmacenado + 2*TAB + "@"+ df["nombreCampo"][i] + TAB + df["tipoDato"][i] + "(" + df["tamanhoCampo"][i] + ") = 'null',"
+                parametrosEntrada += + 2*TAB + "@"+ df["nombreCampo"][i] + TAB + df["tipoDato"][i] + "(" + df["tamanhoCampo"][i] + ") = 'null',"
         else:
             if (df["tipoDato"][i] == 'INT'):
-                parametrosEntradaProcedimientoAlmacenado = 2*TAB + "@"+ df["nombreCampo"][i] + TAB + df["tipoDato"][i] + " = 0,"
+                parametrosEntrada = 2*TAB + "@"+ df["nombreCampo"][i] + TAB + df["tipoDato"][i] + " = 0,"
             else:
-                parametrosEntradaProcedimientoAlmacenado = 2*TAB + "@"+ df["nombreCampo"][i] + TAB + df["tipoDato"][i] + "(" + df["tamanhoCampo"][i] + ") = 'null',"
+                parametrosEntrada = 2*TAB + "@"+ df["nombreCampo"][i] + TAB + df["tipoDato"][i] + "(" + df["tamanhoCampo"][i] + ") = 'null',"
     
-    parametrosEntradaProcedimientoAlmacenado = util.extraerUltimoCaracter(parametrosEntradaProcedimientoAlmacenado) + ENTER
-
-    cabeceraProcedimientoAlmacenado = libreriaProcedimientoAlmacenado + "CREATE PROCEDURE dbo." + generarNombreProcedimientoAlmacenado(nombreTabla) + ENTER + "(" + ENTER
-    cabeceraProcedimientoAlmacenado = cabeceraProcedimientoAlmacenado + parametrosEntradaProcedimientoAlmacenado + ")" + ENTER + "AS" + ENTER + TAB + "BEGIN" + ENTER
-    
-    return cabeceraProcedimientoAlmacenado
+    parametrosEntrada = util.extraerUltimoCaracter(parametrosEntrada) + ENTER    
+    return parametrosEntrada
 
 def generarCondicionalProcedimientoAlmacenado(nombreTabla):
     df = consultaDatos.obtenerMetaDataClavePrincipal(nombreTabla)
-    estructuraControlSQLIF = ""
+    condicionalProcedimientoAlmacenado = ""
     
     for i in df.index:
         if (df["tipoDato"][i] == 'INT'):
-            estructuraControlSQLIF = 2*TAB + "IF (@"+ df["nombreCampo"][i] +" > 0)" + ENTER
+            condicionalProcedimientoAlmacenado += 2*TAB + "IF (@"+ df["nombreCampo"][i] +" > 0)" + ENTER
         else:
-            estructuraControlSQLIF = 2*TAB + "IF (@"+ df["nombreCampo"][i] +" = 'null')" + ENTER
+            condicionalProcedimientoAlmacenado += 2*TAB + "IF (@"+ df["nombreCampo"][i] +" = 'null')" + ENTER
+    
+    condicionalProcedimientoAlmacenado += 3*TAB + "BEGIN" + ENTER
+    condicionalProcedimientoAlmacenado += generarConsultaProcedimientoAlmacenado(nombreTabla)
+    condicionalProcedimientoAlmacenado += generarFiltroConsulta(nombreTabla)
+    condicionalProcedimientoAlmacenado += 3*TAB + "END" + ENTER
+    condicionalProcedimientoAlmacenado += 2*TAB + "ELSE" + ENTER
+    condicionalProcedimientoAlmacenado += 3*TAB + "BEGIN" + ENTER
+    condicionalProcedimientoAlmacenado += generarConsultaProcedimientoAlmacenado(nombreTabla)
+    condicionalProcedimientoAlmacenado += 3*TAB + "END" + ENTER
 
-    return estructuraControlSQLIF
+    return condicionalProcedimientoAlmacenado
 
 
 def generarConsultaProcedimientoAlmacenado(nombreTabla):
     
     df = consultaDatos.obtenerMetaDataTodosCampos(nombreTabla)
     lineaCodigoProcedimientoAlmacenado = ""
-    consultaProcedimientoAlmacenado = ""
+    consultaProcedimientoAlmacenado = 4*TAB + "SELECT" + ENTER
     
     for i in df.index:
-        lineaCodigoProcedimientoAlmacenado = lineaCodigoProcedimientoAlmacenado + 5*TAB + nombreTabla + '.' + df["nombreCampo"][i] + "," + ENTER
+        lineaCodigoProcedimientoAlmacenado += 5*TAB + nombreTabla + '.' + df["nombreCampo"][i] + "," + ENTER
     
-    lineaCodigoProcedimientoAlmacenado = util.extraerUltimoCaracter(lineaCodigoProcedimientoAlmacenado) + ENTER
-    consultaProcedimientoAlmacenado = 4*TAB + "SELECT" + ENTER + lineaCodigoProcedimientoAlmacenado 
-    consultaProcedimientoAlmacenado = consultaProcedimientoAlmacenado + 4*TAB + "FROM " + "dbo." + nombreTabla + " WITH(NOLOCK)" + ENTER
+    consultaProcedimientoAlmacenado += util.extraerUltimoCaracter(lineaCodigoProcedimientoAlmacenado) + ENTER
+    consultaProcedimientoAlmacenado += 4*TAB + "FROM " + "dbo." + nombreTabla + " WITH(NOLOCK)" + ENTER
 
     return consultaProcedimientoAlmacenado
 
-
-def crearSPConsultaDatos(nombreTabla):
+def generarFiltroConsulta(nombreTabla):
     
+    dfClave = consultaDatos.obtenerMetaDataClavePrincipal(nombreTabla)
+    lineaFiltroCodigoProcedimientoAlmacenado = 4*TAB + "WHERE"
 
-    nombreProcedimientoAlmacenado = generarNombreProcedimientoAlmacenado(nombreTabla)
-    nombreArchivoProcedimientoAlmacenado = generarNombreArchivoProcedimientoAlmacenado(nombreProcedimientoAlmacenado)
-
-    cabeceraProcedimientoAlmacenado = generarCabeceraProcedimientoAlmacenado(nombreTabla)
-    condicionalProcedimientoAlmacenado = generarCondicionalProcedimientoAlmacenado(nombreTabla)
-    consultaProcedimientoAlmacenado = generarConsultaProcedimientoAlmacenado(nombreTabla)
-
-    comandoInicioEstructura = 3*TAB + "BEGIN" + ENTER
-    comandoFinEstructura = 3*TAB + "END" + ENTER
-    estructuraControlSQLELSE = 2*TAB + "ELSE" + ENTER 
-    comandoFinProcedimientoAlmacenado = TAB + "END"
-
-    procedimientoAlmacenado = cabeceraProcedimientoAlmacenado + condicionalProcedimientoAlmacenado + comandoInicioEstructura
-    procedimientoAlmacenado = procedimientoAlmacenado + consultaProcedimientoAlmacenado + comandoFinEstructura + estructuraControlSQLELSE 
-    procedimientoAlmacenado = procedimientoAlmacenado + comandoInicioEstructura + consultaProcedimientoAlmacenado + comandoFinEstructura 
-    procedimientoAlmacenado = procedimientoAlmacenado + comandoFinProcedimientoAlmacenado
+    for i in dfClave.index:
+        lineaFiltroCodigoProcedimientoAlmacenado += 2*TAB + nombreTabla + "."+ dfClave["nombreCampo"][i] + TAB + "=" + TAB + "@" + dfClave["nombreCampo"][i] + ENTER
     
-    remove(nombreArchivoProcedimientoAlmacenado)
-    f = open (nombreArchivoProcedimientoAlmacenado,'w')
-    f.write(procedimientoAlmacenado)
-    f.close()
+    return lineaFiltroCodigoProcedimientoAlmacenado
+
