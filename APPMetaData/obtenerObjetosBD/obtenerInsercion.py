@@ -1,7 +1,5 @@
-from zlib import DEF_BUF_SIZE
 import pyodbc as pyo
 import pandas as pd
-import obtenerConexionBD
 from obtenerObjetosBD import obtenerConsulta
 from utilitarios import generarRutaArchivo, generarNombreArchivo, generarArchivo, generarExtensionArchivo
 from utilitarios import tipoObjeto, claseObjeto
@@ -12,7 +10,6 @@ TAB = "\t"
 ENTER = "\n"
 
 def generarProcedimientoAlmacenadoInsercion(nombreTabla):
-    procedimientoAlmacenado = ""
 
     rutaArchivo = generarRutaArchivo(nombreTabla, tipoObjeto.BaseDatos)
     nombreArchivo = generarNombreArchivo(nombreTabla, claseObjeto.insert)
@@ -71,13 +68,16 @@ def generarParametrosSalidaProcedimientoAlmacenado(nombreTabla):
 def generarParametrosEntradaProcedimientoAlmacenado(nombreTabla):
     parametrosEntrada = ""
 
-    df = obtenerParametrosInsercion(nombreTabla)
+    df = obtenerParametrosParaInsercion(nombreTabla)
     for i in df.index:
         if (df["tipoCampo"][i] == "CAMPO"):
-            if (df["tipoDato"][i] == 'INT' or df["tipoDato"][i] == 'DATE' or df["tipoDato"][i] == 'DATETIME'):
-                parametrosEntrada += 2*TAB + "@"+ df["nombreCampo"][i] + 10*TAB + df["tipoDato"][i] + "," + ENTER
+            if ((df["tipoDato"][i] == 'DATETIME') and ("Registro" in df["nombreCampo"][i])):
+                parametrosEntrada += ""
             else:
-                parametrosEntrada += 2*TAB + "@"+ df["nombreCampo"][i] + 10*TAB + df["tipoDato"][i] + "(" + df["tamanhoCampo"][i].astype(str) + ")," + ENTER
+                if (df["tipoDato"][i] == 'INT' or df["tipoDato"][i] == 'DATE' or df["tipoDato"][i] == 'DATETIME'):
+                    parametrosEntrada += 2*TAB + "@"+ df["nombreCampo"][i] + 10*TAB + df["tipoDato"][i] + "," + ENTER
+                else:
+                    parametrosEntrada += 2*TAB + "@"+ df["nombreCampo"][i] + 10*TAB + df["tipoDato"][i] + "(" + df["tamanhoCampo"][i].astype(str) + ")," + ENTER
 
     parametrosEntrada = util.extraerUltimoCaracter(parametrosEntrada) + ENTER
 
@@ -87,13 +87,13 @@ def generarCuerpoProcedimientoAlmacenado(nombreTabla):
     cuerpoProcedimientoAlmacenado = ""
     cuerpoProcedimientoAlmacenado += 4*TAB + "INSERT INTO dbo." + nombreTabla + ENTER
     cuerpoProcedimientoAlmacenado += 9*TAB + "(" + ENTER
-    cuerpoProcedimientoAlmacenado += obtenerParametrosInsercion(nombreTabla, "campo") + ENTER
+    cuerpoProcedimientoAlmacenado += obtenerParametrosInsercion(nombreTabla, tipoParametro = "campo") + ENTER
     cuerpoProcedimientoAlmacenado += 9*TAB + ")" + ENTER
     cuerpoProcedimientoAlmacenado += 4*TAB + "VALUES" + ENTER
     cuerpoProcedimientoAlmacenado += 9*TAB + "(" + ENTER
-    cuerpoProcedimientoAlmacenado += obtenerParametrosInsercion(nombreTabla, "valor") + ENTER
+    cuerpoProcedimientoAlmacenado += obtenerParametrosInsercion(nombreTabla, tipoParametro = "valor") + ENTER
     cuerpoProcedimientoAlmacenado += 9*TAB + ")" + ENTER
-
+    cuerpoProcedimientoAlmacenado += obtenerSalidaProcedimientoAlmacenado(nombreTabla)
     cuerpoProcedimientoAlmacenado += "END" + ENTER
 
     return cuerpoProcedimientoAlmacenado
@@ -101,7 +101,7 @@ def generarCuerpoProcedimientoAlmacenado(nombreTabla):
 def obtenerParametrosInsercion(nombreTabla, tipoParametro):
     parametrosInsercion = ""
 
-    df = obtenerParametrosInsercion(nombreTabla)
+    df = obtenerParametrosParaInsercion(nombreTabla)
 
     if (tipoParametro == "valor"):
         for i in df.index:
@@ -116,7 +116,7 @@ def obtenerParametrosInsercion(nombreTabla, tipoParametro):
             if (df["tipoCampo"][i] == "CAMPO"):
                 parametrosInsercion += 10*TAB + nombreTabla + "." + df["nombreCampo"][i] + "," + ENTER
       
-    parametrosInsercion = util.extraerUltimoCaracter(parametrosInsercion) + ENTER
+    parametrosInsercion = util.extraerUltimoCaracter(parametrosInsercion)
     
     return parametrosInsercion
 
@@ -131,7 +131,7 @@ def obtenerSalidaProcedimientoAlmacenado(nombreTabla):
     return salidaProcedimientoAlmacenado
 
 
-def obtenerParametrosInsercion(nombreTabla):
+def obtenerParametrosParaInsercion(nombreTabla):
 
     df = consultaDatos.obtenerMetaDataTodosCampos(nombreTabla)
 
