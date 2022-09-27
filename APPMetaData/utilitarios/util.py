@@ -14,3 +14,8 @@ def generarArchivo(nombreTabla, nombreArchivo, contenidoArchivo):
 
     return
 
+def extraerUltimoCaracter(texto):
+    last_char_index = texto.rfind(",")
+    texto = texto[:last_char_index]
+
+    return texto

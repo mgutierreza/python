@@ -1,11 +1,11 @@
 import pyodbc as pyo
 import pandas as pd
 import os
-from consulta import crearSPConsultaDatos
-from insercion import crearSPInserciónDatos
-from actualizacion import crearSPActualizacionDatos
-from borrado import crearSPEliminacionDatos
-from obtenerController import generarArchivoController
+from obtenerObjetosBD.consulta import crearSPConsultaDatos
+from obtenerObjetosBD.insercion import crearSPInserciónDatos
+from obtenerObjetosBD.actualizacion import crearSPActualizacionDatos
+from obtenerObjetosBD.borrado import crearSPEliminacionDatos
+from obtenerObjetosAPP.obtenerController import generarArchivoController
 
 nombreTablaBaseDatos = "AcdCampus"
 
@@ -25,7 +25,7 @@ if (not os.path.isdir(rutaGeneralBD)):
 
 
 #Creación de Objetos de Base de Datos
-#crearSPConsultaDatos("AcdCampus")
+crearSPConsultaDatos("AcdCampus")
 #crearSPInserciónDatos("AcdCampus")
 #crearSPActualizacionDatos("AcdCampus")
 #crearSPEliminacionDatos("AcdCampus")
@@ -33,7 +33,7 @@ if (not os.path.isdir(rutaGeneralBD)):
 
 #Creación de Objetos de Aplicación
 #generarArchivoEntity("AcdCampus")
-generarArchivoController("AcdCampus")
+#generarArchivoController("AcdCampus")
 
 
 

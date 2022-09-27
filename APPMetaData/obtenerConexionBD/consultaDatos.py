@@ -1,7 +1,7 @@
 import pyodbc as pyo
 import pandas as pd
 
-def obtenerMetaDataCampos(nombreTabla):
+def obtenerMetaDataTodosCampos(nombreTabla):
 
     conexionAzure = (
         r"Driver={SQL SERVER};Server=tcp:developerep.database.windows.net;Database=BDEpartners_Dev;UID=epartners;PWD=Peam41923m*"
@@ -15,7 +15,7 @@ def obtenerMetaDataCampos(nombreTabla):
     sql = sql + "LEFT JOIN information_schema.key_column_usage b ON a.COLUMN_NAME = b.COLUMN_NAME AND a.TABLE_NAME = b.TABLE_NAME AND a.TABLE_SCHEMA = b.TABLE_SCHEMA "
     sql = sql + "LEFT JOIN information_schema.table_constraints c ON b.CONSTRAINT_NAME = c.CONSTRAINT_NAME AND b.TABLE_NAME = c.TABLE_NAME AND b.TABLE_SCHEMA = c.TABLE_SCHEMA "
     sql = sql + "WHERE a.table_name = '" + nombreTabla + "' "
-    sql = sql + "ORDER BY a.ORDINAL_POSITION;"
+    sql = sql + "ORDER BY a.ORDINAL_POSITION"
     df = pd.read_sql(sql, conexionAzure)
 
     conexionAzure.close()
@@ -39,7 +39,8 @@ def obtenerMetaDataClavePrincipal(nombreTabla):
     sql = sql + "AND a.table_schema = b.TABLE_SCHEMA "
     sql = sql + "AND a.constraint_name = b.constraint_name "
     sql = sql + "AND b.COLUMN_NAME = c.COLUMN_NAME AND b.TABLE_NAME = c.TABLE_NAME "
-    sql = sql + "AND a.CONSTRAINT_TYPE = 'PRIMARY KEY'"
+    sql = sql + "AND a.CONSTRAINT_TYPE = 'PRIMARY KEY' "
+    sql = sql + "ORDER BY c.ORDINAL_POSITION"
     
     df = pd.read_sql(sql, conexionAzure)
 
