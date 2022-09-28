@@ -25,8 +25,6 @@ def generarProcedimientoAlmacenado(nombreTabla):
     procedimientoAlmacenado += generarLibreriasProcedimientoAlmacenado()
     procedimientoAlmacenado += generarCabeceraProcedimientoAlmacenado(nombreTabla)
     procedimientoAlmacenado += generarCuerpoProcedimientoAlmacenado(nombreTabla)
-
-
     return procedimientoAlmacenado
 
 def generarLibreriasProcedimientoAlmacenado():
@@ -35,7 +33,6 @@ def generarLibreriasProcedimientoAlmacenado():
     libreriasProcedimientoAlmacenado += "GO" + ENTER 
     libreriasProcedimientoAlmacenado += "SET QUOTED_IDENTIFIER ON" + ENTER
     libreriasProcedimientoAlmacenado += "GO" + 2*ENTER
-
     return libreriasProcedimientoAlmacenado
 
 def generarCabeceraProcedimientoAlmacenado(nombreTabla):

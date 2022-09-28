@@ -1,7 +1,4 @@
-import pyodbc as pyo
-import pandas as pd
-import os
-from obtenerObjetosBD import generarProcedimientoAlmacenadoSelect, generarProcedimientoAlmacenadoInsercion, generarProcedimientoAlmacenadoActualizacion
+from obtenerObjetosBD import *
 
 nombreTablaBaseDatos = "AcdCampus"
 
@@ -9,6 +6,7 @@ nombreTablaBaseDatos = "AcdCampus"
 generarProcedimientoAlmacenadoSelect("AcdCampus")
 generarProcedimientoAlmacenadoInsercion("AcdCampus")
 generarProcedimientoAlmacenadoActualizacion("AcdCampus")
+generarProcedimientoAlmacenadoBorrado("AcdCampus")
 
 #crearSPInserciónDatos("AcdCampus")
 #crearSPActualizacionDatos("AcdCampus")
