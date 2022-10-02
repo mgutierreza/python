@@ -1,43 +1,49 @@
 import pyodbc as pyo
 import pandas as pd
-from consultaDatos import obtenerMetaDataClavePrincipal
-from os import remove
+from utilitarios import generarRutaArchivo, generarNombreArchivo, generarArchivo, generarExtensionArchivo
+from utilitarios import tipoObjeto, claseObjeto
+from obtenerConexionBD import consultaDatos
 
 TAB = "\t"
 ENTER = "\n"
 
 def generarArchivoFilter(nombreTabla):
-    clase = ""
-    cabeceraClase = generarCabeceraClase()
-    claseEntity = generarClaseEntity(nombreTabla)
-    nombreClase = generarNombreClase(nombreTabla)
-    nombreArchivo = generarNombreArchivo(nombreClase)
-    clase = cabeceraClase + claseEntity 
+    rutaArchivo = generarRutaArchivo(nombreTabla, tipoObjeto.Aplicacion)
+    nombreArchivo = generarNombreArchivo(nombreTabla, claseObjeto.filter)
+    extensionArchivo = generarExtensionArchivo(tipoObjeto.Aplicacion)
+    contenidoArchivo = generarClase(nombreTabla)
     
-    #remove(nombreArchivoProcedimientoAlmacenado)
-    f = open (nombreArchivo,'w')
-    f.write(clase)
-    f.close()
+    generarArchivo(rutaArchivo, nombreArchivo + extensionArchivo, contenidoArchivo)
 
-    return 
+    return
 
-def generarClaseEntity(nombreTabla):
-    claseEntity = ""
-    cabeceraClaseEntity = "namespace EP_AcademicMicroservice.Entities" + ENTER + "{" + ENTER
-    cabeceraClaseEntity = cabeceraClaseEntity + TAB + "public class " + generarNombreClase(nombreTabla) + ENTER + TAB + "{" 
-    pieClaseEntity = TAB + "}" + ENTER + "}" + ENTER
+def generarClase(nombreTabla):
+    clase = ""
+    clase += generarCabeceraClase()
+    clase += "namespace EP_AcademicMicroservice.Entities" + ENTER 
+    clase += "{" + ENTER
+    clase += TAB + "public class " + generarNombreArchivo(nombreTabla, claseObjeto.filter) + ENTER 
+    clase += TAB + "{" 
+    clase += generarCuerpoClase(nombreTabla)
+    clase += TAB + "}" + ENTER 
+    clase += "}" + ENTER
 
-    cuerpoClaseEntity = generarCuerpoClaseEntity(nombreTabla)    
+    return clase
 
-    claseEntity = cabeceraClaseEntity + cuerpoClaseEntity + pieClaseEntity
+def generarCabeceraClase():
+    cabeceraClase = "using System;" + ENTER 
+    cabeceraClase = cabeceraClase +"using System.Collections.Generic;" + ENTER
+    cabeceraClase = cabeceraClase + "using System.Linq;" + ENTER 
+    cabeceraClase = cabeceraClase + "using System.Text;" + ENTER
+    cabeceraClase = cabeceraClase + "using System.Threading.Tasks;" + 2*ENTER
 
-    return claseEntity
+    return cabeceraClase
 
-def generarCuerpoClaseEntity(nombreTabla):
-    cuerpoClaseEntity = ""
+def generarCuerpoClase(nombreTabla):
+    cuerpoClase = ""
     textoGetSet = " { get; set; }"
     tipoDato = ""
-    df = obtenerMetaDataClavePrincipal(nombreTabla)
+    df = consultaDatos.obtenerMetaDataClavePrincipal(nombreTabla)
 
     for i in df.index:
         if (df["tipoDato"][i] == 'INT'):
@@ -46,21 +52,6 @@ def generarCuerpoClaseEntity(nombreTabla):
             tipoDato = "public String "
         else:
             tipoDato = "public DateTime "
-        cuerpoClaseEntity = cuerpoClaseEntity + ENTER + 2*TAB + tipoDato + df["nombreCampo"][i] + textoGetSet + ENTER
+        cuerpoClase += 2*TAB + tipoDato + df["nombreCampo"][i] + textoGetSet + ENTER
 
-    return cuerpoClaseEntity
-
-def generarCabeceraClase():
-    cabeceraClase = "using System;" + ENTER 
-    cabeceraClase = cabeceraClase +"using System.Collections.Generic;" + ENTER
-    cabeceraClase = cabeceraClase + "using System.Linq;" + ENTER 
-    cabeceraClase = cabeceraClase + "using System.Text;" + ENTER
-    cabeceraClase = cabeceraClase + "using System.Threading.Tasks;" + 2*ENTER
-    return cabeceraClase
-
-def generarNombreClase(nombreTabla):
-    return nombreTabla + 'Filter'
-
-def generarNombreArchivo(nombreClase):
-    nombreClase = nombreClase + ".cs"
-    return nombreClase
+    return cuerpoClase

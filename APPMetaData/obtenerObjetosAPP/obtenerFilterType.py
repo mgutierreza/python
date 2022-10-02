@@ -1,56 +1,31 @@
 import pyodbc as pyo
 import pandas as pd
-from os import remove
+from utilitarios import generarRutaArchivo, generarNombreArchivo, generarArchivo, generarExtensionArchivo
+from utilitarios import tipoObjeto, claseObjeto
+from obtenerConexionBD import consultaDatos
 
 TAB = "\t"
 ENTER = "\n"
 
 def generarArchivoFilterType(nombreTabla):
-    clase = ""
-    cabeceraClase = generarCabeceraClase()
-    claseEntity = generarClaseEntity(nombreTabla)
-    nombreClase = generarNombreClase(nombreTabla)
-    nombreArchivo = generarNombreArchivo(nombreClase)
-    clase = cabeceraClase + claseEntity 
+    rutaArchivo = generarRutaArchivo(nombreTabla, tipoObjeto.Aplicacion)
+    nombreArchivo = generarNombreArchivo(nombreTabla, claseObjeto.filterType)
+    extensionArchivo = generarExtensionArchivo(tipoObjeto.Aplicacion)
+    contenidoArchivo = generarClase(nombreTabla)
     
-    #remove(nombreArchivoProcedimientoAlmacenado)
-    f = open (nombreArchivo,'w')
-    f.write(clase)
-    f.close()
+    generarArchivo(rutaArchivo, nombreArchivo + extensionArchivo, contenidoArchivo)
 
-    return 
+    return
 
-def generarClaseEntity(nombreTabla):
-    claseEntity = ""
-    cabeceraClaseEntity = "namespace EP_AcademicMicroservice.Entities" + ENTER + "{" 
-    pieClaseEntity = "}"
+def generarClase(nombreTabla):
+    clase = ""
+    clase += generarCabeceraClase() + ENTER
+    clase += "namespace EP_AcademicMicroservice.Entities" + ENTER 
+    clase += "{" + ENTER
+    clase += generarCuerpoClase(nombreTabla)    
+    clase += "}" + ENTER
 
-    cuerpoClaseEntity = generarCuerpoClaseEntity(nombreTabla)    
-
-    claseEntity = cabeceraClaseEntity + cuerpoClaseEntity + pieClaseEntity
-
-    return claseEntity
-
-def generarCuerpoClaseEntity(nombreTabla):
-    cuerpoClaseEntity = ""
-    enumeradoItemType = ""
-    enumeradoLstItemType = ""
-
-    enumeradoItemType = enumeradoItemType + ENTER + TAB + "public enum " + nombreTabla + "FilterItemType : byte" + ENTER
-    enumeradoItemType = enumeradoItemType + TAB + "{" + ENTER 
-    enumeradoItemType = enumeradoItemType + 2*TAB + "Undefined," + ENTER
-    enumeradoItemType = enumeradoItemType + 2*TAB + "ById," + ENTER
-    enumeradoItemType = enumeradoItemType + TAB + "}" + 2*ENTER
-
-    enumeradoLstItemType = enumeradoLstItemType + TAB + "public enum " + nombreTabla + "FilterLstItemType : byte" + ENTER
-    enumeradoLstItemType = enumeradoLstItemType + TAB + "{" + ENTER 
-    enumeradoLstItemType = enumeradoLstItemType + 2*TAB + "Undefined," + ENTER
-    enumeradoLstItemType = enumeradoLstItemType + 2*TAB + "ById," + ENTER
-    enumeradoLstItemType = enumeradoLstItemType + TAB + "}" + ENTER
-
-    cuerpoClaseEntity = enumeradoItemType + enumeradoLstItemType 
-
-    return cuerpoClaseEntity
+    return clase
 
 def generarCabeceraClase():
     cabeceraClase = "using System;" + ENTER 
@@ -60,9 +35,21 @@ def generarCabeceraClase():
     cabeceraClase = cabeceraClase + "using System.Threading.Tasks;" + 2*ENTER
     return cabeceraClase
 
-def generarNombreClase(nombreTabla):
-    return nombreTabla + 'FilterType'
 
-def generarNombreArchivo(nombreClase):
-    nombreClase = nombreClase + ".cs"
-    return nombreClase
+def generarCuerpoClase(nombreTabla):
+    cuerpoClase = ""
+
+    cuerpoClase += ENTER + TAB + "public enum " + nombreTabla + "FilterItemType : byte" + ENTER
+    cuerpoClase += TAB + "{" + ENTER 
+    cuerpoClase += 2*TAB + "Undefined," + ENTER
+    cuerpoClase += 2*TAB + "ById" + ENTER
+    cuerpoClase += TAB + "}" + 2*ENTER
+
+    cuerpoClase += TAB + "public enum " + nombreTabla + "FilterLstItemType : byte" + ENTER
+    cuerpoClase += TAB + "{" + ENTER 
+    cuerpoClase += 2*TAB + "Undefined," + ENTER
+    cuerpoClase += 2*TAB + "ByPagination" + ENTER
+    cuerpoClase += + TAB + "}" + ENTER
+
+    return cuerpoClase
+

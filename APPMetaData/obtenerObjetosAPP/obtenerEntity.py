@@ -1,51 +1,54 @@
 import pyodbc as pyo
 import pandas as pd
-from consultaDatos import obtenerMetaDataCampos
-from os import remove
+from utilitarios import generarRutaArchivo, generarNombreArchivo, generarArchivo, generarExtensionArchivo
+from utilitarios import tipoObjeto, claseObjeto
+from obtenerConexionBD import consultaDatos
 
 TAB = "\t"
 ENTER = "\n"
 
 def generarArchivoEntity(nombreTabla):
-    clase = ""
-    cabeceraClase = generarCabeceraClase()
-    claseEntity = generarClaseEntity(nombreTabla)
-    nombreClase = generarNombreClase(nombreTabla)
-    nombreArchivo = generarNombreArchivo(nombreClase)
-    clase = cabeceraClase + claseEntity 
+    rutaArchivo = generarRutaArchivo(nombreTabla, tipoObjeto.Aplicacion)
+    nombreArchivo = generarNombreArchivo(nombreTabla, claseObjeto.entity)
+    extensionArchivo = generarExtensionArchivo(tipoObjeto.Aplicacion)
+    contenidoArchivo = generarClase(nombreTabla)
     
-    #remove(nombreArchivoProcedimientoAlmacenado)
-    f = open (nombreArchivo,'w')
-    f.write(clase)
-    f.close()
+    generarArchivo(rutaArchivo, nombreArchivo + extensionArchivo, contenidoArchivo)
 
-    return 
+    return
 
-def generarClaseEntity(nombreTabla):
+def generarClase(nombreTabla):
     claseEntity = ""
-    cabeceraClaseEntity = "namespace EP_AcademicMicroservice.Entities" + ENTER + "{" + ENTER
-    cabeceraClaseEntity = cabeceraClaseEntity + TAB + "[DataContract]" + ENTER
-    cabeceraClaseEntity = cabeceraClaseEntity + TAB + "public class AcdCampusEntity" + ENTER + TAB + "{" + 2*ENTER 
-    pieClaseEntity = TAB + "}" + ENTER + "}" + ENTER
-
-    cuerpoClaseEntity = generarCuerpoClaseEntity(nombreTabla)    
-
-    claseEntity = cabeceraClaseEntity + cuerpoClaseEntity + pieClaseEntity
+    claseEntity += generarCabeceraClase()
+    claseEntity += "namespace EP_AcademicMicroservice.Entities" + ENTER 
+    claseEntity += "{" + ENTER
+    claseEntity += TAB + "[DataContract]" + ENTER
+    claseEntity += TAB + "public class AcdCampusEntity" + ENTER 
+    claseEntity += TAB + "{" + ENTER 
+    claseEntity += generarCuerpoClase(nombreTabla)
+    claseEntity += TAB + "}" + ENTER 
+    claseEntity += "}" + ENTER
 
     return claseEntity
 
 def generarCabeceraClase():
-    cabeceraClase = "using System;" + ENTER + "using System.Collections.Generic;" + ENTER + "using System.ComponentModel.DataAnnotations;" + ENTER
-    cabeceraClase = cabeceraClase + "using System.Linq;" + ENTER + "using System.Runtime.Serialization;" + ENTER + "using System.Text;" + ENTER
-    cabeceraClase = cabeceraClase + "using System.Threading.Tasks;" + 3*ENTER
+    cabeceraClase = ""
+    cabeceraClase += "using System;" + ENTER
+    cabeceraClase += "using System.Collections.Generic;" + ENTER
+    cabeceraClase += "using System.ComponentModel.DataAnnotations;" + ENTER
+    cabeceraClase += "using System.Linq;" + ENTER 
+    cabeceraClase += "using System.Runtime.Serialization;" + ENTER 
+    cabeceraClase += "using System.Text;" + ENTER
+    cabeceraClase += "using System.Threading.Tasks;" + 3*ENTER
     return cabeceraClase
 
-def generarCuerpoClaseEntity(nombreTabla):
+def generarCuerpoClase(nombreTabla):
     cuerpoClaseEntity = ""
-    cabeceraPropiedad = "[DataMember(EmitDefaultValue = false)]"
-    textoGetSet = " { get; set; }"
     tipoDato = ""
-    df = obtenerMetaDataCampos(nombreTabla)
+    datamember =  "[DataMember(EmitDefaultValue = false)]"
+    textoGetSet = " { get; set; }"
+    
+    df = consultaDatos.obtenerMetaDataTodosCampos(nombreTabla)
 
     for i in df.index:
         if (df["tipoDato"][i] == 'INT'):
@@ -54,13 +57,8 @@ def generarCuerpoClaseEntity(nombreTabla):
             tipoDato = "public String "
         else:
             tipoDato = "public DateTime "
-        cuerpoClaseEntity = cuerpoClaseEntity + 2*TAB + cabeceraPropiedad + ENTER + 2*TAB + tipoDato + df["nombreCampo"][i] + textoGetSet + 2*ENTER
+        cuerpoClaseEntity += 2*TAB + datamember + ENTER 
+        cuerpoClaseEntity += 2*TAB + tipoDato + df["nombreCampo"][i] + textoGetSet + 2*ENTER
 
     return cuerpoClaseEntity
 
-def generarNombreClase(nombreTabla):
-    return nombreTabla + 'Entity'
-
-def generarNombreArchivo(nombreClase):
-    nombreClase = nombreClase + ".cs"
-    return nombreClase
