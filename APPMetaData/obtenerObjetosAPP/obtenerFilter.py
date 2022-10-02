@@ -23,7 +23,7 @@ def generarClase(nombreTabla):
     clase += "namespace EP_AcademicMicroservice.Entities" + ENTER 
     clase += "{" + ENTER
     clase += TAB + "public class " + generarNombreArchivo(nombreTabla, claseObjeto.filter) + ENTER 
-    clase += TAB + "{" 
+    clase += TAB + "{" + ENTER
     clase += generarCuerpoClase(nombreTabla)
     clase += TAB + "}" + ENTER 
     clase += "}" + ENTER
@@ -32,10 +32,10 @@ def generarClase(nombreTabla):
 
 def generarCabeceraClase():
     cabeceraClase = "using System;" + ENTER 
-    cabeceraClase = cabeceraClase +"using System.Collections.Generic;" + ENTER
-    cabeceraClase = cabeceraClase + "using System.Linq;" + ENTER 
-    cabeceraClase = cabeceraClase + "using System.Text;" + ENTER
-    cabeceraClase = cabeceraClase + "using System.Threading.Tasks;" + 2*ENTER
+    cabeceraClase += "using System.Collections.Generic;" + ENTER
+    cabeceraClase += "using System.Linq;" + ENTER 
+    cabeceraClase += "using System.Text;" + ENTER
+    cabeceraClase += "using System.Threading.Tasks;" + 2*ENTER
 
     return cabeceraClase
 

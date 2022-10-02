@@ -14,10 +14,11 @@ generarArchivoEntity(nombreTablaBaseDatos)
 generarArchivoException(nombreTablaBaseDatos)
 generarArchivoFilter(nombreTablaBaseDatos)
 generarArchivoFilterType(nombreTablaBaseDatos)
-
-#Creación de Objetos de Aplicación
-#generarArchivoEntity("AcdCampus")
-#generarArchivoController("AcdCampus")
-
-
-
+generarArchivoRequest(nombreTablaBaseDatos)
+generarArchivoRequestValidator(nombreTablaBaseDatos)
+generarArchivoResponse(nombreTablaBaseDatos)
+generarArchivoRepository(nombreTablaBaseDatos)
+generarArchivoIRepository(nombreTablaBaseDatos)
+generarArchivoService(nombreTablaBaseDatos)
+generarArchivoDomain(nombreTablaBaseDatos)
+generarArchivoController(nombreTablaBaseDatos)

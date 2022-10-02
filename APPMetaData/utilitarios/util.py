@@ -1,6 +1,6 @@
 import os
 from os import remove
-from .enumerados import *
+from utilitarios.enumerados import tipoObjeto, claseObjeto
 
 def extraerUltimoCaracter(texto):
     last_char_index = texto.rfind(",")
@@ -13,7 +13,7 @@ def generarRutaArchivo(nombreTabla, tipoObjeto):
 
     rutaCreacionArchivo = "d:\\Clases\\"
 
-    if (tipoObjeto.BaseDatos):
+    if (tipoObjeto == tipoObjeto.BaseDatos):
         rutaCreacionArchivo = rutaCreacionArchivo + nombreTabla + "\\BD"
     else:
         rutaCreacionArchivo = rutaCreacionArchivo +nombreTabla + "\\AP"
@@ -68,7 +68,7 @@ def generarNombreArchivo(nombreTablaBaseDatos, claseObjeto):
 def generarExtensionArchivo(tipoObjeto):
     extensionArchivo = ".cs"
 
-    if (tipoObjeto.BaseDatos):
+    if (tipoObjeto == tipoObjeto.BaseDatos):
         extensionArchivo = ".sql"
 
     return extensionArchivo

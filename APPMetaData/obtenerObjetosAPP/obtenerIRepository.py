@@ -1,63 +1,53 @@
 import pyodbc as pyo
 import pandas as pd
-from os import remove
+from obtenerObjetosBD import obtenerConsulta
+from utilitarios import generarRutaArchivo, generarNombreArchivo, generarArchivo, generarExtensionArchivo
+from utilitarios import tipoObjeto, claseObjeto
+from obtenerConexionBD import consultaDatos
 
 TAB = "\t"
 ENTER = "\n"
 
 def generarArchivoIRepository(nombreTabla):
-    clase = ""
-    cabeceraClase = generarCabeceraClase()
-    claseRequest = generarClaseRequest(nombreTabla)
-    nombreClase = generarNombreClase(nombreTabla)
-    nombreArchivo = generarNombreArchivo(nombreClase)
-    clase = cabeceraClase + claseRequest 
+    rutaArchivo = generarRutaArchivo(nombreTabla, tipoObjeto.Aplicacion)
+    nombreArchivo = generarNombreArchivo(nombreTabla, claseObjeto.iRepository)
+    extensionArchivo = generarExtensionArchivo(tipoObjeto.Aplicacion)
+    contenidoArchivo = generarClase(nombreTabla)
     
-    #remove(nombreArchivoProcedimientoAlmacenado)
-    f = open (nombreArchivo,'w')
-    f.write(clase)
-    f.close()
+    generarArchivo(rutaArchivo, nombreArchivo + extensionArchivo, contenidoArchivo)
 
     return 
 
-def generarClaseRequest(nombreTabla):
+def generarClase(nombreTabla):
     claseEntity = ""
-    cabeceraClaseEntity = "namespace EP_AcademicMicroservice.Repository" + ENTER + "{"  + ENTER   
-    pieClaseEntity = "}"
-
-    cuerpoClaseEntity = generarCuerpoClaseRequest(nombreTabla)    
-
-    claseEntity = cabeceraClaseEntity + cuerpoClaseEntity + pieClaseEntity
+    claseEntity += generarCabeceraClase()
+    claseEntity += "namespace EP_AcademicMicroservice.Repository" + ENTER 
+    claseEntity += "{"  + ENTER   
+    claseEntity += generarCuerpoClase(nombreTabla)    
+    claseEntity += "}"
 
     return claseEntity
 
-def generarCuerpoClaseRequest(nombreTabla):
-    cuerpoClase = ""
-
-    cuerpoClase = cuerpoClase + TAB + "public interface " + generarNombreClase(nombreTabla) + " : IGenericRepository<" + nombreTabla + "Entity>" + ENTER
-    cuerpoClase = cuerpoClase + TAB + "{" + ENTER 
-    cuerpoClase = cuerpoClase + 2*TAB + "int Insert" + nombreTabla + "(" + nombreTabla + "Entity item);" + ENTER 
-    cuerpoClase = cuerpoClase + 2*TAB + "bool Update" + nombreTabla + "(" + nombreTabla + "Entity item);" + ENTER 
-    cuerpoClase = cuerpoClase + 2*TAB + "bool Delete" + nombreTabla + "(int Id);" + ENTER 
-    cuerpoClase = cuerpoClase + 2*TAB + nombreTabla + "Entity GetItem" + nombreTabla + "(" + nombreTabla + "Filter filter, " + nombreTabla + "FilterItemType filterType);" + ENTER 
-    cuerpoClase = cuerpoClase + 2*TAB + "IEnumerable<" + nombreTabla + "Entity> GetLstItem" + nombreTabla + "(" + nombreTabla + "Filter filter, " + nombreTabla + "FilterLstItemType filterType, Pagination pagination);" + ENTER 
-    cuerpoClase = cuerpoClase + TAB + "}" + ENTER
-    
-    return cuerpoClase
-
 def generarCabeceraClase():
     cabeceraClase = ""
-    cabeceraClase = cabeceraClase + "using EP_AcademicMicroservice.Entities;" + ENTER 
-    cabeceraClase = cabeceraClase + "using System;" + ENTER 
-    cabeceraClase = cabeceraClase + "using System.Collections.Generic;" + ENTER
-    cabeceraClase = cabeceraClase + "using System.Linq;" + ENTER 
-    cabeceraClase = cabeceraClase + "using System.Text;" + ENTER
-    cabeceraClase = cabeceraClase + "using System.Threading.Tasks;" + 2*ENTER
+    cabeceraClase += "using EP_AcademicMicroservice.Entities;" + ENTER 
+    cabeceraClase += "using System;" + ENTER 
+    cabeceraClase += "using System.Collections.Generic;" + ENTER
+    cabeceraClase += "using System.Linq;" + ENTER 
+    cabeceraClase += "using System.Text;" + ENTER
+    cabeceraClase += "using System.Threading.Tasks;" + 2*ENTER
     return cabeceraClase
 
-def generarNombreClase(nombreTabla):
-    return "I" + nombreTabla + "Repository"
+def generarCuerpoClase(nombreTabla):
+    cuerpoClase = ""
 
-def generarNombreArchivo(nombreClase):
-    nombreClase = nombreClase + ".cs"
-    return nombreClase
+    cuerpoClase += TAB + "public interface " + generarNombreArchivo(nombreTabla, claseObjeto.iRepository) + " : IGenericRepository<" + nombreTabla + "Entity>" + ENTER
+    cuerpoClase += TAB + "{" + ENTER 
+    cuerpoClase += 2*TAB + "int Insert" + nombreTabla + "(" + nombreTabla + "Entity item);" + ENTER 
+    cuerpoClase += 2*TAB + "bool Update" + nombreTabla + "(" + nombreTabla + "Entity item);" + ENTER 
+    cuerpoClase += 2*TAB + "bool Delete" + nombreTabla + "(int Id);" + ENTER 
+    cuerpoClase += 2*TAB + nombreTabla + "Entity GetItem" + nombreTabla + "(" + nombreTabla + "Filter filter, " + nombreTabla + "FilterItemType filterType);" + ENTER 
+    cuerpoClase += 2*TAB + "IEnumerable<" + nombreTabla + "Entity> GetLstItem" + nombreTabla + "(" + nombreTabla + "Filter filter, " + nombreTabla + "FilterLstItemType filterType, Pagination pagination);" + ENTER 
+    cuerpoClase += TAB + "}" + ENTER
+    
+    return cuerpoClase

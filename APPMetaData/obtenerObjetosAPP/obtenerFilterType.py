@@ -49,7 +49,7 @@ def generarCuerpoClase(nombreTabla):
     cuerpoClase += TAB + "{" + ENTER 
     cuerpoClase += 2*TAB + "Undefined," + ENTER
     cuerpoClase += 2*TAB + "ByPagination" + ENTER
-    cuerpoClase += + TAB + "}" + ENTER
+    cuerpoClase += TAB + "}" + ENTER
 
     return cuerpoClase
 

@@ -3,7 +3,6 @@ import pandas as pd
 from utilitarios import generarRutaArchivo, generarNombreArchivo, generarArchivo, generarExtensionArchivo
 from utilitarios import tipoObjeto, claseObjeto
 from obtenerConexionBD import consultaDatos
-from utilitarios import util
 
 TAB = "\t"
 ENTER = "\n"
