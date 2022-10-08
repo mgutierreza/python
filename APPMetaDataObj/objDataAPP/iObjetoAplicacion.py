@@ -1,10 +1,5 @@
-import string
 
-
-class iObjetoAplicacion:
-
-    _nombreTabla: string
-    _claseObjeto: string
+class iObjetoAplicacion():
 
     def __init__(self, nombreTabla, claseObjeto):
         self._nombreTabla = nombreTabla
