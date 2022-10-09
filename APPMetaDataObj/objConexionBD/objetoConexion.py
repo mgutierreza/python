@@ -15,18 +15,20 @@ class gestionBaseDatos():
 
         conexion = self.__obtenerConexionBD()
         cursor = conexion.cursor()
+        #cursor = conexion.cursor(dictionary = True)
         #cursor.execute(consulta, self.__nombreTabla)
         cursor.execute(consulta)
-
+        filas = cursor.fetchall()
+        registros = []
         columnas = [column[0] for column in cursor.description]
-        dataConsulta = []
+                
+        for fila in filas:
+            registros.append(dict(zip(columnas, fila)))
         
-        for row in cursor.fetchall():
-            dataConsulta.append(dict(zip(columnas, row)))
-        
+        cursor.close()
         self.__cerrarConexionBD()
     
-        return dataConsulta
+        return registros
 
     def __obtenerConexionBD(self):
 

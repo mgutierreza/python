@@ -10,9 +10,9 @@ class gestionArchivos():
         self.__tipoObjeto = ""
     
     def generarArchivo(self, contenidoArchivo):
-        self.__generarTipoObjeto(self)
+        self.__generarTipoObjeto()
         
-        rutayNombreArchivo = self.__generarRutaArchivo(self) + "\\" + self.generarNombreArchivo(self) + self.__generarExtensionArchivo(self)
+        rutayNombreArchivo = self.__generarRutaArchivo() + "\\" + self.generarNombreArchivo() + self.__generarExtensionArchivo()
 
         if (os.path.isdir(rutayNombreArchivo)):
             remove(rutayNombreArchivo)

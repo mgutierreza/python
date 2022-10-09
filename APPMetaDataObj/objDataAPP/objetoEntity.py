@@ -9,7 +9,7 @@ class objetoEntity(iObjetoAplicacion):
         self.__claseObjeto = claseObjeto
         self.__nombreClase = ''
         self.TAB = '\t'
-        self.ENTER = '\t'
+        self.ENTER = '\n'
 
     def generarArchivo(self):
         nuevoArchivo = gestionArchivos(self.__nombreTabla, self.__claseObjeto)
@@ -21,7 +21,7 @@ class objetoEntity(iObjetoAplicacion):
     def __generarClase(self):
         clase = ""
         clase += self.__generarCabeceraClase()
-        clase += "namespace EP_AcademicMicroservice.Entities" + self.TAB 
+        clase += "namespace EP_AcademicMicroservice.Entities" + self.ENTER 
         clase += "{" + self.ENTER
         clase += self.TAB + "[DataContract]" + self.ENTER
         clase += self.TAB + "public class " + self.__nombreClase + self.ENTER 
@@ -39,26 +39,28 @@ class objetoEntity(iObjetoAplicacion):
         cabeceraClase += "using System.Linq;" + self.ENTER 
         cabeceraClase += "using System.Runtime.Serialization;" + self.ENTER 
         cabeceraClase += "using System.Text;" + self.ENTER
-        cabeceraClase += "using System.Threading.Tasks;" + 3*self.ENTER
+        cabeceraClase += "using System.Threading.Tasks;" + 2*self.ENTER
         return cabeceraClase
 
     def __generarCuerpoClase(self):
         cuerpoClase = ""
+        dictData = {}
+        
         tipoDato = ""
         datamember =  "[DataMember(EmitDefaultValue = false)]"
         textoGetSet = " { get; set; }"
-        
+                
         data = obtenerData(self.__nombreTabla)
-        dictData = data.metaDataClavePrincipal()
+        dictData = data.metaDataTodosCampos()
 
-        for clave, valor in dictData.items():
-            if (valor == 'INT'):
+        for valor in dictData:
+            if (valor['tipoDato'] == 'INT'):
                 tipoDato = "public Int32 "
-            elif (valor == 'VARCHAR'):
+            elif (valor['tipoDato'] == 'VARCHAR'):
                 tipoDato = "public String "
             else:
                 tipoDato = "public DateTime "
             cuerpoClase += 2*self.TAB + datamember + self.ENTER 
-            cuerpoClase += 2*self.TAB + tipoDato + dictData[0] + textoGetSet + 2*self.ENTER
+            cuerpoClase += 2*self.TAB + tipoDato + str(valor['nombreCampo']) + textoGetSet + 2*self.ENTER
 
         return cuerpoClase
