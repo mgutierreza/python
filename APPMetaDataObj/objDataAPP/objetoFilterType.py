@@ -1,8 +1,7 @@
 from objDataAPP.iObjetoAplicacion import iObjetoAplicacion
-from objConexionBD.consultasBD import obtenerData
 from util.utilitario import gestionArchivos
 
-class objetoEntity(iObjetoAplicacion):
+class objetoFilterType(iObjetoAplicacion):
 
     def __init__(self, nombreTabla, claseObjeto):
         self.__nombreTabla = nombreTabla
@@ -23,44 +22,31 @@ class objetoEntity(iObjetoAplicacion):
         clase += self.__generarCabeceraClase()
         clase += "namespace EP_AcademicMicroservice.Entities" + self.ENTER 
         clase += "{" + self.ENTER
-        clase += self.TAB + "[DataContract]" + self.ENTER
-        clase += self.TAB + "public class " + self.__nombreClase + self.ENTER 
-        clase += self.TAB + "{" + self.ENTER 
         clase += self.__generarCuerpoClase()
-        clase += self.TAB + "}" + self.ENTER 
         clase += "}" + self.ENTER
         return clase
  
     def __generarCabeceraClase(self):
         cabeceraClase = ""
-        cabeceraClase += "using System;" + self.ENTER
+        cabeceraClase += "using System;" + self.ENTER 
         cabeceraClase += "using System.Collections.Generic;" + self.ENTER
-        cabeceraClase += "using System.ComponentModel.DataAnnotations;" + self.ENTER
         cabeceraClase += "using System.Linq;" + self.ENTER 
-        cabeceraClase += "using System.Runtime.Serialization;" + self.ENTER 
         cabeceraClase += "using System.Text;" + self.ENTER
         cabeceraClase += "using System.Threading.Tasks;" + 2*self.ENTER
         return cabeceraClase
 
     def __generarCuerpoClase(self):
         cuerpoClase = ""
-        dictData = {}
-        
-        tipoDato = ""
-        datamember =  "[DataMember(EmitDefaultValue = false)]"
-        textoGetSet = " { get; set; }"
-                
-        data = obtenerData(self.__nombreTabla)
-        dictData = data.metaDataTodosCampos()
+        cuerpoClase += self.ENTER + self.TAB + "public enum " + self.__nombreTabla + "FilterItemType : byte" + self.ENTER
+        cuerpoClase += self.TAB + "{" + self.ENTER 
+        cuerpoClase += 2*self.TAB + "Undefined," + self.ENTER
+        cuerpoClase += 2*self.TAB + "ById" + self.ENTER
+        cuerpoClase += self.TAB + "}" + 2*self.ENTER
 
-        for valor in dictData:
-            if (valor['tipoDato'] == 'INT'):
-                tipoDato = "public Int32 "
-            elif (valor['tipoDato'] == 'VARCHAR'):
-                tipoDato = "public String "
-            else:
-                tipoDato = "public DateTime "
-            cuerpoClase += 2*self.TAB + datamember + self.ENTER 
-            cuerpoClase += 2*self.TAB + tipoDato + str(valor['nombreCampo']) + textoGetSet + 2*self.ENTER
+        cuerpoClase += self.TAB + "public enum " + self.__nombreTabla + "FilterLstItemType : byte" + self.ENTER
+        cuerpoClase += self.TAB + "{" + self.ENTER 
+        cuerpoClase += 2*self.TAB + "Undefined," + self.ENTER
+        cuerpoClase += 2*self.TAB + "ByPagination" + self.ENTER
+        cuerpoClase += self.TAB + "}" + self.ENTER
 
         return cuerpoClase

@@ -2,9 +2,9 @@ from objDataAPP.iObjetoAplicacion import iObjetoAplicacion
 from objConexionBD.consultasBD import obtenerData
 from util.utilitario import gestionArchivos
 
-class objetoEntity(iObjetoAplicacion):
+class objetoFilter(iObjetoAplicacion):
 
-    def __init__(self, nombreTabla, claseObjeto):
+    def __init__(self,nombreTabla, claseObjeto):
         self.__nombreTabla = nombreTabla
         self.__claseObjeto = claseObjeto
         self.__nombreClase = ''
@@ -23,11 +23,7 @@ class objetoEntity(iObjetoAplicacion):
         clase += self.__generarCabeceraClase()
         clase += "namespace EP_AcademicMicroservice.Entities" + self.ENTER 
         clase += "{" + self.ENTER
-        clase += self.TAB + "[DataContract]" + self.ENTER
-        clase += self.TAB + "public class " + self.__nombreClase + self.ENTER 
-        clase += self.TAB + "{" + self.ENTER 
         clase += self.__generarCuerpoClase()
-        clase += self.TAB + "}" + self.ENTER 
         clase += "}" + self.ENTER
         return clase
  
@@ -35,9 +31,7 @@ class objetoEntity(iObjetoAplicacion):
         cabeceraClase = ""
         cabeceraClase += "using System;" + self.ENTER
         cabeceraClase += "using System.Collections.Generic;" + self.ENTER
-        cabeceraClase += "using System.ComponentModel.DataAnnotations;" + self.ENTER
         cabeceraClase += "using System.Linq;" + self.ENTER 
-        cabeceraClase += "using System.Runtime.Serialization;" + self.ENTER 
         cabeceraClase += "using System.Text;" + self.ENTER
         cabeceraClase += "using System.Threading.Tasks;" + 2*self.ENTER
         return cabeceraClase
@@ -45,13 +39,14 @@ class objetoEntity(iObjetoAplicacion):
     def __generarCuerpoClase(self):
         cuerpoClase = ""
         dictData = {}
-        
         tipoDato = ""
-        datamember =  "[DataMember(EmitDefaultValue = false)]"
         textoGetSet = " { get; set; }"
                 
         data = obtenerData(self.__nombreTabla)
-        dictData = data.metaDataTodosCampos()
+        dictData = data.metaDataClavePrincipal()
+
+        cuerpoClase += self.TAB + "public class " + self.__nombreClase + self.ENTER
+        cuerpoClase += self.TAB + "{" + self.ENTER
 
         for valor in dictData:
             if (valor['tipoDato'] == 'INT'):
@@ -60,7 +55,8 @@ class objetoEntity(iObjetoAplicacion):
                 tipoDato = "public String "
             else:
                 tipoDato = "public DateTime "
-            cuerpoClase += 2*self.TAB + datamember + self.ENTER 
-            cuerpoClase += 2*self.TAB + tipoDato + str(valor['nombreCampo']) + textoGetSet + 2*self.ENTER
+        
+        cuerpoClase += 2*self.TAB + tipoDato + str(valor['nombreCampo']) + textoGetSet + self.ENTER
+        cuerpoClase += self.TAB + "}" + self.ENTER
 
         return cuerpoClase
