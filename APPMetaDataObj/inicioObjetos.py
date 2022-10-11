@@ -25,4 +25,10 @@ def ejecutar():
     clase = objetoRequestValidator(nombreTabla, claseObjeto.requestValidation)
     clase.generarArchivo()
 
+    clase = objetoIRepository(nombreTabla, claseObjeto.iRepository)
+    clase.generarArchivo()
+
+    clase = objetoRepository(nombreTabla, claseObjeto.repository)
+    clase.generarArchivo()
+
     return
