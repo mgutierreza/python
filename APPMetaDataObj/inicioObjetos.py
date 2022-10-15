@@ -31,4 +31,13 @@ def ejecutar():
     clase = objetoRepository(nombreTabla, claseObjeto.repository)
     clase.generarArchivo()
 
+    clase = objetoRepository(nombreTabla, claseObjeto.service)
+    clase.generarArchivo()
+
+    clase = objetoRepository(nombreTabla, claseObjeto.domain)
+    clase.generarArchivo()
+
+    clase = objetoRepository(nombreTabla, claseObjeto.controller)
+    clase.generarArchivo()
+
     return
