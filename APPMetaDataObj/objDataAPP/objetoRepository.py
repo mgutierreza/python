@@ -116,14 +116,10 @@ class objetoRepository(iObjetoAplicacion):
 
         data = obtenerData(self.__nombreTabla)
         dictData = data.metaDataTodosCampos()
-
         numeroCampos = len(dictData)
-        rangoMenor = numeroCampos - 3
-        #rangoMayor = numeroCampos
-
-        for i, v in enumerate(dictData):
-            if (i >= rangoMenor):
-                dictData.pop(i)
+        dictData.pop(numeroCampos - 1)
+        dictData.pop(numeroCampos - 2)
+        dictData.pop(numeroCampos - 3)
         
         for valor in dictData:
             if (valor["tipoDato"] == 'INT'):
@@ -157,21 +153,20 @@ class objetoRepository(iObjetoAplicacion):
 
         return metodoActualizar
 
-    def generarCamposActualizar(self):
+    def __generarCamposActualizar(self):
         campoActualizar = ""
         tipoDato = ""
 
         data = obtenerData(self.__nombreTabla)
         dictData = data.metaDataTodosCampos()
-
         numeroCampos = len(dictData)
-        rangoMenor = numeroCampos - 6
-        rangoMayor = numeroCampos - 3
-        #df = df.drop(range(rangoMenor,rangoMayor))
-        for i, v in enumerate(dictData):
-            if (i >= rangoMenor and i <= rangoMayor):
-                dictData.pop(i)
-
+        x = numeroCampos - 4
+        y = numeroCampos - 5
+        z = numeroCampos - 6
+        dictData.pop(x)
+        dictData.pop(y)
+        dictData.pop(z)
+        
         for valor in dictData:
             if (valor["tipoDato"] == 'INT'):
                 tipoDato = "DbType.Int32"
