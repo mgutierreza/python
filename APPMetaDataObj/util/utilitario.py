@@ -61,6 +61,12 @@ class gestionArchivos():
             nombreArchivo = self.__nombreTabla
             
         return nombreArchivo
+    
+    def extraerUltimoCaracter(self, texto):
+        last_char_index = texto.rfind(",")
+        texto = texto[:last_char_index]
+
+        return texto
 
     def __generarTipoObjeto(self):
         

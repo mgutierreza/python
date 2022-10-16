@@ -1,0 +1,1 @@
+from objDataBD.objetoInsertar import objetoProcedimientoInsertar

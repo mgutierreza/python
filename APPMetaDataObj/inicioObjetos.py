@@ -1,4 +1,5 @@
 from objDataAPP import *
+from objDataBD import *
 from util.enumerados import claseObjeto
 
 nombreTabla = "AcdCampus"
@@ -38,6 +39,9 @@ def ejecutar():
     clase.generarArchivo()
 
     clase = objetoRepository(nombreTabla, claseObjeto.controller)
+    clase.generarArchivo()
+
+    clase = objetoProcedimientoInsertar(nombreTabla, claseObjeto.insert)
     clase.generarArchivo()
 
     return
