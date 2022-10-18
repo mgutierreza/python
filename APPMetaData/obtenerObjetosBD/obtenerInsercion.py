@@ -8,6 +8,7 @@ from utilitarios import util
 
 TAB = "\t"
 ENTER = "\n"
+ESPACIO = " "
 
 def generarProcedimientoAlmacenadoInsercion(nombreTabla):
 
@@ -49,14 +50,17 @@ def generarCabeceraProcedimientoAlmacenado(nombreTabla):
 
 def generarParametrosSalidaProcedimientoAlmacenado(nombreTabla):
     parametrosSalida = ""
-    
+    espacioEstandar = 30
+
     df = consultaDatos.obtenerMetaDataClavePrincipal(nombreTabla)
 
     for i in df.index:
-        if (df["tipoDato"][i] == 'INT' or df["tipoDato"][i] == 'DATE' or df["tipoDato"][i] == 'DATETIME'):
-            parametrosSalida += 2*TAB + "@"+ df["nombreCampo"][i] + 10*TAB + df["tipoDato"][i] + " OUTPUT," + ENTER
+        espacioCampo = len(df["nombreCampo"][i])
+        espacioFaltante = espacioEstandar - espacioCampo 
+        if (df["tipoDato"][i] == 'INT' or df["tipoDato"][i] == 'DATE' or df["tipoDato"][i] == 'DATETIME' or df["tipoDato"][i] == 'BIGINT'):
+            parametrosSalida += 2*TAB + "@"+ df["nombreCampo"][i] + espacioFaltante*ESPACIO + 4*TAB + df["tipoDato"][i] + " OUTPUT," + ENTER
         else:
-            parametrosSalida += 2*TAB + "@"+ df["nombreCampo"][i] + 10*TAB + df["tipoDato"][i] + "(" + (df["tamanhoCampo"][i]).astype(str) + ") OUTPUT," + ENTER
+            parametrosSalida += 2*TAB + "@"+ df["nombreCampo"][i] + espacioFaltante*ESPACIO + 4*TAB + df["tipoDato"][i] + "(" + (df["tamanhoCampo"][i]).astype(str) + ") OUTPUT," + ENTER
 
     parametrosSalida = util.extraerUltimoCaracter(parametrosSalida) + ENTER
 
@@ -64,17 +68,20 @@ def generarParametrosSalidaProcedimientoAlmacenado(nombreTabla):
 
 def generarParametrosEntradaProcedimientoAlmacenado(nombreTabla):
     parametrosEntrada = ""
+    espacioEstandar = 30
 
     df = obtenerParametrosParaInsercion(nombreTabla)
     for i in df.index:
-        if (df["tipoCampo"][i] == "CAMPO"):
+        espacioCampo = len(df["nombreCampo"][i])
+        espacioFaltante = espacioEstandar - espacioCampo            
+        if (df["tipoCampo"][i] != "PRIMARY KEY"):
             if ((df["tipoDato"][i] == 'DATETIME') and ("Registro" in df["nombreCampo"][i])):
                 parametrosEntrada += ""
             else:
-                if (df["tipoDato"][i] == 'INT' or df["tipoDato"][i] == 'DATE' or df["tipoDato"][i] == 'DATETIME'):
-                    parametrosEntrada += 2*TAB + "@"+ df["nombreCampo"][i] + 10*TAB + df["tipoDato"][i] + "," + ENTER
+                if (df["tipoDato"][i] == 'INT' or df["tipoDato"][i] == 'DATE' or df["tipoDato"][i] == 'DATETIME' or df["tipoDato"][i] == 'BIGINT'):
+                    parametrosEntrada += 2*TAB + "@"+ df["nombreCampo"][i] + espacioFaltante*ESPACIO + 4*TAB + df["tipoDato"][i] + "," + ENTER
                 else:
-                    parametrosEntrada += 2*TAB + "@"+ df["nombreCampo"][i] + 10*TAB + df["tipoDato"][i] + "(" + df["tamanhoCampo"][i].astype(str) + ")," + ENTER
+                    parametrosEntrada += 2*TAB + "@"+ df["nombreCampo"][i] + espacioFaltante*ESPACIO + 4*TAB + df["tipoDato"][i] + "(" + df["tamanhoCampo"][i].astype(str) + ")," + ENTER
 
     parametrosEntrada = util.extraerUltimoCaracter(parametrosEntrada) + ENTER
 
@@ -102,7 +109,7 @@ def obtenerParametrosInsercion(nombreTabla, tipoParametro):
 
     if (tipoParametro == "valor"):
         for i in df.index:
-            if (df["tipoCampo"][i] == "CAMPO"):
+            if (df["tipoCampo"][i] != "PRIMARY KEY"):
                 if ((df["tipoDato"][i] == 'DATETIME') and ("Registro" in df["nombreCampo"][i])):
                     parametrosInsercion += 10*TAB + "GETDATE()," + ENTER
                 else:
@@ -110,7 +117,7 @@ def obtenerParametrosInsercion(nombreTabla, tipoParametro):
         
     if (tipoParametro == "campo"):
         for i in df.index:
-            if (df["tipoCampo"][i] == "CAMPO"):
+            if (df["tipoCampo"][i] != "PRIMARY KEY"):
                 parametrosInsercion += 10*TAB + nombreTabla + "." + df["nombreCampo"][i] + "," + ENTER
       
     parametrosInsercion = util.extraerUltimoCaracter(parametrosInsercion)

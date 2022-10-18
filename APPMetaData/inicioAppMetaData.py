@@ -1,7 +1,7 @@
 from obtenerObjetosBD import *
 from obtenerObjetosAPP import *
 
-nombreTablaBaseDatos = "AcdCampus"
+nombreTablaBaseDatos = "Acd_MatCursos"
 
 #Creación de Objetos de Base de Datos
 generarProcedimientoAlmacenadoSelect(nombreTablaBaseDatos)

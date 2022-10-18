@@ -69,11 +69,12 @@ def generarCamposParaActualizar(nombreTabla):
 
     for i in df.index:
         espacioCampo = len(df["nombreCampo"][i])
-        espacioFaltante = espacioEstandar - espacioCampo        
-        if ((df["tipoDato"][i] == 'DATETIME') and ("Update" in df["nombreCampo"][i])):
-            camposParaActualizar += 5*TAB + "dbo." + nombreTabla + "." + df["nombreCampo"][i] + espacioFaltante*ESPACIO + "=" + 2*TAB + "GETDATE()," + ENTER
-        else:
-            camposParaActualizar += 5*TAB + "dbo." + nombreTabla + "." + df["nombreCampo"][i] + espacioFaltante*ESPACIO + "=" + 2*TAB + "@" + df["nombreCampo"][i] + "," + ENTER
+        espacioFaltante = espacioEstandar - espacioCampo     
+        if(df["tipoCampo"][i] != "PRIMARY KEY"):
+            if ((df["tipoDato"][i] == 'DATETIME') and ("Update","Upd" in df["nombreCampo"][i])):
+                camposParaActualizar += 5*TAB + "dbo." + nombreTabla + "." + df["nombreCampo"][i] + espacioFaltante*ESPACIO + "=" + 2*TAB + "GETDATE()," + ENTER
+            else:
+                camposParaActualizar += 5*TAB + "dbo." + nombreTabla + "." + df["nombreCampo"][i] + espacioFaltante*ESPACIO + "=" + 2*TAB + "@" + df["nombreCampo"][i] + "," + ENTER
     
     camposParaActualizar = util.extraerUltimoCaracter(camposParaActualizar) + ENTER
 
@@ -98,12 +99,12 @@ def generarParametrosEntradaProcedimientoAlmacenado(nombreTabla):
 
     df = obtenerParametrosParaActualizacion(nombreTabla)
     for i in df.index:
-        if ((df["tipoDato"][i] == 'DATETIME') and ("Upd" in df["nombreCampo"][i])):
+        if ((df["tipoDato"][i] == 'DATETIME') and ("Update","Upd" in df["nombreCampo"][i])):
             parametrosEntrada += ""
         else:
             espacioCampo = len(df["nombreCampo"][i])
             espacioFaltante = espacioEstandar - espacioCampo
-            if (df["tipoDato"][i] == 'INT' or df["tipoDato"][i] == 'DATE' or df["tipoDato"][i] == 'DATETIME'):
+            if (df["tipoDato"][i] == 'INT' or df["tipoDato"][i] == 'DATE' or df["tipoDato"][i] == 'DATETIME' or df["tipoDato"][i] == 'BIGINT'):
                 parametrosEntrada += 5*TAB + "@"+ df["nombreCampo"][i] + espacioFaltante*ESPACIO + 2*TAB + df["tipoDato"][i] + "," + ENTER
             else:
                 parametrosEntrada += 5*TAB + "@"+ df["nombreCampo"][i] + espacioFaltante*ESPACIO + 2*TAB + df["tipoDato"][i] + "(" + df["tamanhoCampo"][i].astype(str) + ")," + ENTER
@@ -114,7 +115,7 @@ def generarParametrosEntradaProcedimientoAlmacenado(nombreTabla):
 
 def obtenerParametrosParaActualizacion(nombreTabla):
 
-    df = consultaDatos.obtenerMetaDataCamposSinClavePrincipal(nombreTabla)
+    df = consultaDatos.obtenerMetaDataTodosCampos(nombreTabla)
 
     numeroCampos = len(df.index)
     rangoMenor = numeroCampos - 6

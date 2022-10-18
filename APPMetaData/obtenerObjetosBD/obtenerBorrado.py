@@ -70,7 +70,7 @@ def generarParametrosEntradaProcedimientoAlmacenado(nombreTabla):
     df = consultaDatos.obtenerMetaDataClavePrincipal(nombreTabla)
 
     for i in df.index:
-        if (df["tipoDato"][i] == 'INT' or df["tipoDato"][i] == 'DATE' or df["tipoDato"][i] == 'DATETIME'):
+        if (df["tipoDato"][i] == 'INT' or df["tipoDato"][i] == 'DATE' or df["tipoDato"][i] == 'DATETIME' or df["tipoDato"][i] == 'BIGINT'):
             parametrosEntrada += 2*TAB +"@"+ df["nombreCampo"][i] + 4*TAB + df["tipoDato"][i] + "," + ENTER
         else:
             parametrosEntrada += 2*TAB +"@"+ df["nombreCampo"][i] + 4*TAB + df["tipoDato"][i] + "(" + (df["tamanhoCampo"][i]).astype(str) + ")," + ENTER

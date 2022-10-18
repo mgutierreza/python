@@ -62,15 +62,15 @@ def generarParametrosEntradaProcedimientoAlmacenado(nombreTabla):
 
     for i in df.index:
         if (numeroRegistroDiccionario > 1):
-            if (df["tipoDato"][i] == 'INT'):
+            if (df["tipoDato"][i] == 'INT' or df["tipoDato"][i] == 'BIGINT'):
                 parametrosEntrada += + 2*TAB + "@"+ df["nombreCampo"][i] + TAB + df["tipoDato"][i] + " = 0,"
             else:
-                parametrosEntrada += + 2*TAB + "@"+ df["nombreCampo"][i] + TAB + df["tipoDato"][i] + "(" + df["tamanhoCampo"][i] + ") = 'null',"
+                parametrosEntrada += + 2*TAB + "@"+ df["nombreCampo"][i] + TAB + df["tipoDato"][i] + "(" + str(df["tamanhoCampo"][i]) + ") = 'null',"
         else:
-            if (df["tipoDato"][i] == 'INT'):
+            if (df["tipoDato"][i] == 'INT' or df["tipoDato"][i] == 'BIGINT'):
                 parametrosEntrada = 2*TAB + "@"+ df["nombreCampo"][i] + TAB + df["tipoDato"][i] + " = 0,"
             else:
-                parametrosEntrada = 2*TAB + "@"+ df["nombreCampo"][i] + TAB + df["tipoDato"][i] + "(" + df["tamanhoCampo"][i] + ") = 'null',"
+                parametrosEntrada = 2*TAB + "@"+ df["nombreCampo"][i] + TAB + df["tipoDato"][i] + "(" + str(df["tamanhoCampo"][i]) + ") = 'null',"
     
     parametrosEntrada = util.extraerUltimoCaracter(parametrosEntrada) + ENTER    
     return parametrosEntrada
@@ -80,7 +80,7 @@ def generarCondicionalProcedimientoAlmacenado(nombreTabla):
     condicionalProcedimientoAlmacenado = ""
     
     for i in df.index:
-        if (df["tipoDato"][i] == 'INT'):
+        if (df["tipoDato"][i] == 'INT' or df["tipoDato"][i] == 'BIGINT'):
             condicionalProcedimientoAlmacenado += 2*TAB + "IF (@"+ df["nombreCampo"][i] +" > 0)" + ENTER
         else:
             condicionalProcedimientoAlmacenado += 2*TAB + "IF (@"+ df["nombreCampo"][i] +" = 'null')" + ENTER
