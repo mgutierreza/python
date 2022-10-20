@@ -42,17 +42,22 @@ def generarCabeceraClase():
  
 def generarCuerpoClase(nombreTabla):
     cuerpoClase = ""
+    nombreCampoClavePrincipal = ""
+
+    df = consultaDatos.obtenerMetaDataClavePrincipal(nombreTabla)
+    for i in df.index:
+        nombreCampoClavePrincipal = df["nombreCampo"][i]
 
     cuerpoClase += TAB + "[Route(\"api/[controller]\")]" + ENTER
     cuerpoClase += TAB + "[ApiController]" + ENTER
     cuerpoClase += TAB + "public class " + generarNombreArchivo(nombreTabla, claseObjeto.controller) + " : ControllerBase" + ENTER
     cuerpoClase += TAB + "{" + ENTER 
     cuerpoClase += 2*TAB + "#region Operations" + ENTER 
-    cuerpoClase += 2*TAB + "[HttpGet(\"GetByPagination\", Name = \"" + nombreTabla + "_GetByPagination\")]" + ENTER 
+    cuerpoClase += 2*TAB + "[HttpGet(\"GetByPagination/{" + nombreCampoClavePrincipal + "}\", Name = \"" + nombreTabla + "_GetByPagination\")]" + ENTER 
     cuerpoClase += 2*TAB + "[ProducesResponseType(200)]" + ENTER 
     cuerpoClase += 2*TAB + "[ProducesResponseType(400)]" + ENTER 
     cuerpoClase += generarMetodoObtenerByPagination(nombreTabla) + 2*ENTER
-    cuerpoClase += 2*TAB + "[HttpGet(\"{Id}\", Name = \"" + nombreTabla + "_GetById\")]" + ENTER 
+    cuerpoClase += 2*TAB + "[HttpGet(\"{" + nombreCampoClavePrincipal + "}\", Name = \"" + nombreTabla + "_GetById\")]" + ENTER 
     cuerpoClase += 2*TAB + "[ProducesResponseType(200)]" + ENTER 
     cuerpoClase += 2*TAB + "[ProducesResponseType(400)]" + ENTER
     cuerpoClase += 2*TAB + "[ProducesResponseType(404)]" + ENTER
@@ -70,8 +75,15 @@ def generarCuerpoClase(nombreTabla):
 
 def generarMetodoObtenerByPagination(nombreTabla):
     MetodoObtenerByPagination = ""
+    tipoDatoClavePrincipal = ""
+    nombreCampoClavePrincipal = ""
 
-    MetodoObtenerByPagination += 2*TAB + "public IActionResult GetByPagination()" + ENTER
+    df = consultaDatos.obtenerMetaDataClavePrincipal(nombreTabla)
+    for i in df.index:
+        tipoDatoClavePrincipal = df["tipoDato"][i]
+        nombreCampoClavePrincipal = df["nombreCampo"][i]
+
+    MetodoObtenerByPagination += 2*TAB + "public IActionResult GetByPagination(" + tipoDatoClavePrincipal + " " + nombreCampoClavePrincipal + ")" + ENTER
     MetodoObtenerByPagination += 2*TAB + "{" + ENTER 
     MetodoObtenerByPagination += 3*TAB + nombreTabla + "LstItemResponse response = null;" + ENTER
     MetodoObtenerByPagination += 3*TAB + nombreTabla + "LstItemRequest request = new " + nombreTabla + "LstItemRequest()" + ENTER
