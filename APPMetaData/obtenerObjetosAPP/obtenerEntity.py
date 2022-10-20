@@ -23,7 +23,7 @@ def generarClase(nombreTabla):
     claseEntity += "namespace EP_AcademicMicroservice.Entities" + ENTER 
     claseEntity += "{" + ENTER
     claseEntity += TAB + "[DataContract]" + ENTER
-    claseEntity += TAB + "public class AcdCampusEntity" + ENTER 
+    claseEntity += TAB + "public class " + nombreTabla + "Entity" + ENTER 
     claseEntity += TAB + "{" + ENTER 
     claseEntity += generarCuerpoClase(nombreTabla)
     claseEntity += TAB + "}" + ENTER 
@@ -44,21 +44,14 @@ def generarCabeceraClase():
 
 def generarCuerpoClase(nombreTabla):
     cuerpoClaseEntity = ""
-    tipoDato = ""
     datamember =  "[DataMember(EmitDefaultValue = false)]"
     textoGetSet = " { get; set; }"
     
     df = consultaDatos.obtenerMetaDataTodosCampos(nombreTabla)
 
     for i in df.index:
-        if (df["tipoDato"][i] == 'INT'):
-            tipoDato = "public Int32 "
-        elif (df["tipoDato"][i] == 'VARCHAR'):
-            tipoDato = "public String "
-        else:
-            tipoDato = "public DateTime "
         cuerpoClaseEntity += 2*TAB + datamember + ENTER 
-        cuerpoClaseEntity += 2*TAB + tipoDato + df["nombreCampo"][i] + textoGetSet + 2*ENTER
+        cuerpoClaseEntity += 2*TAB + "public " + df["tipoDato"][i] + " " + df["nombreCampo"][i] + textoGetSet + 2*ENTER
 
     return cuerpoClaseEntity
 

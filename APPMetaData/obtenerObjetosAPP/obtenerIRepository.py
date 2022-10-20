@@ -41,11 +41,19 @@ def generarCabeceraClase():
 def generarCuerpoClase(nombreTabla):
     cuerpoClase = ""
 
+    tipoDatoClavePrincipal = ""
+    nombreCampoClavePrincipal = ""
+
+    df = consultaDatos.obtenerMetaDataClavePrincipal(nombreTabla)
+    for i in df.index:
+        tipoDatoClavePrincipal = df["tipoDato"][i]
+        nombreCampoClavePrincipal = df["nombreCampo"][i]
+    
     cuerpoClase += TAB + "public interface " + generarNombreArchivo(nombreTabla, claseObjeto.iRepository) + " : IGenericRepository<" + nombreTabla + "Entity>" + ENTER
     cuerpoClase += TAB + "{" + ENTER 
     cuerpoClase += 2*TAB + "int Insert" + nombreTabla + "(" + nombreTabla + "Entity item);" + ENTER 
     cuerpoClase += 2*TAB + "bool Update" + nombreTabla + "(" + nombreTabla + "Entity item);" + ENTER 
-    cuerpoClase += 2*TAB + "bool Delete" + nombreTabla + "(int Id);" + ENTER 
+    cuerpoClase += 2*TAB + "bool Delete" + nombreTabla + "("+ tipoDatoClavePrincipal + " " + nombreCampoClavePrincipal + ");" + ENTER 
     cuerpoClase += 2*TAB + nombreTabla + "Entity GetItem" + nombreTabla + "(" + nombreTabla + "Filter filter, " + nombreTabla + "FilterItemType filterType);" + ENTER 
     cuerpoClase += 2*TAB + "IEnumerable<" + nombreTabla + "Entity> GetLstItem" + nombreTabla + "(" + nombreTabla + "Filter filter, " + nombreTabla + "FilterLstItemType filterType, Pagination pagination);" + ENTER 
     cuerpoClase += TAB + "}" + ENTER

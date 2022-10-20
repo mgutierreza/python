@@ -90,7 +90,7 @@ def generarMetodoExecute(nombreTabla):
     metodoExecute += 3*TAB + "}" + ENTER
     metodoExecute += 3*TAB + "catch (CustomException ex)" + ENTER
     metodoExecute += 3*TAB + "{" + ENTER
-    metodoExecute += 4*TAB + "response.LstError.Add(ex.CustomMessage);" + ENTER
+    metodoExecute += 4*TAB + "response.LstError.AddRange(ex.CustomMessage);" + ENTER
     metodoExecute += 3*TAB + "}" + ENTER
     metodoExecute += 3*TAB + "catch (Exception ex)" + ENTER
     metodoExecute += 3*TAB + "{" + ENTER
@@ -114,7 +114,7 @@ def generarMetodoGet(nombreTabla):
     metodoGet += 3*TAB + nombreTabla + "ItemResponse response = new " + nombreTabla + "ItemResponse();" + ENTER 
     metodoGet += 3*TAB + "response.InitializeResponse(request);" + ENTER 
     metodoGet += 3*TAB + "try" + ENTER 
-    metodoGet += 3*TAB + "}" + ENTER 
+    metodoGet += 3*TAB + "{" + ENTER 
     metodoGet += 4*TAB + "if (response.LstError.Count == 0)" + ENTER 
     metodoGet += 4*TAB + "{" + ENTER 
     metodoGet += 5*TAB + "switch (request.FilterType)" + ENTER
@@ -130,7 +130,7 @@ def generarMetodoGet(nombreTabla):
     metodoGet += 3*TAB + "}" + ENTER 
     metodoGet += 3*TAB + "catch (CustomException ex)" + ENTER
     metodoGet += 3*TAB + "{" + ENTER
-    metodoGet += 4*TAB + "response.LstError.Add(ex.CustomMessage);" + ENTER
+    metodoGet += 4*TAB + "response.LstError.AddRange(ex.CustomMessage);" + ENTER
     metodoGet += 3*TAB + "}" + ENTER
     metodoGet += 3*TAB + "catch (Exception ex)" + ENTER
     metodoGet += 3*TAB + "{" + ENTER
@@ -155,7 +155,7 @@ def generarMetodoLstItemResponse(nombreTabla):
     metodoLstItemResponse += 5*TAB + "switch (request.FilterType)" + ENTER
     metodoLstItemResponse += 5*TAB + "{" + ENTER     
     metodoLstItemResponse += 6*TAB + "case " + nombreTabla + "FilterLstItemType.ByPagination:" + ENTER     
-    metodoLstItemResponse += 7*TAB + "response.Item = new " + nombreTabla + "Domain().GetByPagination(request.Filter, request.FilterType, request.Pagination);" + ENTER
+    metodoLstItemResponse += 7*TAB + "response.LstItem = new " + nombreTabla + "Domain().GetByPagination(request.Filter, request.FilterType, request.Pagination);" + ENTER
     metodoLstItemResponse += 7*TAB + "break;" + ENTER 
     metodoLstItemResponse += 6*TAB + "default:" + ENTER 
     metodoLstItemResponse += 7*TAB + "break;" + ENTER 
@@ -165,7 +165,7 @@ def generarMetodoLstItemResponse(nombreTabla):
     metodoLstItemResponse += 3*TAB + "}" + ENTER 
     metodoLstItemResponse += 3*TAB + "catch (CustomException ex)" + ENTER
     metodoLstItemResponse += 3*TAB + "{" + ENTER
-    metodoLstItemResponse += 4*TAB + "response.LstError.Add(ex.CustomMessage);" + ENTER
+    metodoLstItemResponse += 4*TAB + "response.LstError.AddRange(ex.CustomMessage);" + ENTER
     metodoLstItemResponse += 3*TAB + "}" + ENTER
     metodoLstItemResponse += 3*TAB + "catch (Exception ex)" + ENTER
     metodoLstItemResponse += 3*TAB + "{" + ENTER

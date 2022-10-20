@@ -57,7 +57,7 @@ def generarCuerpoProcedimientoAlmacenado(nombreTabla):
 def generarParametrosEntradaProcedimientoAlmacenado(nombreTabla):
     parametrosEntrada = ""
 
-    df = consultaDatos.obtenerMetaDataClavePrincipal(nombreTabla)
+    df = consultaDatos.obtenerMetaDataClavePrincipalBD(nombreTabla)
     numeroRegistroDiccionario = len(df)
 
     for i in df.index:
@@ -76,7 +76,7 @@ def generarParametrosEntradaProcedimientoAlmacenado(nombreTabla):
     return parametrosEntrada
 
 def generarCondicionalProcedimientoAlmacenado(nombreTabla):
-    df = consultaDatos.obtenerMetaDataClavePrincipal(nombreTabla)
+    df = consultaDatos.obtenerMetaDataClavePrincipalBD(nombreTabla)
     condicionalProcedimientoAlmacenado = ""
     
     for i in df.index:
@@ -99,7 +99,7 @@ def generarCondicionalProcedimientoAlmacenado(nombreTabla):
 
 def generarConsultaProcedimientoAlmacenado(nombreTabla):
     
-    df = consultaDatos.obtenerMetaDataTodosCampos(nombreTabla)
+    df = consultaDatos.obtenerMetaDataTodosCamposBD(nombreTabla)
     lineaCodigoProcedimientoAlmacenado = ""
     consultaProcedimientoAlmacenado = 4*TAB + "SELECT" + ENTER
     
@@ -113,7 +113,7 @@ def generarConsultaProcedimientoAlmacenado(nombreTabla):
 
 def generarFiltroConsulta(nombreTabla):
     
-    dfClave = consultaDatos.obtenerMetaDataClavePrincipal(nombreTabla)
+    dfClave = consultaDatos.obtenerMetaDataClavePrincipalBD(nombreTabla)
     lineaFiltroCodigoProcedimientoAlmacenado = 4*TAB + "WHERE"
 
     for i in dfClave.index:

@@ -84,7 +84,7 @@ def generarCamposParaFiltro(nombreTabla):
     camposParaFiltro = ""
     espacioEstandar = 30
 
-    df =  consultaDatos.obtenerMetaDataClavePrincipal(nombreTabla)
+    df =  consultaDatos.obtenerMetaDataClavePrincipalBD(nombreTabla)
 
     for i in df.index:
         espacioCampo = len(df["nombreCampo"][i])
@@ -115,7 +115,7 @@ def generarParametrosEntradaProcedimientoAlmacenado(nombreTabla):
 
 def obtenerParametrosParaActualizacion(nombreTabla):
 
-    df = consultaDatos.obtenerMetaDataTodosCampos(nombreTabla)
+    df = consultaDatos.obtenerMetaDataTodosCamposBD(nombreTabla)
 
     numeroCampos = len(df.index)
     rangoMenor = numeroCampos - 6

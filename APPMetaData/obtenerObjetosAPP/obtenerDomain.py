@@ -99,7 +99,7 @@ def generarMetodoEdit(nombreTabla):
     metodoEdit += 3*TAB + "bool exito = false;" + ENTER 
     metodoEdit += 3*TAB + "using (TransactionScope tx = new TransactionScope())" + ENTER 
     metodoEdit += 3*TAB + "{" + ENTER 
-    metodoEdit += 4*TAB + "exito = _" + nombreTabla + "Repository.Update" + nombreTabla + "(" + nombreTabla + ")" + ENTER 
+    metodoEdit += 4*TAB + "exito = _" + nombreTabla + "Repository.Update" + nombreTabla + "(" + nombreTabla + ");" + ENTER 
     metodoEdit += 4*TAB + "if (exito) tx.Complete();" + ENTER 
     metodoEdit += 3*TAB + "}" + ENTER 
     metodoEdit += 3*TAB + "return exito;" + ENTER 
@@ -110,23 +110,18 @@ def generarMetodoEdit(nombreTabla):
 def generarMetodoDelete(nombreTabla):
     metodoDelete = ""
     tipoDatoClavePrincipal = ""
+    clavePrincipal = ""
     tipoDato = ""
 
     df = consultaDatos.obtenerMetaDataClavePrincipal(nombreTabla)
     for i in df.index:
         tipoDatoClavePrincipal = df["tipoDato"][i]
-    
-    if (tipoDatoClavePrincipal == 'INT'):
-        tipoDato = "Int32"
-    elif (tipoDatoClavePrincipal == 'VARCHAR'):
-        tipoDato = "String"
-    else:
-        tipoDato = "DateTime"
+        clavePrincipal = df["nombreCampo"][i]
 
-    metodoDelete += 2*TAB + "public bool Delete" + nombreTabla + "(" + tipoDato + " Id)" + ENTER
+    metodoDelete += 2*TAB + "public bool Delete" + nombreTabla + "(" + tipoDatoClavePrincipal + " " + clavePrincipal + ")" + ENTER
     metodoDelete += 2*TAB + "{" + ENTER 
     metodoDelete += 3*TAB + "bool exito = false;" + ENTER 
-    metodoDelete += 3*TAB + "exito = _" + nombreTabla + "Repository.Delete" + nombreTabla + "(Id);" + ENTER 
+    metodoDelete += 3*TAB + "exito = _" + nombreTabla + "Repository.Delete" + nombreTabla + "("+ clavePrincipal +");" + ENTER 
     metodoDelete += 3*TAB + "return exito;" + ENTER 
     metodoDelete += 2*TAB + "}" + ENTER
 
@@ -136,24 +131,16 @@ def generarMetodoObtenerByID(nombreTabla):
     metodoObtenerByID = ""
     tipoDatoClavePrincipal = ""
     nombreCampoClavePrincipal = ""
-    tipoDato = ""
 
     df = consultaDatos.obtenerMetaDataClavePrincipal(nombreTabla)
     for i in df.index:
         tipoDatoClavePrincipal = df["tipoDato"][i]
         nombreCampoClavePrincipal = df["nombreCampo"][i]
     
-    if (tipoDatoClavePrincipal == 'INT'):
-        tipoDato = "Int32"
-    elif (tipoDatoClavePrincipal == 'VARCHAR'):
-        tipoDato = "String"
-    else:
-        tipoDato = "DateTime"
-
-    metodoObtenerByID += 2*TAB + "public " + nombreTabla + "Entity GetById(" + tipoDato + " Id)" + ENTER
+    metodoObtenerByID += 2*TAB + "public " + nombreTabla + "Entity GetById(" + tipoDatoClavePrincipal + " " + nombreCampoClavePrincipal + ")" + ENTER
     metodoObtenerByID += 2*TAB + "{" + ENTER 
     metodoObtenerByID += 3*TAB + nombreTabla + "Entity " + nombreTabla + " = null;" + ENTER 
-    metodoObtenerByID += 3*TAB + nombreTabla + " = _" + nombreTabla + "Repository.GetItem" + nombreTabla + "(new " + nombreTabla + "Filter() { " + nombreCampoClavePrincipal + " = Id }, " + nombreTabla + "FilterItemType.ById);" + ENTER 
+    metodoObtenerByID += 3*TAB + nombreTabla + " = _" + nombreTabla + "Repository.GetItem" + nombreTabla + "(new " + nombreTabla + "Filter() { " + nombreCampoClavePrincipal + " =  " + nombreCampoClavePrincipal + " }, " + nombreTabla + "FilterItemType.ById);" + ENTER 
     metodoObtenerByID += 3*TAB + "return "+ nombreTabla +";" + ENTER 
     metodoObtenerByID += 2*TAB + "}" + ENTER
 

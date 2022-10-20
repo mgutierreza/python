@@ -98,26 +98,18 @@ def generarMetodoObtenerByID(nombreTabla):
     metodoObtenerByID = ""
     tipoDatoClavePrincipal = ""
     nombreCampoClavePrincipal = ""
-    tipoDato = ""
 
     df = consultaDatos.obtenerMetaDataClavePrincipal(nombreTabla)
     for i in df.index:
         tipoDatoClavePrincipal = df["tipoDato"][i]
         nombreCampoClavePrincipal = df["nombreCampo"][i]
     
-    if (tipoDatoClavePrincipal == 'INT'):
-        tipoDato = "Int32"
-    elif (tipoDatoClavePrincipal == 'VARCHAR'):
-        tipoDato = "String"
-    else:
-        tipoDato = "DateTime"
-
-    metodoObtenerByID += 2*TAB + "public IActionResult GetById(" + tipoDato + " Id)" + ENTER
+    metodoObtenerByID += 2*TAB + "public IActionResult GetById(" + tipoDatoClavePrincipal + " " + nombreCampoClavePrincipal + ")" + ENTER
     metodoObtenerByID += 2*TAB + "{" + ENTER 
     metodoObtenerByID += 3*TAB + nombreTabla + "ItemResponse response = null;" + ENTER
     metodoObtenerByID += 3*TAB + nombreTabla + "ItemRequest request = new " + nombreTabla + "ItemRequest()" + ENTER
     metodoObtenerByID += 3*TAB + "{" + ENTER
-    metodoObtenerByID += 4*TAB + "Filter = new " + nombreTabla + "Filter() { " + nombreCampoClavePrincipal + " = Id }," + ENTER
+    metodoObtenerByID += 4*TAB + "Filter = new " + nombreTabla + "Filter() { " + nombreCampoClavePrincipal + " = " + nombreCampoClavePrincipal + " }," + ENTER
     metodoObtenerByID += 4*TAB + "FilterType = " + nombreTabla + "FilterItemType.ById" + ENTER
     metodoObtenerByID += 3*TAB + "};" + 2*ENTER
     metodoObtenerByID += 3*TAB + "try" + ENTER
@@ -191,26 +183,18 @@ def generarMetodoDelete(nombreTabla):
     metodoDelete = ""
     tipoDatoClavePrincipal = ""
     nombreCampoClavePrincipal = ""
-    tipoDato = ""
 
     df = consultaDatos.obtenerMetaDataClavePrincipal(nombreTabla)
     for i in df.index:
         tipoDatoClavePrincipal = df["tipoDato"][i]
         nombreCampoClavePrincipal = df["nombreCampo"][i]
-    
-    if (tipoDatoClavePrincipal == 'INT'):
-        tipoDato = "Int32"
-    elif (tipoDatoClavePrincipal == 'VARCHAR'):
-        tipoDato = "String"
-    else:
-        tipoDato = "DateTime"
 
-    metodoDelete += 2*TAB + "public IActionResult Delete(" + tipoDato + " Id)" + ENTER
+    metodoDelete += 2*TAB + "public IActionResult Delete(" + tipoDatoClavePrincipal + " " + nombreCampoClavePrincipal + ")" + ENTER
     metodoDelete += 2*TAB + "{" + ENTER 
     metodoDelete += 3*TAB + nombreTabla + "Response response = null;" + ENTER
     metodoDelete += 3*TAB + nombreTabla + "Request request = new " + nombreTabla + "Request()" + ENTER
     metodoDelete += 3*TAB + "{" + ENTER
-    metodoDelete += 4*TAB + "Item = new " + nombreTabla + "Entity() { " + nombreCampoClavePrincipal + " = Id }," + ENTER
+    metodoDelete += 4*TAB + "Item = new " + nombreTabla + "Entity() { " + nombreCampoClavePrincipal + " = " + nombreCampoClavePrincipal + " }," + ENTER
     metodoDelete += 4*TAB + "Operation = Operation.Delete" + ENTER
     metodoDelete += 3*TAB + "};" + 2*ENTER
     metodoDelete += 3*TAB + "try" + ENTER

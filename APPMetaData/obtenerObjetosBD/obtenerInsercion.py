@@ -52,7 +52,7 @@ def generarParametrosSalidaProcedimientoAlmacenado(nombreTabla):
     parametrosSalida = ""
     espacioEstandar = 30
 
-    df = consultaDatos.obtenerMetaDataClavePrincipal(nombreTabla)
+    df = consultaDatos.obtenerMetaDataClavePrincipalBD(nombreTabla)
 
     for i in df.index:
         espacioCampo = len(df["nombreCampo"][i])
@@ -127,7 +127,7 @@ def obtenerParametrosInsercion(nombreTabla, tipoParametro):
 def obtenerSalidaProcedimientoAlmacenado(nombreTabla):
     salidaProcedimientoAlmacenado = ""
         
-    df = consultaDatos.obtenerMetaDataClavePrincipal(nombreTabla)
+    df = consultaDatos.obtenerMetaDataClavePrincipalBD(nombreTabla)
 
     for i in df.index:
         salidaProcedimientoAlmacenado += 4*TAB + "SET @"+ df["nombreCampo"][i] + TAB + "=" + TAB + "@@IDENTITY" + ENTER
@@ -137,7 +137,7 @@ def obtenerSalidaProcedimientoAlmacenado(nombreTabla):
 
 def obtenerParametrosParaInsercion(nombreTabla):
 
-    df = consultaDatos.obtenerMetaDataTodosCampos(nombreTabla)
+    df = consultaDatos.obtenerMetaDataTodosCamposBD(nombreTabla)
 
     numeroCampos = len(df.index)
     rangoMenor = numeroCampos - 3

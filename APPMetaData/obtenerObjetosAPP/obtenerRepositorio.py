@@ -33,6 +33,7 @@ def generarCabeceraClase():
     cabeceraClase += "using Dapper;" + ENTER 
     cabeceraClase += "using EP_AcademicMicroservice.Entities;" + ENTER 
     cabeceraClase += "using EP_AcademicMicroservice.Repository;" + ENTER
+    cabeceraClase += "using EP_AcademicMicroservice.Exceptions;" + ENTER
     cabeceraClase += "using System;" + ENTER 
     cabeceraClase += "using System.Collections.Generic;" + ENTER
     cabeceraClase += "using System.Composition;" + ENTER
@@ -44,7 +45,7 @@ def generarCabeceraClase():
 
 def generarCuerpoClase(nombreTabla):
     cuerpoClase = ""
-    cuerpoClase += TAB + "[Export(typeof(I" + generarNombreArchivo(nombreTabla, claseObjeto.repository) + "))]"
+    cuerpoClase += TAB + "[Export(typeof(I" + generarNombreArchivo(nombreTabla, claseObjeto.repository) + "))]" + ENTER
     cuerpoClase += TAB + "public class " + generarNombreArchivo(nombreTabla, claseObjeto.repository) + " : BaseRepository, I" + nombreTabla + "Repository" + ENTER
     cuerpoClase += TAB + "{" + ENTER 
     cuerpoClase += generarConstructorClase(nombreTabla) + ENTER 
@@ -78,30 +79,22 @@ def generarMetodoInsertar(nombreTabla):
     metodoInsertar = ""
     campoClavePrincipal = ""
     tipoDatoClavePrincipal = ""
-    tipoDato = ""
 
     df = consultaDatos.obtenerMetaDataClavePrincipal(nombreTabla)
     for i in df.index:
         campoClavePrincipal = df["nombreCampo"][i]
         tipoDatoClavePrincipal = df["tipoDato"][i]
 
-    if (tipoDatoClavePrincipal == 'INT'):
-        tipoDato = "int"
-    elif (tipoDatoClavePrincipal == 'VARCHAR'):
-        tipoDato = "var"
-    else:
-        tipoDato = "datetime"
-
-    metodoInsertar += 2*TAB + "public " + tipoDato + " Insert" + nombreTabla + "(" + nombreTabla + "Entity item)" + ENTER
+    metodoInsertar += 2*TAB + "public int Insert" + nombreTabla + "(" + nombreTabla + "Entity item)" + ENTER
     metodoInsertar += 2*TAB + "{" + ENTER 
     metodoInsertar += 3*TAB + "int afect = 0;" + ENTER 
-    metodoInsertar += 3*TAB + tipoDato + " Resultado = 0;" + ENTER 
+    metodoInsertar += 3*TAB + tipoDatoClavePrincipal + " Resultado = 0;" + ENTER 
     metodoInsertar += 3*TAB + "var query = \"" + nombreTabla + "_Insert\";" + ENTER 
     metodoInsertar += 3*TAB + "var param = new DynamicParameters();" + 2*ENTER 
     metodoInsertar += generarCamposInsertar(nombreTabla) + ENTER
     metodoInsertar += 3*TAB + "afect = SqlMapper.Execute(this._connectionFactory.GetConnection, query, param, commandType: CommandType.StoredProcedure);" + 2*ENTER
-    metodoInsertar += 3*TAB + "Resultado = param.Get<" + tipoDato + ">(\"@" + campoClavePrincipal + "\");" + 2*ENTER
-    metodoInsertar += 3*TAB + "return Resultado;" + ENTER
+    metodoInsertar += 3*TAB + "Resultado = param.Get<" + tipoDatoClavePrincipal + ">(\"@" + campoClavePrincipal + "\");" + 2*ENTER
+    metodoInsertar += 3*TAB + "return (int)Resultado;" + ENTER
     metodoInsertar += 2*TAB + "}" + ENTER 
 
     return metodoInsertar
@@ -110,13 +103,20 @@ def generarMetodoActualizar(nombreTabla):
     metodoActualizar = ""
     metodoActualizar += 2*TAB + "public bool Update" + nombreTabla + "(" + nombreTabla + "Entity item)" + ENTER
     metodoActualizar += 2*TAB + "{" + ENTER 
-    metodoActualizar += 3*TAB + "bool result = true;" + ENTER 
+    metodoActualizar += 3*TAB + "bool Resultado = true;" + ENTER 
     metodoActualizar += 3*TAB + "int afect = 0;" + ENTER 
+    metodoActualizar += 3*TAB + "string errorCode;" + ENTER 
     metodoActualizar += 3*TAB + "var query = \"" + nombreTabla + "_Update\";" + ENTER 
     metodoActualizar += 3*TAB + "var param = new DynamicParameters();" + 2*ENTER 
     metodoActualizar += generarCamposActualizar(nombreTabla) + ENTER
-    metodoActualizar += 3*TAB + "afect = SqlMapper.Execute(this._connectionFactory.GetConnection, query, param, commandType: CommandType.StoredProcedure);" + 2*ENTER
-    metodoActualizar += 3*TAB + "return result" + ENTER
+    metodoActualizar += 3*TAB + "afect = SqlMapper.Execute(this._connectionFactory.GetConnection, query, param, commandType: CommandType.StoredProcedure);" + ENTER
+    metodoActualizar += 3*TAB + "Resultado = afect > 0;" + 2*ENTER
+    metodoActualizar += 3*TAB + "errorCode = param.Get<string>(\"@errorCode\");" + 2*ENTER
+    metodoActualizar += 3*TAB + "if (errorCode != null)" + ENTER
+    metodoActualizar += 3*TAB + "{" + ENTER
+    metodoActualizar += 4*TAB + "throw new FailAcd_PerEstudianteException(errorCode);" + ENTER
+    metodoActualizar += 3*TAB + "}" + ENTER
+    metodoActualizar += 3*TAB + "return Resultado;" + ENTER
     metodoActualizar += 2*TAB + "}" + ENTER 
 
     return metodoActualizar
@@ -125,30 +125,22 @@ def generarMetodoBorrar(nombreTabla):
     metodoBorrar = ""
     campoClavePrincipal = ""
     tipoDatoClavePrincipal = ""
-    tipoDato = ""
 
     df = consultaDatos.obtenerMetaDataClavePrincipal(nombreTabla)
     for i in df.index:
         campoClavePrincipal = df["nombreCampo"][i]
         tipoDatoClavePrincipal = df["tipoDato"][i]
     
-    if (tipoDatoClavePrincipal == 'INT'):
-        tipoDato = "DbType.Int32"
-    elif (tipoDatoClavePrincipal == 'VARCHAR'):
-        tipoDato = "DbType.String"
-    else:
-        tipoDato = "DbType.DateTime"
-
-    metodoBorrar += 2*TAB + "public bool Delete" + nombreTabla + "(" + tipoDato + " Id)" + ENTER
+    metodoBorrar += 2*TAB + "public bool Delete" + nombreTabla + "(" + tipoDatoClavePrincipal + " " + campoClavePrincipal + ")" + ENTER
     metodoBorrar += 2*TAB + "{" + ENTER 
     metodoBorrar += 3*TAB + "bool exito = false;" + ENTER 
     metodoBorrar += 3*TAB + "var afect = 0;" + ENTER 
     metodoBorrar += 3*TAB + "var query = \"" + nombreTabla + "_Delete\";" + ENTER 
     metodoBorrar += 3*TAB + "var param = new DynamicParameters();" + 2*ENTER 
-    metodoBorrar += 3*TAB + "param.Add(\"@" + campoClavePrincipal + "\", Id, " + tipoDato + ");" + ENTER 
+    metodoBorrar += 3*TAB + "param.Add(\"@" + campoClavePrincipal + "\", " + campoClavePrincipal + ", DbType." + tipoDatoClavePrincipal + ");" + ENTER 
     metodoBorrar += 3*TAB + "afect = SqlMapper.Execute(this._connectionFactory.GetConnection, query, param, commandType: CommandType.StoredProcedure);" + ENTER 
     metodoBorrar += 3*TAB + "exito = afect > 0;" + 2*ENTER 
-    metodoBorrar += 3*TAB + "return exito" + ENTER 
+    metodoBorrar += 3*TAB + "return exito;" + ENTER 
     metodoBorrar += 2*TAB + "}" + ENTER 
 
     return metodoBorrar
@@ -177,6 +169,13 @@ def generarMetodoObtenerItem(nombreTabla):
 
 def generarMetodoObtenerLstItem(nombreTabla):
     metodoObtenerLstItem = ""
+    campoClavePrincipal = ""
+    tipoDatoClavePrincipal = ""
+
+    df = consultaDatos.obtenerMetaDataClavePrincipal(nombreTabla)
+    for i in df.index:
+        campoClavePrincipal = df["nombreCampo"][i]
+        tipoDatoClavePrincipal = df["tipoDato"][i]
 
     metodoObtenerLstItem += 2*TAB + "public IEnumerable<" + nombreTabla + "Entity> GetLstItem" + nombreTabla + "(" + nombreTabla + "Filter filter, " + nombreTabla + "FilterLstItemType filterType, Pagination pagination)" + ENTER
     metodoObtenerLstItem += 2*TAB + "{" + ENTER 
@@ -184,7 +183,7 @@ def generarMetodoObtenerLstItem(nombreTabla):
     metodoObtenerLstItem += 3*TAB + "switch (filterType)" + ENTER 
     metodoObtenerLstItem += 3*TAB + "{" + ENTER 
     metodoObtenerLstItem += 4*TAB + "case " + nombreTabla + "FilterLstItemType.ByPagination:" + ENTER 
-    metodoObtenerLstItem += 5*TAB + "lstItemFound = this.GetByPagination();" + ENTER 
+    metodoObtenerLstItem += 5*TAB + "lstItemFound = this.GetByPagination(filter." + campoClavePrincipal +");" + ENTER 
     metodoObtenerLstItem += 5*TAB + "break;" + ENTER 
     metodoObtenerLstItem += 4*TAB + "default:" + ENTER 
     metodoObtenerLstItem += 5*TAB + "break;" + ENTER 
@@ -207,6 +206,11 @@ def generarMetodosNoImplementados(nombreTabla):
     metodosNoImplementados += 3*TAB + "throw new NotImplementedException();" + ENTER 
     metodosNoImplementados += 2*TAB + "}" + 2*ENTER 
 
+    metodosNoImplementados += 2*TAB + "public bool Delete(int id)" + ENTER
+    metodosNoImplementados += 2*TAB + "{" + ENTER 
+    metodosNoImplementados += 3*TAB + "throw new NotImplementedException();" + ENTER 
+    metodosNoImplementados += 2*TAB + "}" + 2*ENTER 
+
     metodosNoImplementados += 2*TAB + "public bool Delete(string id)" + ENTER
     metodosNoImplementados += 2*TAB + "{" + ENTER 
     metodosNoImplementados += 3*TAB + "throw new NotImplementedException();" + ENTER 
@@ -218,26 +222,18 @@ def generarMetodosObtenerByID(nombreTabla):
     metodoObtenerByID = ""
     campoClavePrincipal = ""
     tipoDatoClavePrincipal = ""
-    tipoDato = ""
 
     df = consultaDatos.obtenerMetaDataClavePrincipal(nombreTabla)
     for i in df.index:
         campoClavePrincipal = df["nombreCampo"][i]
         tipoDatoClavePrincipal = df["tipoDato"][i]
     
-    if (tipoDatoClavePrincipal == 'INT'):
-        tipoDato = "DbType.Int32"
-    elif (tipoDatoClavePrincipal == 'VARCHAR'):
-        tipoDato = "DbType.String"
-    else:
-        tipoDato = "DbType.DateTime"
-
-    metodoObtenerByID += 2*TAB + "private " + nombreTabla + "Entity GetById(" + tipoDato + " Id)" + ENTER
+    metodoObtenerByID += 2*TAB + "private " + nombreTabla + "Entity GetById(" + tipoDatoClavePrincipal + " " + campoClavePrincipal + ")" + ENTER
     metodoObtenerByID += 2*TAB + "{" + ENTER 
     metodoObtenerByID += 3*TAB + nombreTabla + "Entity itemFound = null;" + ENTER 
     metodoObtenerByID += 3*TAB + "var query =\"" + nombreTabla + "_Get\";" + ENTER 
     metodoObtenerByID += 3*TAB + "var param = new DynamicParameters();" + ENTER 
-    metodoObtenerByID += 3*TAB + "param.Add(\"@" + campoClavePrincipal + "\", Id, " + tipoDato + ");" + ENTER 
+    metodoObtenerByID += 3*TAB + "param.Add(\"@" + campoClavePrincipal + "\", " + campoClavePrincipal + ", DbType." + tipoDatoClavePrincipal + ");" + ENTER 
     metodoObtenerByID += 3*TAB + "itemFound = SqlMapper.QueryFirstOrDefault<" + nombreTabla + "Entity>(this._connectionFactory.GetConnection, query, param, commandType: CommandType.StoredProcedure);" + 2*ENTER 
     metodoObtenerByID += 3*TAB + "return itemFound;" + ENTER 
     metodoObtenerByID += 2*TAB + "}" + ENTER 
@@ -248,27 +244,19 @@ def generarMetodosObtenerByPagination(nombreTabla):
     metodoObtenerByPagination = ""
     campoClavePrincipal = ""
     tipoDatoClavePrincipal = ""
-    tipoDato = ""
-    
+   
     df = consultaDatos.obtenerMetaDataClavePrincipal(nombreTabla)
     for i in df.index:
         campoClavePrincipal = df["nombreCampo"][i]
         tipoDatoClavePrincipal = df["tipoDato"][i]
-    
-    if (tipoDatoClavePrincipal == 'INT'):
-        tipoDato = "DbType.Int32"
-    elif (tipoDatoClavePrincipal == 'VARCHAR'):
-        tipoDato = "DbType.String"
-    else:
-        tipoDato = "DbType.DateTime"
 
-    metodoObtenerByPagination += 2*TAB + "private IEnumerable<" + nombreTabla + "Entity> GetByPagination()" + ENTER
+    metodoObtenerByPagination += 2*TAB + "private IEnumerable<" + nombreTabla + "Entity> GetByPagination(" + tipoDatoClavePrincipal + " " + campoClavePrincipal + ")" + ENTER
     metodoObtenerByPagination += 2*TAB + "{" + ENTER 
     metodoObtenerByPagination += 3*TAB + "IEnumerable<" + nombreTabla + "Entity> lstFound = new List<" + nombreTabla + "Entity>();" + ENTER 
     metodoObtenerByPagination += 3*TAB + "var query =\"" + nombreTabla + "_Get\";" + ENTER 
     metodoObtenerByPagination += 3*TAB + "var param = new DynamicParameters();" + ENTER 
-    metodoObtenerByPagination += 3*TAB + "param.Add(\"@" + campoClavePrincipal + "\", 0, " + tipoDato + ");" + ENTER 
-    metodoObtenerByPagination += 3*TAB + "lstFound = SqlMapper.Query" + nombreTabla + "Entity>(this._connectionFactory.GetConnection, query, param, commandType: CommandType.StoredProcedure);" + 2*ENTER 
+    metodoObtenerByPagination += 3*TAB + "param.Add(\"@" + campoClavePrincipal + "\", " + campoClavePrincipal + ", DbType." + tipoDatoClavePrincipal + ");" + ENTER 
+    metodoObtenerByPagination += 3*TAB + "lstFound = SqlMapper.Query<" + nombreTabla + "Entity>(this._connectionFactory.GetConnection, query, param, commandType: CommandType.StoredProcedure);" + 2*ENTER 
     metodoObtenerByPagination += 3*TAB + "return lstFound;" + ENTER 
     metodoObtenerByPagination += 2*TAB + "}" + ENTER     
     
@@ -286,19 +274,13 @@ def generarCamposInsertar(nombreTabla):
     df = df.drop(range(rangoMenor,rangoMayor))
     
     for i in df.index:
-        if (df["tipoDato"][i] == 'INT'):
-            tipoDato = "DbType.Int32"
-        elif (df["tipoDato"][i] == 'VARCHAR'):
-            tipoDato = "DbType.String"
-        else:
-            tipoDato = "DbType.DateTime"
-
+        tipoDato = df["tipoDato"][i]
         if (df["tipoCampo"][i] == 'PRIMARY KEY'):
-            campoInsertar += 3*TAB + "param.Add(@" + df["nombreCampo"][i] + ", item." + df["nombreCampo"][i] 
-            campoInsertar += ", " + tipoDato + ", direction: ParameterDirection.Output); " + ENTER
+            campoInsertar += 3*TAB + "param.Add(\"@" + df["nombreCampo"][i] + "\", item." + df["nombreCampo"][i] 
+            campoInsertar += ", DbType." + tipoDato + ", direction: ParameterDirection.Output); " + ENTER
         else:
-            campoInsertar += 3*TAB + "param.Add(@" + df["nombreCampo"][i] + ", item." + df["nombreCampo"][i] 
-            campoInsertar += ", " + tipoDato + "); " + ENTER
+            campoInsertar += 3*TAB + "param.Add(\"@" + df["nombreCampo"][i] + "\", item." + df["nombreCampo"][i] 
+            campoInsertar += ", DbType." + tipoDato + "); " + ENTER
 
     return campoInsertar
 
@@ -314,14 +296,8 @@ def generarCamposActualizar(nombreTabla):
     df = df.drop(range(rangoMenor,rangoMayor))
     
     for i in df.index:
-        if (df["tipoDato"][i] == 'INT'):
-            tipoDato = "DbType.Int32"
-        elif (df["tipoDato"][i] == 'VARCHAR'):
-            tipoDato = "DbType.String"
-        else:
-            tipoDato = "DbType.DateTime"
-
-        campoActualizar += 3*TAB + "param.Add(@" + df["nombreCampo"][i] + ", item." + df["nombreCampo"][i] + ", " + tipoDato + "); " + ENTER
+        tipoDato = df["tipoDato"][i]
+        campoActualizar += 3*TAB + "param.Add(\"@" + df["nombreCampo"][i] + "\", item." + df["nombreCampo"][i] + ", DbType." + tipoDato + "); " + ENTER
 
     return campoActualizar
 

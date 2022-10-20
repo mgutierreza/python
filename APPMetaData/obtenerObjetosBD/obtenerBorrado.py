@@ -67,7 +67,7 @@ def generarCuerpoProcedimientoAlmacenado(nombreTabla):
 def generarParametrosEntradaProcedimientoAlmacenado(nombreTabla):
     parametrosEntrada = ""
 
-    df = consultaDatos.obtenerMetaDataClavePrincipal(nombreTabla)
+    df = consultaDatos.obtenerMetaDataClavePrincipalBD(nombreTabla)
 
     for i in df.index:
         if (df["tipoDato"][i] == 'INT' or df["tipoDato"][i] == 'DATE' or df["tipoDato"][i] == 'DATETIME' or df["tipoDato"][i] == 'BIGINT'):
@@ -107,7 +107,7 @@ def generarActualizacionEstado(nombreTabla, estadoRegistro = 0):
 def obtenerClavePrincipalTabla(nombreTabla): 
     campoClavePrincipal = ""
 
-    df = consultaDatos.obtenerMetaDataClavePrincipal(nombreTabla)
+    df = consultaDatos.obtenerMetaDataClavePrincipalBD(nombreTabla)
 
     for i in df.index:
         campoClavePrincipal += df["nombreCampo"][i]
@@ -117,7 +117,7 @@ def obtenerClavePrincipalTabla(nombreTabla):
 def obtenerCampoEstadoTabla(nombreTabla):
     campoEstado = ""
 
-    df = consultaDatos.obtenerMetaDataCamposSinClavePrincipal(nombreTabla)
+    df = consultaDatos.obtenerMetaDataCamposSinClavePrincipalBD(nombreTabla)
 
     for i in df.index:
         if ((df["tipoDato"][i] == 'INT') and ("Estado" in df["nombreCampo"][i])):

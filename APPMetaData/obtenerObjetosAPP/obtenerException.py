@@ -40,11 +40,15 @@ def generarCuerpoClase(nombreTabla):
 
     cuerpoClaseEntity = cuerpoClaseEntity + TAB + "public class " + generarNombreArchivo(nombreTabla, claseObjeto.exception) + " : CustomException" + ENTER
     cuerpoClaseEntity = cuerpoClaseEntity + TAB + "{" + ENTER 
-    cuerpoClaseEntity = cuerpoClaseEntity + 2*TAB + "public override string CustomMessage" + ENTER
+    cuerpoClaseEntity = cuerpoClaseEntity + 2*TAB + "public string ErrorCode { get; set; }" + ENTER 
+    cuerpoClaseEntity = cuerpoClaseEntity + 2*TAB + "private List<ErrorCodeEntityException> ErrorsList = new List<ErrorCodeEntityException>() {" + ENTER 
+    cuerpoClaseEntity = cuerpoClaseEntity + 3*TAB + "new ErrorCodeEntityException { Code=\"not_found\", Message=\"No existe el objeto en la base de datos\" }" + ENTER 
+    cuerpoClaseEntity = cuerpoClaseEntity + 2*TAB + "};" + 2*ENTER     
+    cuerpoClaseEntity = cuerpoClaseEntity + 2*TAB + "public override List<string> CustomMessage" + ENTER
     cuerpoClaseEntity = cuerpoClaseEntity + 2*TAB + "{" + ENTER
     cuerpoClaseEntity = cuerpoClaseEntity + 3*TAB + "get" + ENTER
     cuerpoClaseEntity = cuerpoClaseEntity + 3*TAB + "{" + ENTER
-    cuerpoClaseEntity = cuerpoClaseEntity + 4*TAB + "return \"Prueba Fail inserting header\";" + ENTER
+    cuerpoClaseEntity = cuerpoClaseEntity + 4*TAB + "return this.GetExceptionsList(this.ErrorCode, this.ErrorsList);" + ENTER
     cuerpoClaseEntity = cuerpoClaseEntity + 3*TAB + "}" + ENTER
     cuerpoClaseEntity = cuerpoClaseEntity + 2*TAB + "}" + ENTER
     cuerpoClaseEntity = cuerpoClaseEntity + TAB + "}" + ENTER

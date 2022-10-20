@@ -43,15 +43,10 @@ def generarCuerpoClase(nombreTabla):
     cuerpoClase = ""
     textoGetSet = " { get; set; }"
     tipoDato = ""
-    df = consultaDatos.obtenerMetaDataClavePrincipal(nombreTabla)
+    df = consultaDatos.obtenerMetaDataClaves(nombreTabla)
 
     for i in df.index:
-        if (df["tipoDato"][i] == 'INT'):
-            tipoDato = "public Int32 "
-        elif (df["tipoDato"][i] == 'VARCHAR'):
-            tipoDato = "public String "
-        else:
-            tipoDato = "public DateTime "
-        cuerpoClase += 2*TAB + tipoDato + df["nombreCampo"][i] + textoGetSet + ENTER
+        tipoDato = df["tipoDato"][i]
+        cuerpoClase += 2*TAB + "public " + tipoDato + " " + df["nombreCampo"][i] + textoGetSet + ENTER
 
     return cuerpoClase
