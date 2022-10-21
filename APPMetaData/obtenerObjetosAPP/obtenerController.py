@@ -1,17 +1,17 @@
-import pyodbc as pyo
+import pyodbc as pyonsultaDatos
 import pandas as pd
 from obtenerObjetosBD import obtenerConsulta
 from utilitarios import generarRutaArchivo, generarNombreArchivo, generarArchivo, generarExtensionArchivo
-from utilitarios import tipoObjeto, claseObjeto
+from utilitarios import enumerados
 from obtenerConexionBD import consultaDatos
 
 TAB = "\t"
 ENTER = "\n"
 
 def generarArchivoController(nombreTabla):
-    rutaArchivo = generarRutaArchivo(nombreTabla, tipoObjeto.Aplicacion)
-    nombreArchivo = generarNombreArchivo(nombreTabla, claseObjeto.controller)
-    extensionArchivo = generarExtensionArchivo(tipoObjeto.Aplicacion)
+    rutaArchivo = generarRutaArchivo(nombreTabla, enumerados.tipoObjeto.Aplicacion)
+    nombreArchivo = generarNombreArchivo(nombreTabla, enumerados.claseObjeto.controller)
+    extensionArchivo = generarExtensionArchivo(enumerados.tipoObjeto.Aplicacion)
     contenidoArchivo = generarClase(nombreTabla)
     
     generarArchivo(rutaArchivo, nombreArchivo + extensionArchivo, contenidoArchivo)
@@ -50,7 +50,7 @@ def generarCuerpoClase(nombreTabla):
 
     cuerpoClase += TAB + "[Route(\"api/[controller]\")]" + ENTER
     cuerpoClase += TAB + "[ApiController]" + ENTER
-    cuerpoClase += TAB + "public class " + generarNombreArchivo(nombreTabla, claseObjeto.controller) + " : ControllerBase" + ENTER
+    cuerpoClase += TAB + "public class " + generarNombreArchivo(nombreTabla, enumerados.claseObjeto.controller) + " : ControllerBase" + ENTER
     cuerpoClase += TAB + "{" + ENTER 
     cuerpoClase += 2*TAB + "#region Operations" + ENTER 
     cuerpoClase += 2*TAB + "[HttpGet(\"GetByPagination/{" + nombreCampoClavePrincipal + "}\", Name = \"" + nombreTabla + "_GetByPagination\")]" + ENTER 
@@ -80,7 +80,7 @@ def generarMetodoObtenerByPagination(nombreTabla):
 
     df = consultaDatos.obtenerMetaDataClavePrincipal(nombreTabla)
     for i in df.index:
-        tipoDatoClavePrincipal = df["tipoDato"][i]
+        tipoDatoClavePrincipal = df["tipoDatoNET"][i]
         nombreCampoClavePrincipal = df["nombreCampo"][i]
 
     MetodoObtenerByPagination += 2*TAB + "public IActionResult GetByPagination(" + tipoDatoClavePrincipal + " " + nombreCampoClavePrincipal + ")" + ENTER
@@ -113,7 +113,7 @@ def generarMetodoObtenerByID(nombreTabla):
 
     df = consultaDatos.obtenerMetaDataClavePrincipal(nombreTabla)
     for i in df.index:
-        tipoDatoClavePrincipal = df["tipoDato"][i]
+        tipoDatoClavePrincipal = df["tipoDatoNET"][i]
         nombreCampoClavePrincipal = df["nombreCampo"][i]
     
     metodoObtenerByID += 2*TAB + "public IActionResult GetById(" + tipoDatoClavePrincipal + " " + nombreCampoClavePrincipal + ")" + ENTER
@@ -198,7 +198,7 @@ def generarMetodoDelete(nombreTabla):
 
     df = consultaDatos.obtenerMetaDataClavePrincipal(nombreTabla)
     for i in df.index:
-        tipoDatoClavePrincipal = df["tipoDato"][i]
+        tipoDatoClavePrincipal = df["tipoDatoNET"][i]
         nombreCampoClavePrincipal = df["nombreCampo"][i]
 
     metodoDelete += 2*TAB + "public IActionResult Delete(" + tipoDatoClavePrincipal + " " + nombreCampoClavePrincipal + ")" + ENTER

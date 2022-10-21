@@ -1,13 +1,13 @@
 from utilitarios import generarRutaArchivo, generarNombreArchivo, generarArchivo, generarExtensionArchivo
-from utilitarios import tipoObjeto, claseObjeto
+from utilitarios import enumerados
 
 TAB = "\t"
 ENTER = "\n"
 
 def generarArchivoRequestValidator(nombreTabla):
-    rutaArchivo = generarRutaArchivo(nombreTabla, tipoObjeto.Aplicacion)
-    nombreArchivo = generarNombreArchivo(nombreTabla, claseObjeto.requestValidation)
-    extensionArchivo = generarExtensionArchivo(tipoObjeto.Aplicacion)
+    rutaArchivo = generarRutaArchivo(nombreTabla, enumerados.tipoObjeto.Aplicacion)
+    nombreArchivo = generarNombreArchivo(nombreTabla, enumerados.claseObjeto.requestValidation)
+    extensionArchivo = generarExtensionArchivo(enumerados.tipoObjeto.Aplicacion)
     contenidoArchivo = generarClase(nombreTabla)
     
     generarArchivo(rutaArchivo, nombreArchivo + extensionArchivo, contenidoArchivo)
@@ -37,7 +37,7 @@ def generarCabeceraClase():
 def generarCuerpoClase(nombreTabla):
     cuerpoClase = ""
 
-    cuerpoClase += TAB + "public static class " + generarNombreArchivo(nombreTabla, claseObjeto.requestValidation) + ENTER
+    cuerpoClase += TAB + "public static class " + generarNombreArchivo(nombreTabla, enumerados.claseObjeto.requestValidation) + ENTER
     cuerpoClase += TAB + "{" + ENTER 
    
     cuerpoClase +=  2*TAB + "#region Validate" + ENTER

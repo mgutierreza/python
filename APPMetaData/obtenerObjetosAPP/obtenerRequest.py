@@ -1,13 +1,13 @@
 from utilitarios import generarRutaArchivo, generarNombreArchivo, generarArchivo, generarExtensionArchivo
-from utilitarios import tipoObjeto, claseObjeto
+from utilitarios import enumerados
 
 TAB = "\t"
 ENTER = "\n"
 
 def generarArchivoRequest(nombreTabla):
-    rutaArchivo = generarRutaArchivo(nombreTabla, tipoObjeto.Aplicacion)
-    nombreArchivo = generarNombreArchivo(nombreTabla, claseObjeto.request)
-    extensionArchivo = generarExtensionArchivo(tipoObjeto.Aplicacion)
+    rutaArchivo = generarRutaArchivo(nombreTabla, enumerados.tipoObjeto.Aplicacion)
+    nombreArchivo = generarNombreArchivo(nombreTabla, enumerados.claseObjeto.request)
+    extensionArchivo = generarExtensionArchivo(enumerados.tipoObjeto.Aplicacion)
     contenidoArchivo = generarClase(nombreTabla)
     
     generarArchivo(rutaArchivo, nombreArchivo + extensionArchivo, contenidoArchivo)

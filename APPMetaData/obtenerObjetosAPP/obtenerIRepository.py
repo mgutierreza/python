@@ -2,16 +2,16 @@ import pyodbc as pyo
 import pandas as pd
 from obtenerObjetosBD import obtenerConsulta
 from utilitarios import generarRutaArchivo, generarNombreArchivo, generarArchivo, generarExtensionArchivo
-from utilitarios import tipoObjeto, claseObjeto
+from utilitarios import enumerados
 from obtenerConexionBD import consultaDatos
 
 TAB = "\t"
 ENTER = "\n"
 
 def generarArchivoIRepository(nombreTabla):
-    rutaArchivo = generarRutaArchivo(nombreTabla, tipoObjeto.Aplicacion)
-    nombreArchivo = generarNombreArchivo(nombreTabla, claseObjeto.iRepository)
-    extensionArchivo = generarExtensionArchivo(tipoObjeto.Aplicacion)
+    rutaArchivo = generarRutaArchivo(nombreTabla, enumerados.tipoObjeto.Aplicacion)
+    nombreArchivo = generarNombreArchivo(nombreTabla, enumerados.claseObjeto.iRepository)
+    extensionArchivo = generarExtensionArchivo(enumerados.tipoObjeto.Aplicacion)
     contenidoArchivo = generarClase(nombreTabla)
     
     generarArchivo(rutaArchivo, nombreArchivo + extensionArchivo, contenidoArchivo)
@@ -46,10 +46,10 @@ def generarCuerpoClase(nombreTabla):
 
     df = consultaDatos.obtenerMetaDataClavePrincipal(nombreTabla)
     for i in df.index:
-        tipoDatoClavePrincipal = df["tipoDato"][i]
+        tipoDatoClavePrincipal = df["tipoDatoNET"][i]
         nombreCampoClavePrincipal = df["nombreCampo"][i]
     
-    cuerpoClase += TAB + "public interface " + generarNombreArchivo(nombreTabla, claseObjeto.iRepository) + " : IGenericRepository<" + nombreTabla + "Entity>" + ENTER
+    cuerpoClase += TAB + "public interface " + generarNombreArchivo(nombreTabla, enumerados.claseObjeto.iRepository) + " : IGenericRepository<" + nombreTabla + "Entity>" + ENTER
     cuerpoClase += TAB + "{" + ENTER 
     cuerpoClase += 2*TAB + "int Insert" + nombreTabla + "(" + nombreTabla + "Entity item);" + ENTER 
     cuerpoClase += 2*TAB + "bool Update" + nombreTabla + "(" + nombreTabla + "Entity item);" + ENTER 

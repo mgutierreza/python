@@ -1,16 +1,16 @@
 import pyodbc as pyo
 import pandas as pd
 from utilitarios import generarRutaArchivo, generarNombreArchivo, generarArchivo, generarExtensionArchivo
-from utilitarios import tipoObjeto, claseObjeto
+from utilitarios import enumerados
 from obtenerConexionBD import consultaDatos
 
 TAB = "\t"
 ENTER = "\n"
 
 def generarArchivoEntity(nombreTabla):
-    rutaArchivo = generarRutaArchivo(nombreTabla, tipoObjeto.Aplicacion)
-    nombreArchivo = generarNombreArchivo(nombreTabla, claseObjeto.entity)
-    extensionArchivo = generarExtensionArchivo(tipoObjeto.Aplicacion)
+    rutaArchivo = generarRutaArchivo(nombreTabla, enumerados.tipoObjeto.Aplicacion)
+    nombreArchivo = generarNombreArchivo(nombreTabla, enumerados.claseObjeto.entity)
+    extensionArchivo = generarExtensionArchivo(enumerados.tipoObjeto.Aplicacion)
     contenidoArchivo = generarClase(nombreTabla)
     
     generarArchivo(rutaArchivo, nombreArchivo + extensionArchivo, contenidoArchivo)
@@ -51,7 +51,7 @@ def generarCuerpoClase(nombreTabla):
 
     for i in df.index:
         cuerpoClaseEntity += 2*TAB + datamember + ENTER 
-        cuerpoClaseEntity += 2*TAB + "public " + df["tipoDato"][i] + " " + df["nombreCampo"][i] + textoGetSet + 2*ENTER
+        cuerpoClaseEntity += 2*TAB + "public " + df["tipoDatoNET"][i] + " " + df["nombreCampo"][i] + textoGetSet + 2*ENTER
 
     return cuerpoClaseEntity
 

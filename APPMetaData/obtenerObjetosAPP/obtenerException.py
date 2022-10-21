@@ -1,16 +1,16 @@
 import pyodbc as pyo
 import pandas as pd
 from utilitarios import generarRutaArchivo, generarNombreArchivo, generarArchivo, generarExtensionArchivo
-from utilitarios import tipoObjeto, claseObjeto
+from utilitarios import enumerados
 from obtenerConexionBD import consultaDatos
 
 TAB = "\t"
 ENTER = "\n"
 
 def generarArchivoException(nombreTabla):
-    rutaArchivo = generarRutaArchivo(nombreTabla, tipoObjeto.Aplicacion)
-    nombreArchivo = generarNombreArchivo(nombreTabla, claseObjeto.exception)
-    extensionArchivo = generarExtensionArchivo(tipoObjeto.Aplicacion)
+    rutaArchivo = generarRutaArchivo(nombreTabla, enumerados.tipoObjeto.Aplicacion)
+    nombreArchivo = generarNombreArchivo(nombreTabla, enumerados.claseObjeto.exception)
+    extensionArchivo = generarExtensionArchivo(enumerados.tipoObjeto.Aplicacion)
     contenidoArchivo = generarClase(nombreTabla)
     
     generarArchivo(rutaArchivo, nombreArchivo + extensionArchivo, contenidoArchivo)
@@ -38,7 +38,7 @@ def generarCabeceraClase():
 def generarCuerpoClase(nombreTabla):
     cuerpoClaseEntity = ""
 
-    cuerpoClaseEntity = cuerpoClaseEntity + TAB + "public class " + generarNombreArchivo(nombreTabla, claseObjeto.exception) + " : CustomException" + ENTER
+    cuerpoClaseEntity = cuerpoClaseEntity + TAB + "public class " + generarNombreArchivo(nombreTabla, enumerados.claseObjeto.exception) + " : CustomException" + ENTER
     cuerpoClaseEntity = cuerpoClaseEntity + TAB + "{" + ENTER 
     cuerpoClaseEntity = cuerpoClaseEntity + 2*TAB + "public string ErrorCode { get; set; }" + ENTER 
     cuerpoClaseEntity = cuerpoClaseEntity + 2*TAB + "private List<ErrorCodeEntityException> ErrorsList = new List<ErrorCodeEntityException>() {" + ENTER 

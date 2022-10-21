@@ -2,16 +2,16 @@ import pyodbc as pyo
 import pandas as pd
 from obtenerObjetosBD import obtenerConsulta
 from utilitarios import generarRutaArchivo, generarNombreArchivo, generarArchivo, generarExtensionArchivo
-from utilitarios import tipoObjeto, claseObjeto
+from utilitarios import enumerados
 from obtenerConexionBD import consultaDatos
 
 TAB = "\t"
 ENTER = "\n"
 
 def generarArchivoRepository(nombreTabla):
-    rutaArchivo = generarRutaArchivo(nombreTabla, tipoObjeto.Aplicacion)
-    nombreArchivo = generarNombreArchivo(nombreTabla, claseObjeto.repository)
-    extensionArchivo = generarExtensionArchivo(tipoObjeto.Aplicacion)
+    rutaArchivo = generarRutaArchivo(nombreTabla, enumerados.tipoObjeto.Aplicacion)
+    nombreArchivo = generarNombreArchivo(nombreTabla, enumerados.claseObjeto.repository)
+    extensionArchivo = generarExtensionArchivo(enumerados.tipoObjeto.Aplicacion)
     contenidoArchivo = generarClase(nombreTabla)
     
     generarArchivo(rutaArchivo, nombreArchivo + extensionArchivo, contenidoArchivo)
@@ -45,8 +45,8 @@ def generarCabeceraClase():
 
 def generarCuerpoClase(nombreTabla):
     cuerpoClase = ""
-    cuerpoClase += TAB + "[Export(typeof(I" + generarNombreArchivo(nombreTabla, claseObjeto.repository) + "))]" + ENTER
-    cuerpoClase += TAB + "public class " + generarNombreArchivo(nombreTabla, claseObjeto.repository) + " : BaseRepository, I" + nombreTabla + "Repository" + ENTER
+    cuerpoClase += TAB + "[Export(typeof(I" + generarNombreArchivo(nombreTabla, enumerados.claseObjeto.repository) + "))]" + ENTER
+    cuerpoClase += TAB + "public class " + generarNombreArchivo(nombreTabla, enumerados.claseObjeto.repository) + " : BaseRepository, I" + nombreTabla + "Repository" + ENTER
     cuerpoClase += TAB + "{" + ENTER 
     cuerpoClase += generarConstructorClase(nombreTabla) + ENTER 
     cuerpoClase += 2*TAB + "#region Public Methods" + ENTER 
@@ -69,7 +69,7 @@ def generarConstructorClase(nombreTabla):
     constructorClase = ""
     constructorClase += 2*TAB + "#region Constructor" + ENTER
     constructorClase += 2*TAB + "[ImportingConstructor]" + ENTER
-    constructorClase += 2*TAB + "public " + generarNombreArchivo(nombreTabla, claseObjeto.repository) +"(IConnectionFactory cn) : base(cn)" + ENTER
+    constructorClase += 2*TAB + "public " + generarNombreArchivo(nombreTabla, enumerados.claseObjeto.repository) +"(IConnectionFactory cn) : base(cn)" + ENTER
     constructorClase += 2*TAB + "{" + 2*ENTER
     constructorClase += 2*TAB + "}" + ENTER
     constructorClase += 2*TAB + "#endregion" + ENTER
@@ -83,7 +83,7 @@ def generarMetodoInsertar(nombreTabla):
     df = consultaDatos.obtenerMetaDataClavePrincipal(nombreTabla)
     for i in df.index:
         campoClavePrincipal = df["nombreCampo"][i]
-        tipoDatoClavePrincipal = df["tipoDato"][i]
+        tipoDatoClavePrincipal = df["tipoDatoNET"][i]
 
     metodoInsertar += 2*TAB + "public int Insert" + nombreTabla + "(" + nombreTabla + "Entity item)" + ENTER
     metodoInsertar += 2*TAB + "{" + ENTER 
@@ -129,7 +129,7 @@ def generarMetodoBorrar(nombreTabla):
     df = consultaDatos.obtenerMetaDataClavePrincipal(nombreTabla)
     for i in df.index:
         campoClavePrincipal = df["nombreCampo"][i]
-        tipoDatoClavePrincipal = df["tipoDato"][i]
+        tipoDatoClavePrincipal = df["tipoDatoNET"][i]
     
     metodoBorrar += 2*TAB + "public bool Delete" + nombreTabla + "(" + tipoDatoClavePrincipal + " " + campoClavePrincipal + ")" + ENTER
     metodoBorrar += 2*TAB + "{" + ENTER 
@@ -175,7 +175,7 @@ def generarMetodoObtenerLstItem(nombreTabla):
     df = consultaDatos.obtenerMetaDataClavePrincipal(nombreTabla)
     for i in df.index:
         campoClavePrincipal = df["nombreCampo"][i]
-        tipoDatoClavePrincipal = df["tipoDato"][i]
+        tipoDatoClavePrincipal = df["tipoDatoNET"][i]
 
     metodoObtenerLstItem += 2*TAB + "public IEnumerable<" + nombreTabla + "Entity> GetLstItem" + nombreTabla + "(" + nombreTabla + "Filter filter, " + nombreTabla + "FilterLstItemType filterType, Pagination pagination)" + ENTER
     metodoObtenerLstItem += 2*TAB + "{" + ENTER 
@@ -226,7 +226,7 @@ def generarMetodosObtenerByID(nombreTabla):
     df = consultaDatos.obtenerMetaDataClavePrincipal(nombreTabla)
     for i in df.index:
         campoClavePrincipal = df["nombreCampo"][i]
-        tipoDatoClavePrincipal = df["tipoDato"][i]
+        tipoDatoClavePrincipal = df["tipoDatoNET"][i]
     
     metodoObtenerByID += 2*TAB + "private " + nombreTabla + "Entity GetById(" + tipoDatoClavePrincipal + " " + campoClavePrincipal + ")" + ENTER
     metodoObtenerByID += 2*TAB + "{" + ENTER 
@@ -248,7 +248,7 @@ def generarMetodosObtenerByPagination(nombreTabla):
     df = consultaDatos.obtenerMetaDataClavePrincipal(nombreTabla)
     for i in df.index:
         campoClavePrincipal = df["nombreCampo"][i]
-        tipoDatoClavePrincipal = df["tipoDato"][i]
+        tipoDatoClavePrincipal = df["tipoDatoNET"][i]
 
     metodoObtenerByPagination += 2*TAB + "private IEnumerable<" + nombreTabla + "Entity> GetByPagination(" + tipoDatoClavePrincipal + " " + campoClavePrincipal + ")" + ENTER
     metodoObtenerByPagination += 2*TAB + "{" + ENTER 
@@ -274,7 +274,7 @@ def generarCamposInsertar(nombreTabla):
     df = df.drop(range(rangoMenor,rangoMayor))
     
     for i in df.index:
-        tipoDato = df["tipoDato"][i]
+        tipoDato = df["tipoDatoNET"][i]
         if (df["tipoCampo"][i] == 'PRIMARY KEY'):
             campoInsertar += 3*TAB + "param.Add(\"@" + df["nombreCampo"][i] + "\", item." + df["nombreCampo"][i] 
             campoInsertar += ", DbType." + tipoDato + ", direction: ParameterDirection.Output); " + ENTER
@@ -296,7 +296,7 @@ def generarCamposActualizar(nombreTabla):
     df = df.drop(range(rangoMenor,rangoMayor))
     
     for i in df.index:
-        tipoDato = df["tipoDato"][i]
+        tipoDatoNET = df["tipoDatoNET"][i]
         campoActualizar += 3*TAB + "param.Add(\"@" + df["nombreCampo"][i] + "\", item." + df["nombreCampo"][i] + ", DbType." + tipoDato + "); " + ENTER
 
     return campoActualizar

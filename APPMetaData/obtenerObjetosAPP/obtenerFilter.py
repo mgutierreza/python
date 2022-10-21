@@ -1,16 +1,16 @@
 import pyodbc as pyo
 import pandas as pd
 from utilitarios import generarRutaArchivo, generarNombreArchivo, generarArchivo, generarExtensionArchivo
-from utilitarios import tipoObjeto, claseObjeto
+from utilitarios import enumerados
 from obtenerConexionBD import consultaDatos
 
 TAB = "\t"
 ENTER = "\n"
 
 def generarArchivoFilter(nombreTabla):
-    rutaArchivo = generarRutaArchivo(nombreTabla, tipoObjeto.Aplicacion)
-    nombreArchivo = generarNombreArchivo(nombreTabla, claseObjeto.filter)
-    extensionArchivo = generarExtensionArchivo(tipoObjeto.Aplicacion)
+    rutaArchivo = generarRutaArchivo(nombreTabla, enumerados.tipoObjeto.Aplicacion)
+    nombreArchivo = generarNombreArchivo(nombreTabla, enumerados.claseObjeto.filter)
+    extensionArchivo = generarExtensionArchivo(enumerados.tipoObjeto.Aplicacion)
     contenidoArchivo = generarClase(nombreTabla)
     
     generarArchivo(rutaArchivo, nombreArchivo + extensionArchivo, contenidoArchivo)
@@ -22,7 +22,7 @@ def generarClase(nombreTabla):
     clase += generarCabeceraClase()
     clase += "namespace EP_AcademicMicroservice.Entities" + ENTER 
     clase += "{" + ENTER
-    clase += TAB + "public class " + generarNombreArchivo(nombreTabla, claseObjeto.filter) + ENTER 
+    clase += TAB + "public class " + generarNombreArchivo(nombreTabla, enumerados.claseObjeto.filter) + ENTER 
     clase += TAB + "{" + ENTER
     clase += generarCuerpoClase(nombreTabla)
     clase += TAB + "}" + ENTER 
@@ -46,7 +46,7 @@ def generarCuerpoClase(nombreTabla):
     df = consultaDatos.obtenerMetaDataClaves(nombreTabla)
 
     for i in df.index:
-        tipoDato = df["tipoDato"][i]
+        tipoDato = df["tipoDatoNET"][i]
         cuerpoClase += 2*TAB + "public " + tipoDato + " " + df["nombreCampo"][i] + textoGetSet + ENTER
 
     return cuerpoClase

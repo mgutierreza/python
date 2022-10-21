@@ -1,13 +1,13 @@
 from utilitarios import generarRutaArchivo, generarNombreArchivo, generarArchivo, generarExtensionArchivo
-from utilitarios import tipoObjeto, claseObjeto
+from utilitarios import enumerados
 
 TAB = "\t"
 ENTER = "\n"
 
 def generarArchivoResponse(nombreTabla):
-    rutaArchivo = generarRutaArchivo(nombreTabla, tipoObjeto.Aplicacion)
-    nombreArchivo = generarNombreArchivo(nombreTabla, claseObjeto.response)
-    extensionArchivo = generarExtensionArchivo(tipoObjeto.Aplicacion)
+    rutaArchivo = generarRutaArchivo(nombreTabla, enumerados.tipoObjeto.Aplicacion)
+    nombreArchivo = generarNombreArchivo(nombreTabla, enumerados.claseObjeto.response)
+    extensionArchivo = generarExtensionArchivo(enumerados.tipoObjeto.Aplicacion)
     contenidoArchivo = generarClase(nombreTabla)
     
     generarArchivo(rutaArchivo, nombreArchivo + extensionArchivo, contenidoArchivo)
@@ -37,7 +37,7 @@ def generarCabeceraClase():
 def generarCuerpoClase(nombreTabla):
     cuerpoClase = ""
 
-    cuerpoClase += TAB + "public class " + generarNombreArchivo(nombreTabla, claseObjeto.response) + " : ItemResponse<bool>" + ENTER
+    cuerpoClase += TAB + "public class " + generarNombreArchivo(nombreTabla, enumerados.claseObjeto.response) + " : ItemResponse<bool>" + ENTER
     cuerpoClase += TAB + "{" + 2*ENTER 
     cuerpoClase += TAB + "}" + 2*ENTER
     

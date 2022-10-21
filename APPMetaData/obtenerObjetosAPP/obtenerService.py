@@ -2,16 +2,16 @@ import pyodbc as pyo
 import pandas as pd
 from obtenerObjetosBD import obtenerConsulta
 from utilitarios import generarRutaArchivo, generarNombreArchivo, generarArchivo, generarExtensionArchivo
-from utilitarios import tipoObjeto, claseObjeto
+from utilitarios import enumerados
 from obtenerConexionBD import consultaDatos
 
 TAB = "\t"
 ENTER = "\n"
 
 def generarArchivoService(nombreTabla):
-    rutaArchivo = generarRutaArchivo(nombreTabla, tipoObjeto.Aplicacion)
-    nombreArchivo = generarNombreArchivo(nombreTabla, claseObjeto.service)
-    extensionArchivo = generarExtensionArchivo(tipoObjeto.Aplicacion)
+    rutaArchivo = generarRutaArchivo(nombreTabla, enumerados.tipoObjeto.Aplicacion)
+    nombreArchivo = generarNombreArchivo(nombreTabla, enumerados.claseObjeto.service)
+    extensionArchivo = generarExtensionArchivo(enumerados.tipoObjeto.Aplicacion)
     contenidoArchivo = generarClase(nombreTabla)
     
     generarArchivo(rutaArchivo, nombreArchivo + extensionArchivo, contenidoArchivo)
@@ -42,7 +42,7 @@ def generarCabeceraClase():
 
 def generarCuerpoClase(nombreTabla):
     cuerpoClase = ""
-    cuerpoClase = cuerpoClase + TAB + "public class " + generarNombreArchivo(nombreTabla, claseObjeto.service) + ENTER
+    cuerpoClase = cuerpoClase + TAB + "public class " + generarNombreArchivo(nombreTabla, enumerados.claseObjeto.service) + ENTER
     cuerpoClase = cuerpoClase + TAB + "{" + ENTER 
     cuerpoClase = cuerpoClase + 2*TAB + "#region Public Methods" + ENTER 
     cuerpoClase = cuerpoClase + generarMetodoExecute(nombreTabla) + 2*ENTER 

@@ -2,7 +2,7 @@ import pyodbc as pyo
 import pandas as pd
 from obtenerObjetosBD import obtenerConsulta
 from utilitarios import generarRutaArchivo, generarNombreArchivo, generarArchivo, generarExtensionArchivo
-from utilitarios import tipoObjeto, claseObjeto
+from utilitarios import enumerados
 from obtenerConexionBD import consultaDatos
 from utilitarios import util
 
@@ -11,9 +11,9 @@ ENTER = "\n"
 
 def generarProcedimientoAlmacenadoBorrado(nombreTabla):
 
-    rutaArchivo = generarRutaArchivo(nombreTabla, tipoObjeto.BaseDatos)
-    nombreArchivo = generarNombreArchivo(nombreTabla, claseObjeto.delete)
-    extensionArchivo = generarExtensionArchivo(tipoObjeto.BaseDatos)
+    rutaArchivo = generarRutaArchivo(nombreTabla, enumerados.tipoObjeto.BaseDatos)
+    nombreArchivo = generarNombreArchivo(nombreTabla, enumerados.claseObjeto.delete)
+    extensionArchivo = generarExtensionArchivo(enumerados.tipoObjeto.BaseDatos)
     contenidoArchivo = generarProcedimientoAlmacenado(nombreTabla)
 
     generarArchivo(rutaArchivo, nombreArchivo + extensionArchivo, contenidoArchivo)
@@ -37,7 +37,7 @@ def generarLibreriasProcedimientoAlmacenado():
 
 def generarCabeceraProcedimientoAlmacenado(nombreTabla):
     CabeceraProcedimientoAlmacenado = ""
-    CabeceraProcedimientoAlmacenado += "CREATE PROCEDURE dbo." + generarNombreArchivo(nombreTabla, claseObjeto.delete) + ENTER 
+    CabeceraProcedimientoAlmacenado += "CREATE PROCEDURE dbo." + generarNombreArchivo(nombreTabla, enumerados.claseObjeto.delete) + ENTER 
     CabeceraProcedimientoAlmacenado += "(" + ENTER
     CabeceraProcedimientoAlmacenado += generarParametrosEntradaProcedimientoAlmacenado(nombreTabla)
     CabeceraProcedimientoAlmacenado += ")" + ENTER   
@@ -67,13 +67,13 @@ def generarCuerpoProcedimientoAlmacenado(nombreTabla):
 def generarParametrosEntradaProcedimientoAlmacenado(nombreTabla):
     parametrosEntrada = ""
 
-    df = consultaDatos.obtenerMetaDataClavePrincipalBD(nombreTabla)
+    df = consultaDatos.obtenerMetaDataClavePrincipal(nombreTabla)
 
     for i in df.index:
-        if (df["tipoDato"][i] == 'INT' or df["tipoDato"][i] == 'DATE' or df["tipoDato"][i] == 'DATETIME' or df["tipoDato"][i] == 'BIGINT'):
-            parametrosEntrada += 2*TAB +"@"+ df["nombreCampo"][i] + 4*TAB + df["tipoDato"][i] + "," + ENTER
+        if (df["tamanhoCampo"][i] == 0):
+            parametrosEntrada += 2*TAB +"@"+ df["nombreCampo"][i] + 4*TAB + df["tipoDatoBD"][i] + "," + ENTER
         else:
-            parametrosEntrada += 2*TAB +"@"+ df["nombreCampo"][i] + 4*TAB + df["tipoDato"][i] + "(" + (df["tamanhoCampo"][i]).astype(str) + ")," + ENTER
+            parametrosEntrada += 2*TAB +"@"+ df["nombreCampo"][i] + 4*TAB + df["tipoDatoBD"][i] + "(" + (df["tamanhoCampo"][i]).astype(str) + ")," + ENTER
     
     parametrosEntrada = util.extraerUltimoCaracter(parametrosEntrada) + ENTER
     
@@ -107,7 +107,7 @@ def generarActualizacionEstado(nombreTabla, estadoRegistro = 0):
 def obtenerClavePrincipalTabla(nombreTabla): 
     campoClavePrincipal = ""
 
-    df = consultaDatos.obtenerMetaDataClavePrincipalBD(nombreTabla)
+    df = consultaDatos.obtenerMetaDataClavePrincipal(nombreTabla)
 
     for i in df.index:
         campoClavePrincipal += df["nombreCampo"][i]
@@ -117,10 +117,10 @@ def obtenerClavePrincipalTabla(nombreTabla):
 def obtenerCampoEstadoTabla(nombreTabla):
     campoEstado = ""
 
-    df = consultaDatos.obtenerMetaDataCamposSinClavePrincipalBD(nombreTabla)
+    df = consultaDatos.obtenerMetaDataCamposSinClavePrincipal(nombreTabla)
 
     for i in df.index:
-        if ((df["tipoDato"][i] == 'INT') and ("Estado" in df["nombreCampo"][i])):
+        if ((df["tipoDatoBD"][i] == 'INT') and ("Estado" in df["nombreCampo"][i])):
             campoEstado += df["nombreCampo"][i]
 
     return campoEstado

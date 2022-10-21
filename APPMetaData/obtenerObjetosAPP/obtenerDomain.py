@@ -2,16 +2,16 @@ import pyodbc as pyo
 import pandas as pd
 from obtenerObjetosBD import obtenerConsulta
 from utilitarios import generarRutaArchivo, generarNombreArchivo, generarArchivo, generarExtensionArchivo
-from utilitarios import tipoObjeto, claseObjeto
+from utilitarios import enumerados
 from obtenerConexionBD import consultaDatos
 
 TAB = "\t"
 ENTER = "\n"
 
 def generarArchivoDomain(nombreTabla):
-    rutaArchivo = generarRutaArchivo(nombreTabla, tipoObjeto.Aplicacion)
-    nombreArchivo = generarNombreArchivo(nombreTabla, claseObjeto.domain)
-    extensionArchivo = generarExtensionArchivo(tipoObjeto.Aplicacion)
+    rutaArchivo = generarRutaArchivo(nombreTabla, enumerados.tipoObjeto.Aplicacion)
+    nombreArchivo = generarNombreArchivo(nombreTabla, enumerados.claseObjeto.domain)
+    extensionArchivo = generarExtensionArchivo(enumerados.tipoObjeto.Aplicacion)
     contenidoArchivo = generarClase(nombreTabla)
     
     generarArchivo(rutaArchivo, nombreArchivo + extensionArchivo, contenidoArchivo)
@@ -44,7 +44,7 @@ def generarCabeceraClase():
 
 def generarCuerpoClase(nombreTabla):
     cuerpoClase = ""
-    cuerpoClase += TAB + "public class " + generarNombreArchivo(nombreTabla, claseObjeto.domain) + ENTER
+    cuerpoClase += TAB + "public class " + generarNombreArchivo(nombreTabla, enumerados.claseObjeto.domain) + ENTER
     cuerpoClase += TAB + "{" + ENTER 
     cuerpoClase += 2*TAB + "#region MEF" + ENTER 
     cuerpoClase += 2*TAB + "[Import]" + ENTER 
@@ -66,7 +66,7 @@ def generarCuerpoClase(nombreTabla):
 
 def generarConstructorClase(nombreTabla):
     constructorClase = ""
-    constructorClase += 2*TAB + "public " + generarNombreArchivo(nombreTabla, claseObjeto.domain) + "()" + ENTER
+    constructorClase += 2*TAB + "public " + generarNombreArchivo(nombreTabla, enumerados.claseObjeto.domain) + "()" + ENTER
     constructorClase += 2*TAB + "{" + ENTER
     constructorClase += 3*TAB + "_" + nombreTabla + "Repository = MEFContainer.Container.GetExport<I" + nombreTabla + "Repository>();" + ENTER
     constructorClase += 2*TAB + "}" + ENTER
@@ -115,7 +115,7 @@ def generarMetodoDelete(nombreTabla):
 
     df = consultaDatos.obtenerMetaDataClavePrincipal(nombreTabla)
     for i in df.index:
-        tipoDatoClavePrincipal = df["tipoDato"][i]
+        tipoDatoClavePrincipal = df["tipoDatoNET"][i]
         clavePrincipal = df["nombreCampo"][i]
 
     metodoDelete += 2*TAB + "public bool Delete" + nombreTabla + "(" + tipoDatoClavePrincipal + " " + clavePrincipal + ")" + ENTER
@@ -134,7 +134,7 @@ def generarMetodoObtenerByID(nombreTabla):
 
     df = consultaDatos.obtenerMetaDataClavePrincipal(nombreTabla)
     for i in df.index:
-        tipoDatoClavePrincipal = df["tipoDato"][i]
+        tipoDatoClavePrincipal = df["tipoDatoNET"][i]
         nombreCampoClavePrincipal = df["nombreCampo"][i]
     
     metodoObtenerByID += 2*TAB + "public " + nombreTabla + "Entity GetById(" + tipoDatoClavePrincipal + " " + nombreCampoClavePrincipal + ")" + ENTER
