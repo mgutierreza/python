@@ -15,8 +15,10 @@ def generarRutaArchivo(nombreTabla, tipoObjeto):
 
     if (tipoObjeto == tipoObjeto.BaseDatos):
         rutaCreacionArchivo = rutaCreacionArchivo + nombreTabla + "\\BD"
-    else:
+    elif(tipoObjeto == tipoObjeto.Aplicacion):
         rutaCreacionArchivo = rutaCreacionArchivo +nombreTabla + "\\AP"
+    else:
+        rutaCreacionArchivo = rutaCreacionArchivo +nombreTabla + "\\JSON"
 
     if (not os.path.isdir(rutaCreacionArchivo)):
         os.makedirs(rutaCreacionArchivo)
@@ -70,6 +72,8 @@ def generarExtensionArchivo(tipoObjeto):
 
     if (tipoObjeto == tipoObjeto.BaseDatos):
         extensionArchivo = ".sql"
+    elif(tipoObjeto == tipoObjeto.JSON):
+        extensionArchivo = ".json"
 
     return extensionArchivo
 

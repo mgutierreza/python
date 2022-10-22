@@ -1,7 +1,8 @@
 from obtenerObjetosBD import *
 from obtenerObjetosAPP import *
+from obtenerJSON import *
 
-nombreTablaBaseDatos = "Acd_MatCursos"
+nombreTablaBaseDatos = "Acd_GrupoEstudio"
 
 #Creación de Objetos de Base de Datos
 generarProcedimientoAlmacenadoSelect(nombreTablaBaseDatos)
@@ -10,7 +11,7 @@ generarProcedimientoAlmacenadoActualizacion(nombreTablaBaseDatos)
 generarProcedimientoAlmacenadoBorrado(nombreTablaBaseDatos)
 
 #Creación de Objetos de Aplicación
-'''generarArchivoEntity(nombreTablaBaseDatos)
+generarArchivoEntity(nombreTablaBaseDatos)
 generarArchivoException(nombreTablaBaseDatos)
 generarArchivoFilter(nombreTablaBaseDatos)
 generarArchivoFilterType(nombreTablaBaseDatos)
@@ -21,4 +22,7 @@ generarArchivoRepository(nombreTablaBaseDatos)
 generarArchivoIRepository(nombreTablaBaseDatos)
 generarArchivoService(nombreTablaBaseDatos)
 generarArchivoDomain(nombreTablaBaseDatos)
-generarArchivoController(nombreTablaBaseDatos)'''
+generarArchivoController(nombreTablaBaseDatos)
+
+#Creación de JSON
+generarJSONInsercion(nombreTablaBaseDatos)

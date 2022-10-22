@@ -61,7 +61,7 @@ def generarCuerpoProcedimientoAlmacenado(nombreTabla):
 
     if (existeClaveForanea):
         for i in df.index:
-            cuerpoProcedimientoAlmacenado += TAB + "SELECT @existeRegistro = " + df["columnaOrigen"][i] + " FROM dbo." + df["tablaOrigen"][i] + " WHERE " + df["columnaOrigen"][i] + " = @" + df["columnaDestino"][i] + 2*ENTER
+            cuerpoProcedimientoAlmacenado += TAB + "SELECT @existeRegistro = " + df["columnaOrigen"][i] + " FROM dbo." + df["tablaOrigen"][i] + " WITH(NOLOCK) WHERE " + df["columnaOrigen"][i] + " = @" + df["columnaDestino"][i] + 2*ENTER
             cuerpoProcedimientoAlmacenado += TAB + "IF @existeRegistro <= 0" + ENTER
             cuerpoProcedimientoAlmacenado += TAB + "BEGIN" + ENTER
             cuerpoProcedimientoAlmacenado += 2*TAB + "SET @errorCode = CONCAT(@errorCode, '/', 'not_found_record_" + df["tablaOrigen"][i] + "/'" + ENTER

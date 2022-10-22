@@ -4,6 +4,7 @@ from enum import Enum, unique
 class tipoObjeto(Enum):
     BaseDatos = 1
     Aplicacion = 2
+    JSON = 3
 
 @unique
 class claseObjeto(Enum):

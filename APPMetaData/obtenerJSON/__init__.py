@@ -1,0 +1,1 @@
+from obtenerJSON.obtenerArchivosJSON import generarJSONInsercion

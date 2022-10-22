@@ -114,7 +114,7 @@ def generarConsultaProcedimientoAlmacenado(nombreTabla):
 def generarFiltroConsulta(nombreTabla):
     
     dfClave = consultaDatos.obtenerMetaDataClavePrincipal(nombreTabla)
-    lineaFiltroCodigoProcedimientoAlmacenado = 4*TAB + "WHERE"
+    lineaFiltroCodigoProcedimientoAlmacenado = 4*TAB + "WHERE "
 
     for i in dfClave.index:
         lineaFiltroCodigoProcedimientoAlmacenado += nombreTabla + "."+ dfClave["nombreCampo"][i] + TAB + "=" + TAB + "@" + dfClave["nombreCampo"][i] + ENTER

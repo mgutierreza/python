@@ -62,7 +62,7 @@ def generarParametrosSalidaProcedimientoAlmacenado(nombreTabla):
         else:
             parametrosSalida += 2*TAB + "@"+ df["nombreCampo"][i] + espacioFaltante*ESPACIO + 4*TAB + df["tipoDatoBD"][i] + "(" + (df["tamanhoCampo"][i]).astype(str) + ") OUTPUT," + ENTER
 
-    parametrosSalida = util.extraerUltimoCaracter(parametrosSalida) + ENTER
+    #parametrosSalida = util.extraerUltimoCaracter(parametrosSalida) + ENTER
 
     return parametrosSalida
 

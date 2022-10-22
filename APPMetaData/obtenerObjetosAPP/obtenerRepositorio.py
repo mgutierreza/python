@@ -1,6 +1,5 @@
 import pyodbc as pyo
 import pandas as pd
-from obtenerObjetosBD import obtenerConsulta
 from utilitarios import generarRutaArchivo, generarNombreArchivo, generarArchivo, generarExtensionArchivo
 from utilitarios import enumerados
 from obtenerConexionBD import consultaDatos
@@ -279,8 +278,11 @@ def generarCamposInsertar(nombreTabla):
             campoInsertar += 3*TAB + "param.Add(\"@" + df["nombreCampo"][i] + "\", item." + df["nombreCampo"][i] 
             campoInsertar += ", DbType." + tipoDato + ", direction: ParameterDirection.Output); " + ENTER
         else:
-            campoInsertar += 3*TAB + "param.Add(\"@" + df["nombreCampo"][i] + "\", item." + df["nombreCampo"][i] 
-            campoInsertar += ", DbType." + tipoDato + "); " + ENTER
+            if((df["tipoCampo"][i] == 'CAMPO') and (df["tipoDatoBD"][i] == 'DATETIME') and ('Registro' in df["nombreCampo"][i])):
+                campoInsertar += ""
+            else:
+                campoInsertar += 3*TAB + "param.Add(\"@" + df["nombreCampo"][i] + "\", item." + df["nombreCampo"][i] 
+                campoInsertar += ", DbType." + tipoDato + "); " + ENTER
 
     return campoInsertar
 
@@ -288,7 +290,7 @@ def generarCamposActualizar(nombreTabla):
     campoActualizar = ""
     tipoDato = ""
 
-    df = consultaDatos.obtenerMetaDataCamposSinClavePrincipal(nombreTabla)
+    df = consultaDatos.obtenerMetaDataTodosCampos(nombreTabla)
 
     numeroCampos = len(df.index)
     rangoMenor = numeroCampos - 6
@@ -296,8 +298,13 @@ def generarCamposActualizar(nombreTabla):
     df = df.drop(range(rangoMenor,rangoMayor))
     
     for i in df.index:
-        tipoDatoNET = df["tipoDatoNET"][i]
-        campoActualizar += 3*TAB + "param.Add(\"@" + df["nombreCampo"][i] + "\", item." + df["nombreCampo"][i] + ", DbType." + tipoDato + "); " + ENTER
+        tipoDato = df["tipoDatoNET"][i]
+        if((df["tipoCampo"][i] == 'CAMPO') and (df["tipoDatoBD"][i] == 'DATETIME') and ('Upd' in df["nombreCampo"][i])):
+            campoActualizar += ""
+        else:
+            campoActualizar += 3*TAB + "param.Add(\"@" + df["nombreCampo"][i] + "\", item." + df["nombreCampo"][i] + ", DbType." + tipoDato + "); " + ENTER
+        
+        campoActualizar +="param.Add(\"@errorCode\", "", DbType.String, direction: ParameterDirection.Output);"
 
     return campoActualizar
 
