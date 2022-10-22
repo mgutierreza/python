@@ -8,6 +8,11 @@ def extraerUltimoCaracter(texto):
 
     return texto
 
+def extraerUltimaPalabra(texto, palabra):
+    last_char_index = texto.rfind(palabra)
+    texto = texto[:last_char_index]
+
+    return texto
 
 def generarRutaArchivo(nombreTabla, tipoObjeto):
 

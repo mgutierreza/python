@@ -55,27 +55,45 @@ def generarCuerpoProcedimientoAlmacenado(nombreTabla):
     
     df = consultaDatos.obtenerMetaDataFK(nombreTabla)
     
-    if (len(df) > 0 ):
-        existeClaveForanea = True
-        cuerpoProcedimientoAlmacenado += TAB + "DECLARE @existeRegistro INT = 0" + 2*ENTER
-
-    if (existeClaveForanea):
+    cantidadFK = len(df)
+    
+    if (cantidadFK <= 0):
+        cuerpoProcedimientoAlmacenado += ""
+    elif (cantidadFK == 1):
         for i in df.index:
+            cuerpoProcedimientoAlmacenado += TAB + "DECLARE @existeRegistro INT = 0" + 2*ENTER
             cuerpoProcedimientoAlmacenado += TAB + "SELECT @existeRegistro = " + df["columnaOrigen"][i] + " FROM dbo." + df["tablaOrigen"][i] + " WITH(NOLOCK) WHERE " + df["columnaOrigen"][i] + " = @" + df["columnaDestino"][i] + 2*ENTER
             cuerpoProcedimientoAlmacenado += TAB + "IF @existeRegistro <= 0" + ENTER
             cuerpoProcedimientoAlmacenado += TAB + "BEGIN" + ENTER
-            cuerpoProcedimientoAlmacenado += 2*TAB + "SET @errorCode = CONCAT(@errorCode, '/', 'not_found_record_" + df["tablaOrigen"][i] + "/'" + ENTER
+            cuerpoProcedimientoAlmacenado += 2*TAB + "SET @errorCode = CONCAT(@errorCode, '/', 'not_found_record_" + df["tablaOrigen"][i] + "/')" + ENTER
             cuerpoProcedimientoAlmacenado += TAB + "END" + 2*ENTER
             cuerpoProcedimientoAlmacenado += TAB + "IF @existeRegistro > 0" + ENTER
+    else:
+        for i in df.index:
+            cuerpoProcedimientoAlmacenado += TAB + "DECLARE @existeRegistroFK" + str(i) + " INT = 0" + ENTER
+        
+        for i in df.index:
+            cuerpoProcedimientoAlmacenado += TAB + "SELECT @existeRegistroFK" + str(i) + " = " + df["columnaOrigen"][i] + " FROM dbo." + df["tablaOrigen"][i] + " WITH(NOLOCK) WHERE " + df["columnaOrigen"][i] + " = @" + df["columnaDestino"][i] + 2*ENTER
+            cuerpoProcedimientoAlmacenado += TAB + "IF @existeRegistroFK" + str(i) + " <= 0" + ENTER
             cuerpoProcedimientoAlmacenado += TAB + "BEGIN" + ENTER
-            
+            cuerpoProcedimientoAlmacenado += 2*TAB + "SET @errorCode = CONCAT(@errorCode, '/', 'not_found_record_" + df["tablaOrigen"][i] + "/')" + ENTER
+            cuerpoProcedimientoAlmacenado += TAB + "END" + 2*ENTER
+        
+        cuerpoProcedimientoAlmacenado += TAB + "IF "
+
+        for i in df.index:
+            cuerpoProcedimientoAlmacenado += "(@existeRegistroFK" + str(i) + " > 0 ) AND "
+        
+        cuerpoProcedimientoAlmacenado += util.extraerUltimaPalabra(cuerpoProcedimientoAlmacenado, "AND") + ENTER
+
+    cuerpoProcedimientoAlmacenado += TAB + "BEGIN" + ENTER
     cuerpoProcedimientoAlmacenado += 4*TAB + "UPDATE dbo." + nombreTabla + ENTER
     cuerpoProcedimientoAlmacenado += 4*TAB + "SET" + ENTER
     cuerpoProcedimientoAlmacenado += generarCamposParaActualizar(nombreTabla)
     cuerpoProcedimientoAlmacenado +=  4*TAB + "WHERE" + ENTER
     cuerpoProcedimientoAlmacenado += generarCamposParaFiltro(nombreTabla)
     
-    if (existeClaveForanea):
+    if (cantidadFK > 0):
         cuerpoProcedimientoAlmacenado += TAB + "END" + ENTER   
     
     cuerpoProcedimientoAlmacenado += "END" + ENTER

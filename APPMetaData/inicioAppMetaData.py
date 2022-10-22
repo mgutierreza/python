@@ -2,7 +2,7 @@ from obtenerObjetosBD import *
 from obtenerObjetosAPP import *
 from obtenerJSON import *
 
-nombreTablaBaseDatos = "Acd_GrupoEstudio"
+nombreTablaBaseDatos = "Acd_MatCurSubGrupo"
 
 #Creación de Objetos de Base de Datos
 generarProcedimientoAlmacenadoSelect(nombreTablaBaseDatos)

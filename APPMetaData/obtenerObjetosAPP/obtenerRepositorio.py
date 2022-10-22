@@ -304,7 +304,7 @@ def generarCamposActualizar(nombreTabla):
         else:
             campoActualizar += 3*TAB + "param.Add(\"@" + df["nombreCampo"][i] + "\", item." + df["nombreCampo"][i] + ", DbType." + tipoDato + "); " + ENTER
         
-        campoActualizar +="param.Add(\"@errorCode\", "", DbType.String, direction: ParameterDirection.Output);"
+    campoActualizar +="param.Add(\"@errorCode\", \"\", DbType.String, direction: ParameterDirection.Output);" + ENTER
 
     return campoActualizar
 

@@ -68,24 +68,24 @@ def generarValorAleatorio(nombreCampo, tipoDatoBD, tipoCampo):
         tipoDatoGeneral = "fecha"
     
     if(tipoCampo == 'PRIMARY KEY'):
-        valor = "0"
+        nuevoValor = "0"
 
     if((tipoDatoGeneral == 'fecha') and ('Registro','Upd' in (nombreCampo))):
-        valor = "2022-09-30T02:17:07.613Z"
+        nuevoValor = "2022-09-30T02:17:07.613Z"
     
     if((tipoDatoGeneral == 'fecha') and ('Registro','Upd' not in (nombreCampo))):
-        valor = "2022-08-30T02:17:07.613Z"
+        nuevoValor = "2022-08-30T02:17:07.613Z"
  
     if(tipoCampo == 'CAMPO' and tipoDatoGeneral == 'entero'):
-        valor = "1"
+        nuevoValor = "1"
 
     if((tipoDatoGeneral == 'texto') and ('Registro','Upd' in (nombreCampo)) and  ('Usu' in (nombreCampo))):
-        valor = "1009121972"
+        nuevoValor = "1009121972"
     
     if((tipoDatoGeneral == 'texto') and ('Registro','Upd' in (nombreCampo)) and  ('Host' in (nombreCampo))):
-        valor = "127.0.0.1"
+        nuevoValor = "127.0.0.1"
     
     if(tipoDatoGeneral == 'decimal'):
-        valor = "11.22"
+        nuevoValor = "11.22"
   
-    return valor
+    return nuevoValor
