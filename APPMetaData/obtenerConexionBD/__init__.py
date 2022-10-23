@@ -1,1 +1,1 @@
-from obtenerConexionBD.consultaDatos import obtenerMetaDataTodosCampos, obtenerMetaDataClavePrincipal, obtenerMetaDataCamposSinClavePrincipal
+from obtenerConexionBD.consultaDatos import obtenerMetaDataTodosCampos, obtenerMetaDataClavePrincipal, obtenerMetaDataCamposSinClavePrincipal, obtenerMetaDataClaveForanea, obtenerMetaDataClaves

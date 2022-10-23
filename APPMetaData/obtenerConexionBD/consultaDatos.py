@@ -36,6 +36,23 @@ def obtenerMetaDataClavePrincipal(nombreTabla):
 
     return df
 
+def obtenerMetaDataClaveForanea(nombreTabla):
+
+    conexionAzure = (
+        r"Driver={SQL SERVER};Server=tcp:developerep.database.windows.net;Database=BDEpartners_Dev;UID=epartners;PWD=Peam41923m*"
+        )
+    
+    conexionAzure = pyo.connect(conexionAzure)
+    print('Conexión Abierta')
+    
+    consultaSQL = consultaMetaDatos(nombreTabla, enumerados.tipoConsulta.SoloFK)
+    df = pd.read_sql(consultaSQL, conexionAzure)
+
+    conexionAzure.close()
+    print('Conexión Cerrada')
+
+    return df
+
 def obtenerMetaDataCamposSinClavePrincipal(nombreTabla):
 
     conexionAzure = (
@@ -116,12 +133,14 @@ def consultaMetaDatos(nombreTabla, tipoConsulta):
     sql += "LEFT JOIN information_schema.table_constraints c ON b.CONSTRAINT_NAME = c.CONSTRAINT_NAME AND b.TABLE_NAME = c.TABLE_NAME AND b.TABLE_SCHEMA = c.TABLE_SCHEMA "    
     sql += "WHERE a.table_name = '" + nombreTabla + "' "    
     
-    if (tipoConsulta == tipoConsulta.SoloPK):
+    if (tipoConsulta == enumerados.tipoConsulta.SoloPK):
         sql += "AND c.CONSTRAINT_TYPE = 'PRIMARY KEY' "        
-    elif(tipoConsulta == tipoConsulta.CamposSinPK):
+    elif(tipoConsulta == enumerados.tipoConsulta.CamposSinPK):
         sql += "AND ISNULL(c.CONSTRAINT_TYPE,'X') NOT IN ('PRIMARY KEY') "
-    elif(tipoConsulta == tipoConsulta.SoloPKFK):
+    elif(tipoConsulta == enumerados.tipoConsulta.SoloPKFK):
         sql += "AND c.CONSTRAINT_TYPE IN ('PRIMARY KEY','FOREIGN KEY') "    
+    elif(tipoConsulta == enumerados.tipoConsulta.SoloFK):
+        sql += "AND c.CONSTRAINT_TYPE IN ('FOREIGN KEY') "            
 
     sql += "ORDER BY a.ORDINAL_POSITION "    				 
 

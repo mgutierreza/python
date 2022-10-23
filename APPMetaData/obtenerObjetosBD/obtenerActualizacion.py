@@ -51,8 +51,8 @@ def generarCabeceraProcedimientoAlmacenado(nombreTabla):
 
 def generarCuerpoProcedimientoAlmacenado(nombreTabla):
     cuerpoProcedimientoAlmacenado = ""
-    existeClaveForanea = False
-    
+    condicionesFK = ""
+        
     df = consultaDatos.obtenerMetaDataFK(nombreTabla)
     
     cantidadFK = len(df)
@@ -72,19 +72,27 @@ def generarCuerpoProcedimientoAlmacenado(nombreTabla):
         for i in df.index:
             cuerpoProcedimientoAlmacenado += TAB + "DECLARE @existeRegistroFK" + str(i) + " INT = 0" + ENTER
         
+        cuerpoProcedimientoAlmacenado += ENTER
+
         for i in df.index:
-            cuerpoProcedimientoAlmacenado += TAB + "SELECT @existeRegistroFK" + str(i) + " = " + df["columnaOrigen"][i] + " FROM dbo." + df["tablaOrigen"][i] + " WITH(NOLOCK) WHERE " + df["columnaOrigen"][i] + " = @" + df["columnaDestino"][i] + 2*ENTER
-            cuerpoProcedimientoAlmacenado += TAB + "IF @existeRegistroFK" + str(i) + " <= 0" + ENTER
+            cuerpoProcedimientoAlmacenado += TAB + "SELECT @existeRegistroFK" + str(i) + " = " + df["columnaOrigen"][i] + " FROM dbo." + df["tablaOrigen"][i] + " WITH(NOLOCK) WHERE " + df["columnaOrigen"][i] + " = @" + df["columnaDestino"][i] + ENTER
+        
+        cuerpoProcedimientoAlmacenado += ENTER
+            
+        for i in df.index:
+            cuerpoProcedimientoAlmacenado += ENTER
+            cuerpoProcedimientoAlmacenado += TAB + "IF (@existeRegistroFK" + str(i) + " <= 0)" + ENTER
             cuerpoProcedimientoAlmacenado += TAB + "BEGIN" + ENTER
             cuerpoProcedimientoAlmacenado += 2*TAB + "SET @errorCode = CONCAT(@errorCode, '/', 'not_found_record_" + df["tablaOrigen"][i] + "/')" + ENTER
-            cuerpoProcedimientoAlmacenado += TAB + "END" + 2*ENTER
+            cuerpoProcedimientoAlmacenado += TAB + "END" + ENTER
         
+        cuerpoProcedimientoAlmacenado += ENTER
         cuerpoProcedimientoAlmacenado += TAB + "IF "
 
         for i in df.index:
-            cuerpoProcedimientoAlmacenado += "(@existeRegistroFK" + str(i) + " > 0 ) AND "
+            condicionesFK += "(@existeRegistroFK" + str(i) + " > 0 ) AND "
         
-        cuerpoProcedimientoAlmacenado += util.extraerUltimaPalabra(cuerpoProcedimientoAlmacenado, "AND") + ENTER
+        cuerpoProcedimientoAlmacenado += util.extraerUltimaPalabra(condicionesFK, "AND") + ENTER
 
     cuerpoProcedimientoAlmacenado += TAB + "BEGIN" + ENTER
     cuerpoProcedimientoAlmacenado += 4*TAB + "UPDATE dbo." + nombreTabla + ENTER
@@ -97,9 +105,6 @@ def generarCuerpoProcedimientoAlmacenado(nombreTabla):
         cuerpoProcedimientoAlmacenado += TAB + "END" + ENTER   
     
     cuerpoProcedimientoAlmacenado += "END" + ENTER
-
-    
-
 
     return cuerpoProcedimientoAlmacenado
 
@@ -124,14 +129,25 @@ def generarCamposParaActualizar(nombreTabla):
 
 def generarCamposParaFiltro(nombreTabla):
     camposParaFiltro = ""
+    camposParaFiltroFK = ""
     espacioEstandar = 30
 
     df =  consultaDatos.obtenerMetaDataClavePrincipal(nombreTabla)
+    cantidadRegistros = len(df)
 
-    for i in df.index:
-        espacioCampo = len(df["nombreCampo"][i])
-        espacioFaltante = espacioEstandar - espacioCampo
-        camposParaFiltro += 5*TAB + "dbo." + nombreTabla + "." + df["nombreCampo"][i] + espacioFaltante*ESPACIO + "=" + 2*TAB + "@" + df["nombreCampo"][i] + ENTER
+    if (cantidadRegistros > 0):
+        for i in df.index:
+            espacioCampo = len(df["nombreCampo"][i])
+            espacioFaltante = espacioEstandar - espacioCampo
+            camposParaFiltro += 5*TAB + "dbo." + nombreTabla + "." + df["nombreCampo"][i] + espacioFaltante*ESPACIO + "=" + 2*TAB + "@" + df["nombreCampo"][i] + " AND " + ENTER
+    else:
+        df =  consultaDatos.obtenerMetaDataFK(nombreTabla)
+        for i in df.index:
+            espacioCampo = len(df["columnaDestino"][i])
+            espacioFaltante = espacioEstandar - espacioCampo
+            camposParaFiltroFK += 5*TAB + "dbo." + nombreTabla + "." + df["columnaDestino"][i] + espacioFaltante*ESPACIO + "=" + 2*TAB + "@" + df["columnaDestino"][i] + " AND " + ENTER
+    
+    camposParaFiltro += util.extraerUltimaPalabra(camposParaFiltroFK, "AND") + ENTER
     
     return camposParaFiltro
 

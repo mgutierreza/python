@@ -100,7 +100,8 @@ def generarActualizacionEstado(nombreTabla, estadoRegistro = 0):
 
     actualizacionEstado += 7*TAB + "UPDATE dbo." + nombreTabla + ENTER 
     actualizacionEstado += 7*TAB + "SET " + nombreTabla + "." + campoEstado + TAB + "=" + TAB + str(estadoRegistro) + ENTER
-    actualizacionEstado += 7*TAB + "WHERE " + nombreTabla + "." + campoClavePrincipal + TAB + "=" + TAB + "@" + campoClavePrincipal + ENTER
+    actualizacionEstado += 7*TAB + "WHERE " + ENTER
+    actualizacionEstado += obtenerFiltros(nombreTabla) + ENTER
     
     return actualizacionEstado
 
@@ -124,3 +125,23 @@ def obtenerCampoEstadoTabla(nombreTabla):
             campoEstado += df["nombreCampo"][i]
 
     return campoEstado
+
+def obtenerFiltros(nombreTabla):
+    filtros = ""
+    filtrosClave = ""
+
+    dfClave = consultaDatos.obtenerMetaDataClavePrincipal(nombreTabla)
+    numeroRegistroDiccionario = len(dfClave)
+    
+    if (numeroRegistroDiccionario > 0):    
+        for i in dfClave.index:
+            filtrosClave += 8*TAB + nombreTabla + "."+ dfClave["nombreCampo"][i] + TAB + "=" + TAB + "@" + dfClave["nombreCampo"][i] + " AND " + ENTER
+    else:
+        dfClave = consultaDatos.obtenerMetaDataClaveForanea(nombreTabla)
+        for i in dfClave.index:
+            filtrosClave += 8*TAB + nombreTabla + "."+ dfClave["nombreCampo"][i] + TAB + "=" + TAB + "@" + dfClave["nombreCampo"][i] + " AND " + ENTER
+    
+    filtros += util.extraerUltimaPalabra(filtrosClave, "AND")
+
+
+    return filtros

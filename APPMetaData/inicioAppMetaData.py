@@ -11,7 +11,7 @@ generarProcedimientoAlmacenadoActualizacion(nombreTablaBaseDatos)
 generarProcedimientoAlmacenadoBorrado(nombreTablaBaseDatos)
 
 #Creación de Objetos de Aplicación
-generarArchivoEntity(nombreTablaBaseDatos)
+'''generarArchivoEntity(nombreTablaBaseDatos)
 generarArchivoException(nombreTablaBaseDatos)
 generarArchivoFilter(nombreTablaBaseDatos)
 generarArchivoFilterType(nombreTablaBaseDatos)
@@ -25,4 +25,4 @@ generarArchivoDomain(nombreTablaBaseDatos)
 generarArchivoController(nombreTablaBaseDatos)
 
 #Creación de JSON
-generarJSONInsercion(nombreTablaBaseDatos)
+generarJSONInsercion(nombreTablaBaseDatos)'''
