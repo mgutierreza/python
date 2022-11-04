@@ -2,109 +2,59 @@ import pyodbc as pyo
 import pandas as pd
 from utilitarios import enumerados
 
+conexionBD = None
+
 def obtenerMetaDataTodosCampos(nombreTabla):
 
-    conexionAzure = (
-        r"Driver={SQL SERVER};Server=tcp:developerep.database.windows.net;Database=BDEpartners_Dev;UID=epartners;PWD=Peam41923m*"
-        )
-    
-    conexionAzure = pyo.connect(conexionAzure)
-    print('Conexión Abierta')
-    
-    consultaSQL = consultaMetaDatos(nombreTabla, enumerados.tipoConsulta.TodosCampos)
-    df = pd.read_sql(consultaSQL, conexionAzure)
-
-    conexionAzure.close()
-    print('Conexión Cerrada')
+    df = realizarConsulta(nombreTabla, enumerados.tipoConsulta.TodosCampos)
 
     return df
 
 def obtenerMetaDataClavePrincipal(nombreTabla):
 
-    conexionAzure = (
-        r"Driver={SQL SERVER};Server=tcp:developerep.database.windows.net;Database=BDEpartners_Dev;UID=epartners;PWD=Peam41923m*"
-        )
-    
-    conexionAzure = pyo.connect(conexionAzure)
-    print('Conexión Abierta')
-    
-    consultaSQL = consultaMetaDatos(nombreTabla, enumerados.tipoConsulta.SoloPK)
-    df = pd.read_sql(consultaSQL, conexionAzure)
-
-    conexionAzure.close()
-    print('Conexión Cerrada')
+    df = realizarConsulta(nombreTabla, enumerados.tipoConsulta.SoloPK)
 
     return df
 
 def obtenerMetaDataClaveForanea(nombreTabla):
 
-    conexionAzure = (
-        r"Driver={SQL SERVER};Server=tcp:developerep.database.windows.net;Database=BDEpartners_Dev;UID=epartners;PWD=Peam41923m*"
-        )
-    
-    conexionAzure = pyo.connect(conexionAzure)
-    print('Conexión Abierta')
-    
-    consultaSQL = consultaMetaDatos(nombreTabla, enumerados.tipoConsulta.SoloFK)
-    df = pd.read_sql(consultaSQL, conexionAzure)
-
-    conexionAzure.close()
-    print('Conexión Cerrada')
+    df = realizarConsulta(nombreTabla, enumerados.tipoConsulta.SoloFK)
 
     return df
 
 def obtenerMetaDataCamposSinClavePrincipal(nombreTabla):
 
-    conexionAzure = (
-        r"Driver={SQL SERVER};Server=tcp:developerep.database.windows.net;Database=BDEpartners_Dev;UID=epartners;PWD=Peam41923m*"
-        )
-    
-    conexionAzure = pyo.connect(conexionAzure)
-    print('Conexión Abierta')
-    
-    consultaSQL = consultaMetaDatos(nombreTabla, enumerados.tipoConsulta.CamposSinPK)
-    df = pd.read_sql(consultaSQL, conexionAzure)
-
-    conexionAzure.close()
-    print('Conexión Cerrada')
+    df = realizarConsulta(nombreTabla, enumerados.tipoConsulta.CamposSinPK)
 
     return df
 
 def obtenerMetaDataClaves(nombreTabla):
 
-    conexionAzure = (
-        r"Driver={SQL SERVER};Server=tcp:developerep.database.windows.net;Database=BDEpartners_Dev;UID=epartners;PWD=Peam41923m*"
-        )
-    
-    conexionAzure = pyo.connect(conexionAzure)
-    print('Conexión Abierta')
-    
-    consultaSQL = consultaMetaDatos(nombreTabla, enumerados.tipoConsulta.SoloPKFK)
-    df = pd.read_sql(consultaSQL, conexionAzure)
-
-    conexionAzure.close()
-    print('Conexión Cerrada')
+    df = realizarConsulta(nombreTabla, enumerados.tipoConsulta.SoloPKFK)
 
     return df
 
 def obtenerMetaDataFK(nombreTabla):
+    global conexionBD
 
-    conexionAzure = (
-        r"Driver={SQL SERVER};Server=tcp:developerep.database.windows.net;Database=BDEpartners_Dev;UID=epartners;PWD=Peam41923m*"
-        )
-    
-    conexionAzure = pyo.connect(conexionAzure)
-    print('Conexión Abierta')
-    
-    consultaSQL = consultaMetaDatosFK(nombreTabla)
-    df = pd.read_sql(consultaSQL, conexionAzure)
-
-    conexionAzure.close()
-    print('Conexión Cerrada')
+    conexionBD = __abrirConexionBD()
+    consultaSQL = __consultaMetaDatosFK(nombreTabla)
+    df = pd.read_sql(consultaSQL, conexionBD)
+    __cerrarConexionBD()
 
     return df
-    
-def consultaMetaDatos(nombreTabla, tipoConsulta):
+
+def realizarConsulta(nombreTabla, tipoConsulta):
+    global conexionBD
+
+    conexionBD = __abrirConexionBD()
+    consultaSQL = __consultaMetaDatos(nombreTabla, tipoConsulta)
+    df = pd.read_sql(consultaSQL, conexionBD)
+    __cerrarConexionBD()
+
+    return df
+
+def __consultaMetaDatos(nombreTabla, tipoConsulta):
     sql = ""
 
     sql += "SELECT "
@@ -146,7 +96,7 @@ def consultaMetaDatos(nombreTabla, tipoConsulta):
 
     return sql
 
-def consultaMetaDatosFK(nombreTabla):
+def __consultaMetaDatosFK(nombreTabla):
     sql = ""
 
     sql += "SELECT "
@@ -167,3 +117,24 @@ def consultaMetaDatosFK(nombreTabla):
     sql += "ORDER BY foreign_key_columns.constraint_column_id, FOREIGN_KEY_TABLE.name ; "    				 
 
     return sql
+
+def __abrirConexionBD():
+    cadenaConexion = ""
+    global conexionBD
+
+    if (conexionBD is None):
+        cadenaConexion = (
+            r"Driver={SQL SERVER};Server=tcp:developerep.database.windows.net;Database=BDEpartners_Dev;UID=epartners;PWD=Peam41923m*"
+            )
+        conexionBD = pyo.connect(cadenaConexion)
+
+    return conexionBD
+
+def __cerrarConexionBD():
+    global conexionBD
+
+    if (conexionBD is not None):
+        conexionBD.close()
+        conexionBD = None
+
+    return 
