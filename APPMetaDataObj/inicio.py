@@ -1,3 +1,7 @@
-from inicioObjetos import ejecutar
+from inicioObjetos import generarObjetos
 
-ejecutar()
+def generarObjetos():
+    nombreTabla = "AcdCampus"
+    clase = generarObjetos(nombreTabla)
+    clase.generarObjetosBankEnd()
+    return 

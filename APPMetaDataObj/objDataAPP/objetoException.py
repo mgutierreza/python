@@ -22,7 +22,10 @@ class objetoException(iObjetoAplicacion):
         clase += self.__generarCabeceraClase()
         clase += "namespace EP_AcademicMicroservice.Exceptions" + self.ENTER 
         clase += "{" + self.ENTER
+        clase += self.TAB + "public class " + self.__nombreClase + " : CustomException" + self.ENTER
+        clase += self.TAB + "{" + self.ENTER         
         clase += self.__generarCuerpoClase()
+        clase += self.TAB + "}" + self.ENTER
         clase += "}" + self.ENTER
         return clase
  
@@ -37,15 +40,18 @@ class objetoException(iObjetoAplicacion):
 
     def __generarCuerpoClase(self):
         cuerpoClase = ""
-        cuerpoClase = cuerpoClase + self.TAB + "public class " + self.__nombreClase + " : CustomException" + self.ENTER
-        cuerpoClase = cuerpoClase + self.TAB + "{" + self.ENTER 
-        cuerpoClase = cuerpoClase + 2*self.TAB + "public override string CustomMessage" + self.ENTER
-        cuerpoClase = cuerpoClase + 2*self.TAB + "{" + self.ENTER
-        cuerpoClase = cuerpoClase + 3*self.TAB + "get" + self.ENTER
-        cuerpoClase = cuerpoClase + 3*self.TAB + "{" + self.ENTER
-        cuerpoClase = cuerpoClase + 4*self.TAB + "return \"Prueba Fail inserting header\";" + self.ENTER
-        cuerpoClase = cuerpoClase + 3*self.TAB + "}" + self.ENTER
-        cuerpoClase = cuerpoClase + 2*self.TAB + "}" + self.ENTER
-        cuerpoClase = cuerpoClase + self.TAB + "}" + self.ENTER
+
+        cuerpoClase += 2*self.TAB + "public string ErrorCode { get; set; }" + self.ENTER
+        cuerpoClase += 2*self.TAB + "private List<ErrorCodeEntityException> ErrorsList = new List<ErrorCodeEntityException>() {" + self.ENTER
+        cuerpoClase += 3*self.TAB + "new ErrorCodeEntityException { Code=\"not_found\", Message=\"No existe el objeto en la base de datos\" }" + self.ENTER
+        cuerpoClase += 2*self.TAB + "};" + 2*self.ENTER
+
+        cuerpoClase += 2*self.TAB + "public override List<string> CustomMessage" + self.ENTER
+        cuerpoClase += 2*self.TAB + "{" + self.ENTER
+        cuerpoClase += 3*self.TAB + "get" + self.ENTER
+        cuerpoClase += 3*self.TAB + "{" + self.ENTER
+        cuerpoClase += 4*self.TAB + "return this.GetExceptionsList(this.ErrorCode, this.ErrorsList);" + self.ENTER
+        cuerpoClase += 3*self.TAB + "}" + self.ENTER
+        cuerpoClase += 2*self.TAB + "}" + self.ENTER
 
         return cuerpoClase

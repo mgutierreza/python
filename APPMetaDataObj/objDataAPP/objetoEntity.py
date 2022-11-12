@@ -10,6 +10,7 @@ class objetoEntity(iObjetoAplicacion):
         self.__nombreClase = ''
         self.TAB = '\t'
         self.ENTER = '\n'
+        self.ESPACIO = ' '
 
     def generarArchivo(self):
         nuevoArchivo = gestionArchivos(self.__nombreTabla, self.__claseObjeto)
@@ -45,22 +46,12 @@ class objetoEntity(iObjetoAplicacion):
     def __generarCuerpoClase(self):
         cuerpoClase = ""
         dictData = {}
-        
-        tipoDato = ""
-        datamember =  "[DataMember(EmitDefaultValue = false)]"
-        textoGetSet = " { get; set; }"
-                
+              
         data = obtenerData(self.__nombreTabla)
         dictData = data.metaDataTodosCampos()
 
         for valor in dictData:
-            if (valor['tipoDato'] == 'INT'):
-                tipoDato = "public Int32 "
-            elif (valor['tipoDato'] == 'VARCHAR'):
-                tipoDato = "public String "
-            else:
-                tipoDato = "public DateTime "
-            cuerpoClase += 2*self.TAB + datamember + self.ENTER 
-            cuerpoClase += 2*self.TAB + tipoDato + str(valor['nombreCampo']) + textoGetSet + 2*self.ENTER
+            cuerpoClase += 2*self.TAB + "[DataMember(EmitDefaultValue = false)]" + self.ENTER
+            cuerpoClase += 2*self.TAB + "public " + valor['tipoDatoNET'] + self.ESPACIO + valor['nombreCampo'] + self.ESPACIO + "{ get; set; }" + 2*self.ENTER 
 
         return cuerpoClase

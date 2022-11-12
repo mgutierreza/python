@@ -1,6 +1,14 @@
 from enum import Enum, unique
 
 @unique
+class tipoConsulta(Enum):
+    SoloPK = 1
+    CamposSinPK = 2
+    SoloPKFK = 3
+    SoloFK = 4
+    TodosCampos = 5
+
+@unique
 class tipoObjeto(Enum):
     BaseDatos = 1
     Aplicacion = 2

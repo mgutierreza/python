@@ -15,8 +15,6 @@ class gestionBaseDatos():
 
         conexion = self.__obtenerConexionBD()
         cursor = conexion.cursor()
-        #cursor = conexion.cursor(dictionary = True)
-        #cursor.execute(consulta, self.__nombreTabla)
         cursor.execute(consulta)
         filas = cursor.fetchall()
         registros = []
@@ -50,5 +48,6 @@ class gestionBaseDatos():
 
         if (self.conexionBD != None):
             self.conexionBD.close()
+            self.conexionBD = None
 
         return

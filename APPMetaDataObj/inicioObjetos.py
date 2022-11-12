@@ -2,46 +2,50 @@ from objDataAPP import *
 from objDataBD import *
 from util.enumerados import claseObjeto
 
-nombreTabla = "AcdCampus"
+'''nombreTabla = "AcdCampus"'''
+class generarObjetos():
 
-def ejecutar():
-    clase = objetoEntity(nombreTabla, claseObjeto.entity)
-    clase.generarArchivo()
+    def __init__(self, nombreTabla):
+        self.__nombreTabla = nombreTabla
 
-    clase = objetoException(nombreTabla, claseObjeto.exception)
-    clase.generarArchivo()
+    def generarObjetosBackEnd(self):
+        clase = objetoEntity(self.__nombreTabla, claseObjeto.entity)
+        clase.generarArchivo()
 
-    clase = objetoFilter(nombreTabla, claseObjeto.filter)
-    clase.generarArchivo()
+        clase = objetoException(self.__nombreTabla, claseObjeto.exception)
+        clase.generarArchivo()
 
-    clase = objetoFilterType(nombreTabla, claseObjeto.filterType)
-    clase.generarArchivo()
+        clase = objetoFilter(self.__nombreTabla, claseObjeto.filter)
+        clase.generarArchivo()
 
-    clase = objetoRequest(nombreTabla, claseObjeto.request)
-    clase.generarArchivo()
+        clase = objetoFilterType(self.__nombreTabla, claseObjeto.filterType)
+        clase.generarArchivo()
 
-    clase = objetoResponse(nombreTabla, claseObjeto.response)
-    clase.generarArchivo()
+        clase = objetoRequest(self.__nombreTabla, claseObjeto.request)
+        clase.generarArchivo()
 
-    clase = objetoRequestValidator(nombreTabla, claseObjeto.requestValidation)
-    clase.generarArchivo()
+        clase = objetoResponse(self.__nombreTabla, claseObjeto.response)
+        clase.generarArchivo()
 
-    clase = objetoIRepository(nombreTabla, claseObjeto.iRepository)
-    clase.generarArchivo()
+        clase = objetoRequestValidator(self.__nombreTabla, claseObjeto.requestValidation)
+        clase.generarArchivo()
 
-    clase = objetoRepository(nombreTabla, claseObjeto.repository)
-    clase.generarArchivo()
+        clase = objetoIRepository(self.__nombreTabla, claseObjeto.iRepository)
+        clase.generarArchivo()
 
-    clase = objetoRepository(nombreTabla, claseObjeto.service)
-    clase.generarArchivo()
+        clase = objetoRepository(self.__nombreTabla, claseObjeto.repository)
+        clase.generarArchivo()
 
-    clase = objetoRepository(nombreTabla, claseObjeto.domain)
-    clase.generarArchivo()
+        clase = objetoRepository(self.__nombreTabla, claseObjeto.service)
+        clase.generarArchivo()
 
-    clase = objetoRepository(nombreTabla, claseObjeto.controller)
-    clase.generarArchivo()
+        clase = objetoRepository(self.__nombreTabla, claseObjeto.domain)
+        clase.generarArchivo()
 
-    clase = objetoProcedimientoInsertar(nombreTabla, claseObjeto.insert)
-    clase.generarArchivo()
+        clase = objetoRepository(self.__nombreTabla, claseObjeto.controller)
+        clase.generarArchivo()
 
-    return
+        clase = objetoProcedimientoInsertar(self.__nombreTabla, claseObjeto.insert)
+        clase.generarArchivo()
+
+        return

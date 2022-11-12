@@ -10,6 +10,7 @@ class objetoFilter(iObjetoAplicacion):
         self.__nombreClase = ''
         self.TAB = '\t'
         self.ENTER = '\n'
+        self.ESPACIO = ' '
 
     def generarArchivo(self):
         nuevoArchivo = gestionArchivos(self.__nombreTabla, self.__claseObjeto)
@@ -23,7 +24,10 @@ class objetoFilter(iObjetoAplicacion):
         clase += self.__generarCabeceraClase()
         clase += "namespace EP_AcademicMicroservice.Entities" + self.ENTER 
         clase += "{" + self.ENTER
+        clase += self.TAB + "public class " + self.__nombreClase + self.ENTER
+        clase += self.TAB + "{" + self.ENTER
         clase += self.__generarCuerpoClase()
+        clase += self.TAB + "}" + self.ENTER
         clase += "}" + self.ENTER
         return clase
  
@@ -39,24 +43,11 @@ class objetoFilter(iObjetoAplicacion):
     def __generarCuerpoClase(self):
         cuerpoClase = ""
         dictData = {}
-        tipoDato = ""
-        textoGetSet = " { get; set; }"
-                
+               
         data = obtenerData(self.__nombreTabla)
         dictData = data.metaDataClavePrincipal()
 
-        cuerpoClase += self.TAB + "public class " + self.__nombreClase + self.ENTER
-        cuerpoClase += self.TAB + "{" + self.ENTER
-
         for valor in dictData:
-            if (valor['tipoDato'] == 'INT'):
-                tipoDato = "public Int32 "
-            elif (valor['tipoDato'] == 'VARCHAR'):
-                tipoDato = "public String "
-            else:
-                tipoDato = "public DateTime "
-        
-        cuerpoClase += 2*self.TAB + tipoDato + str(valor['nombreCampo']) + textoGetSet + self.ENTER
-        cuerpoClase += self.TAB + "}" + self.ENTER
+            cuerpoClase += 2*self.TAB + "public " + valor['tipoDatoNET'] + self.ESPACIO + str(valor['nombreCampo']) + self.ESPACIO + "{ get; set; }" + self.ENTER
 
         return cuerpoClase
