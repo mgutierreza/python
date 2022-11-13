@@ -1,4 +1,5 @@
 from objDataAPP.iObjetoAplicacion import iObjetoAplicacion
+from objConexionBD.consultasBD import obtenerData
 from util.utilitario import gestionArchivos
 
 class objetoIRepository(iObjetoAplicacion):
@@ -7,6 +8,7 @@ class objetoIRepository(iObjetoAplicacion):
         self.__nombreTabla = nombreTabla
         self.__claseObjeto = claseObjeto
         self.__nombreClase = ''
+        self.__claseEntity = self.__nombreTabla + "Entity"
         self.TAB = '\t'
         self.ENTER = '\n'
 
@@ -22,7 +24,10 @@ class objetoIRepository(iObjetoAplicacion):
         clase += self.__generarCabeceraClase()
         clase += "namespace EP_AcademicMicroservice.Repository" + self.ENTER 
         clase += "{" + self.ENTER
+        clase += self.TAB + "public interface " + self.__nombreClase + " : IGenericRepository<" + self.__claseEntity + ">" + self.ENTER
+        clase += self.TAB + "{" + self.ENTER         
         clase += self.__generarCuerpoClase()
+        clase += self.TAB + "}" + self.ENTER 
         clase += "}" + self.ENTER
         return clase
  
@@ -38,14 +43,20 @@ class objetoIRepository(iObjetoAplicacion):
 
     def __generarCuerpoClase(self):
         cuerpoClase = ""
+        camposPK = ""
+        dictData = {}
+               
+        data = obtenerData(self.__nombreTabla)
+        dictData = data.metaDataClavePrincipal()
 
-        cuerpoClase += self.TAB + "public interface " + self.__nombreClase + " : IGenericRepository<" + self.__nombreTabla + "Entity>" + self.ENTER
-        cuerpoClase += self.TAB + "{" + self.ENTER 
-        cuerpoClase += 2*self.TAB + "int Insert" + self.__nombreTabla + "(" + self.__nombreTabla + "Entity item);" + self.ENTER 
-        cuerpoClase += 2*self.TAB + "bool Update" + self.__nombreTabla + "(" + self.__nombreTabla + "Entity item);" + self.ENTER 
-        cuerpoClase += 2*self.TAB + "bool Delete" + self.__nombreTabla + "(int Id);" + self.ENTER 
-        cuerpoClase += 2*self.TAB + self.__nombreTabla + "Entity GetItem" + self.__nombreTabla + "(" + self.__nombreTabla + "Filter filter, " + self.__nombreTabla + "FilterItemType filterType);" + self.ENTER 
-        cuerpoClase += 2*self.TAB + "IEnumerable<" + self.__nombreTabla + "Entity> GetLstItem" + self.__nombreTabla + "(" + self.__nombreTabla + "Filter filter, " + self.__nombreTabla + "FilterLstItemType filterType, Pagination pagination);" + self.ENTER 
-        cuerpoClase += self.TAB + "}" + self.ENTER 
+        for valor in dictData:
+            camposPK = str(valor['tipoDatoNET']) + self.ESPACIO + str(valor['nombreCampo']) + "," + self.ESPACIO
 
+        camposPK = gestionArchivos.extraerUltimoCaracter(camposPK)
+
+        cuerpoClase += 2*self.TAB + "int Insert" + self.__nombreTabla + "(" + self.__claseEntity + " item);" + self.ENTER 
+        cuerpoClase += 2*self.TAB + "bool Update" + self.__nombreTabla + "(" + self.__claseEntity + " item);" + self.ENTER 
+        cuerpoClase += 2*self.TAB + "bool Delete" + self.__nombreTabla + "(" + camposPK + ");" + self.ENTER 
+        cuerpoClase += 2*self.TAB + self.__claseEntity + " GetItem" + self.__nombreTabla + "(" + self.__nombreTabla + "Filter filter, " + self.__nombreTabla + "FilterItemType filterType);" + self.ENTER 
+        cuerpoClase += 2*self.TAB + "IEnumerable<" + self.__claseEntity + "> GetLstItem" + self.__nombreTabla + "(" + self.__nombreTabla + "Filter filter, " + self.__nombreTabla + "FilterLstItemType filterType, Pagination pagination);" + self.ENTER 
         return cuerpoClase
