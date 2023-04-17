@@ -1,13 +1,13 @@
 import cx_Oracle
 import pandas as pd
 
-#connection = cx_Oracle.connect(user="UC_MGUTIERREZA",password="Js8c11Dk",dsn="172.17.23.42:1531/bdpr11g4")
-conexion = cx_Oracle.connect(user="UM_MGUTIERREZ",password="R4354%&$t",dsn="172.17.23.9:1530/bdqa11g4")
+conexion = cx_Oracle.connect(user="UC_MGUTIERREZA",password="pC9Jblu5",dsn="172.17.23.42:1531/bdpr11g4")
+#conexion = cx_Oracle.connect(user="UM_MGUTIERREZ",password="R4354%&$t",dsn="172.17.23.9:1530/bdqa11g4")
 cursor = conexion.cursor()
 print("Successfully connected to Oracle Database")
 #cursor = connection.cursor()
 
-archivo_excel = pd.read_excel('d:/marcacion/Registro de asistencias del 10 de abril de 2023.xlsx')
+archivo_excel = pd.read_excel('d:/marcacion/Registro_asistencias_16_04_2023.xlsx')
 print(archivo_excel.columns)
 
 #values = archivo_excel['Integrante'].values
@@ -24,9 +24,9 @@ marcas = df_seleccionados.columns[1]
 usuarios = df_seleccionados.columns[2]
 
 def getCodigoCarnet(usuario):
-    codigoCarnet = '&&&&&'
+    codigoCarnet = ''
 
-    script = "SELECT ci.codigocarnet "
+    script = "SELECT COALESCE(MAX(ci.codigocarnet),'&') CODIGOCARNET "
     script += "FROM sgcoresys.personamast pe "
     script += "INNER JOIN sgcoresys.as_carnetidentificacion ci ON pe.persona = ci.empleado "
     script += "WHERE pe.codigousuario = \'" + usuario + "\'"
@@ -37,7 +37,7 @@ def getCodigoCarnet(usuario):
 
     return codigoCarnet
 
-f = open('d:/marcacion/archivoBCK_10_04_23.bck','w')
+f = open('d:/marcacion/archivoBCK_16_04_23.bck','w')
 
 marcaBCK = ''
 
@@ -65,7 +65,7 @@ for index, row in df_seleccionados.iterrows():
         modalidad = '&&'
     
     codigoCarnet =  getCodigoCarnet(usuario)
-    if (codigoCarnet != '&&&&&'):
+    if (codigoCarnet != '&'):
         marcaBCK += textoinicial + espacio + marcaFecha + espacio + marcaHora + espacio + textofijo + espacio + codigoCarnet + espacio + modalidad + enter
     
 f.write(marcaBCK)
