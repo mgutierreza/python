@@ -24,7 +24,10 @@ class objetoResponse(iObjetoAplicacion):
         clase += self.__generarCabeceraClase()
         clase += "namespace EP_AcademicMicroservice.Domain" + self.ENTER 
         clase += "{"  + self.ENTER    
+        clase += self.TAB + "public class " + self.__nombreClase + self.ENTER
+        clase += self.TAB + "{" + self.ENTER         
         clase += self.__generarCuerpoClase()
+        clase += self.TAB + "}" + self.ENTER
         clase += "}"
 
         return clase
@@ -46,13 +49,12 @@ class objetoResponse(iObjetoAplicacion):
 
     def __generarCuerpoClase(self):
         cuerpoClase = ""
-        cuerpoClase += self.TAB + "public class " + self.__nombreClase + self.ENTER
-        cuerpoClase += self.TAB + "{" + self.ENTER 
+
         cuerpoClase += 2*self.TAB + "#region MEF" + self.ENTER 
         cuerpoClase += 2*self.TAB + "[Import]" + self.ENTER 
         cuerpoClase += 2*self.TAB + "private I" + self.__nombreTabla + "Repository _" + self.__nombreTabla + "Repository { get; set; }" + self.ENTER 
         cuerpoClase += 2*self.TAB + "#endregion" + 2*self.ENTER 
-        cuerpoClase += 2*self.TAB + "#region Constructor" + 2*self.ENTER 
+        cuerpoClase += 2*self.TAB + "#region Constructor" + self.ENTER 
         cuerpoClase += self.__generarConstructorClase() + self.ENTER 
         cuerpoClase += 2*self.TAB + "#endregion" + 2*self.ENTER 
         cuerpoClase += 2*self.TAB + "#region Methods Public" + 2*self.ENTER 
@@ -62,7 +64,6 @@ class objetoResponse(iObjetoAplicacion):
         cuerpoClase += self.__generarMetodoObtenerByID() + 2*self.ENTER
         cuerpoClase += self.__generarMetodoObtenerByPagination() + self.ENTER
         cuerpoClase += 2*self.TAB + "#endregion" + 2*self.ENTER 
-        cuerpoClase += self.TAB + "}" + self.ENTER
         
         return cuerpoClase
     
@@ -111,26 +112,22 @@ class objetoResponse(iObjetoAplicacion):
     
     def __generarMetodoDelete(self):
         metodoDelete = ""
-        tipoDatoClavePrincipal = ""
-        tipoDato = ""
+        parametrosEntrada = ""
+        parametrosDelete = ""
 
         data = obtenerData(self.__nombreTabla)
         dictData = data.metaDataClavePrincipal()
 
         for valor in dictData:
-            tipoDatoClavePrincipal = valor["tipoDato"]
+            parametrosEntrada += valor["tipoDatoNET"] + self.ESPACIO + valor["nombreCampo"] + ","
+            parametrosDelete += valor["nombreCampo"] + ","
         
-        if (tipoDatoClavePrincipal == 'INT'):
-            tipoDato = "Int32"
-        elif (tipoDatoClavePrincipal == 'VARCHAR'):
-            tipoDato = "String"
-        else:
-            tipoDato = "DateTime"
+        parametrosEntrada = gestionArchivos.extraerUltimoCaracter(parametrosEntrada)
 
-        metodoDelete += 2*self.TAB + "public bool Delete" + self.__nombreTabla + "(" + tipoDato + " Id)" + self.ENTER
+        metodoDelete += 2*self.TAB + "public bool Delete" + self.__nombreTabla + "(" + parametrosEntrada + ")" + self.ENTER
         metodoDelete += 2*self.TAB + "{" + self.ENTER 
         metodoDelete += 3*self.TAB + "bool exito = false;" + self.ENTER 
-        metodoDelete += 3*self.TAB + "exito = _" + self.__nombreTabla + "Repository.Delete" + self.__nombreTabla + "(Id);" + self.ENTER 
+        metodoDelete += 3*self.TAB + "exito = _" + self.__nombreTabla + "Repository.Delete" + self.__nombreTabla + "(" + parametrosDelete + ");" + self.ENTER 
         metodoDelete += 3*self.TAB + "return exito;" + self.ENTER 
         metodoDelete += 2*self.TAB + "}" + self.ENTER
 
@@ -138,28 +135,22 @@ class objetoResponse(iObjetoAplicacion):
     
     def __generarMetodoObtenerByID(self):
         metodoObtenerByID = ""
-        tipoDatoClavePrincipal = ""
-        nombreCampoClavePrincipal = ""
-        tipoDato = ""
+        parametrosEntrada = ""
+        parametrosFiltro = ""
 
         data = obtenerData(self.__nombreTabla)
         dictData = data.metaDataClavePrincipal()
 
         for valor in dictData:
-            tipoDatoClavePrincipal = valor["tipoDato"]
-            nombreCampoClavePrincipal = valor["nombreCampo"]
+            parametrosEntrada += valor["tipoDatoNET"] + self.ESPACIO + valor["nombreCampo"] + ","
+            parametrosFiltro += valor["nombreCampo"] + " = " + valor["nombreCampo"] + ","
         
-        if (tipoDatoClavePrincipal == 'INT'):
-            tipoDato = "Int32"
-        elif (tipoDatoClavePrincipal == 'VARCHAR'):
-            tipoDato = "String"
-        else:
-            tipoDato = "DateTime"
+        parametrosEntrada = gestionArchivos.extraerUltimoCaracter(parametrosEntrada)
 
-        metodoObtenerByID += 2*self.TAB + "public " + self.__nombreTabla + "Entity GetById(" + tipoDato + " Id)" + self.ENTER
+        metodoObtenerByID += 2*self.TAB + "public " + self.__nombreTabla + "Entity GetById(" + parametrosEntrada + ")" + self.ENTER
         metodoObtenerByID += 2*self.TAB + "{" + self.ENTER 
         metodoObtenerByID += 3*self.TAB + self.__nombreTabla + "Entity " + self.__nombreTabla + " = null;" + self.ENTER 
-        metodoObtenerByID += 3*self.TAB + self.__nombreTabla + " = _" + self.__nombreTabla + "Repository.GetItem" + self.__nombreTabla + "(new " + self.__nombreTabla + "Filter() { " + nombreCampoClavePrincipal + " = Id }, " + self.__nombreTabla + "FilterItemType.ById);" + self.ENTER 
+        metodoObtenerByID += 3*self.TAB + self.__nombreTabla + " = _" + self.__nombreTabla + "Repository.GetItem" + self.__nombreTabla + "(new " + self.__nombreTabla + "Filter() { " + parametrosFiltro + " }, " + self.__nombreTabla + "FilterItemType.ById);" + self.ENTER 
         metodoObtenerByID += 3*self.TAB + "return "+ self.__nombreTabla +";" + self.ENTER 
         metodoObtenerByID += 2*self.TAB + "}" + self.ENTER
 

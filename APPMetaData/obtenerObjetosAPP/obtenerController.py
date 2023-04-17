@@ -1,7 +1,7 @@
 import pyodbc as pyonsultaDatos
 import pandas as pd
 from obtenerObjetosBD import obtenerConsulta
-from utilitarios import generarRutaArchivo, generarNombreArchivo, generarArchivo, generarExtensionArchivo
+from utilitarios import generarRutaArchivo, generarNombreArchivo, generarArchivo, generarExtensionArchivo, getNombreProyecto
 from utilitarios import enumerados
 from obtenerConexionBD import consultaDatos
 
@@ -21,7 +21,7 @@ def generarArchivoController(nombreTabla):
 def generarClase(nombreTabla):
     clase = ""
     clase += generarCabeceraClase()
-    clase += "namespace EP_AcademicMicroservice.Api.Controllers" + ENTER 
+    clase += "namespace " + getNombreProyecto() + "Microservice.Api.Controllers" + ENTER 
     clase += "{"  + ENTER   
     clase += generarCuerpoClase(nombreTabla)    
     clase += "}"

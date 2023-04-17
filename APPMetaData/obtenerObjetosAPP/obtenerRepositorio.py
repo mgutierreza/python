@@ -1,6 +1,6 @@
 import pyodbc as pyo
 import pandas as pd
-from utilitarios import generarRutaArchivo, generarNombreArchivo, generarArchivo, generarExtensionArchivo
+from utilitarios import generarRutaArchivo, generarNombreArchivo, generarArchivo, generarExtensionArchivo, getNombreProyecto
 from utilitarios import enumerados
 from obtenerConexionBD import consultaDatos
 
@@ -20,7 +20,7 @@ def generarArchivoRepository(nombreTabla):
 def generarClase(nombreTabla):
     claseEntity = ""
     claseEntity += generarCabeceraClase()
-    claseEntity += "namespace EP_AcademicMicroservice.Infraestructure" + ENTER 
+    claseEntity += "namespace " + getNombreProyecto() + "Microservice.Infraestructure" + ENTER 
     claseEntity += "{"  + ENTER   
     claseEntity += generarCuerpoClase(nombreTabla)
     claseEntity += "}"
@@ -113,7 +113,7 @@ def generarMetodoActualizar(nombreTabla):
     metodoActualizar += 3*TAB + "errorCode = param.Get<string>(\"@errorCode\");" + 2*ENTER
     metodoActualizar += 3*TAB + "if (errorCode != null)" + ENTER
     metodoActualizar += 3*TAB + "{" + ENTER
-    metodoActualizar += 4*TAB + "throw new FailAcd_PerEstudianteException(errorCode);" + ENTER
+    metodoActualizar += 4*TAB + "throw new " + generarNombreArchivo(nombreTabla, enumerados.claseObjeto.exception) + "(errorCode);" + ENTER
     metodoActualizar += 3*TAB + "}" + ENTER
     metodoActualizar += 3*TAB + "return Resultado;" + ENTER
     metodoActualizar += 2*TAB + "}" + ENTER 
@@ -293,9 +293,11 @@ def generarCamposActualizar(nombreTabla):
     df = consultaDatos.obtenerMetaDataTodosCampos(nombreTabla)
 
     numeroCampos = len(df.index)
-    rangoMenor = numeroCampos - 6
-    rangoMayor = numeroCampos - 3
-    df = df.drop(range(rangoMenor,rangoMayor))
+
+    if(numeroCampos > 3):
+        rangoMenor = numeroCampos - 6
+        rangoMayor = numeroCampos - 3
+        df = df.drop(range(rangoMenor,rangoMayor))
     
     for i in df.index:
         tipoDato = df["tipoDatoNET"][i]

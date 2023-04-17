@@ -23,7 +23,12 @@ class objetoRepository(iObjetoAplicacion):
         clase += self.__generarCabeceraClase()
         clase += "namespace EP_AcademicMicroservice.Api.Controllers" + self.ENTER 
         clase += "{"  + self.ENTER   
+        clase += self.TAB + "[Route(\"api/[controller]\")]" + self.ENTER
+        clase += self.TAB + "[ApiController]" + self.ENTER
+        clase += self.TAB + "public class " + self.__nombreClase + " : ControllerBase" + self.ENTER
+        clase += self.TAB + "{" + self.ENTER         
         clase += self.__generarCuerpoClase()    
+        clase += self.TAB + "}" + self.ENTER        
         clase += "}"
 
         return clase
@@ -43,10 +48,6 @@ class objetoRepository(iObjetoAplicacion):
     def __generarCuerpoClase(self):
         cuerpoClase = ""
 
-        cuerpoClase += self.TAB + "[Route(\"api/[controller]\")]" + self.ENTER
-        cuerpoClase += self.TAB + "[ApiController]" + self.ENTER
-        cuerpoClase += self.TAB + "public class " + self.__nombreClase + " : ControllerBase" + self.ENTER
-        cuerpoClase += self.TAB + "{" + self.ENTER 
         cuerpoClase += 2*self.TAB + "#region Operations" + self.ENTER 
         cuerpoClase += 2*self.TAB + "[HttpGet(\"GetByPagination\", Name = \"" + self.__nombreTabla + "_GetByPagination\")]" + self.ENTER 
         cuerpoClase += 2*self.TAB + "[ProducesResponseType(200)]" + self.ENTER 
@@ -64,7 +65,6 @@ class objetoRepository(iObjetoAplicacion):
         cuerpoClase += 2*self.TAB + "[HttpPost(\"Delete\")]" + self.ENTER
         cuerpoClase += self.__generarMetodoDelete() + 2*self.ENTER
         cuerpoClase += 2*self.TAB + "#endregion" + self.ENTER 
-        cuerpoClase += self.TAB + "}" + self.ENTER
         
         return cuerpoClase
 

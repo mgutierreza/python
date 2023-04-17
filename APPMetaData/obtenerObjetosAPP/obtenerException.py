@@ -1,6 +1,6 @@
 import pyodbc as pyo
 import pandas as pd
-from utilitarios import generarRutaArchivo, generarNombreArchivo, generarArchivo, generarExtensionArchivo
+from utilitarios import generarRutaArchivo, generarNombreArchivo, generarArchivo, generarExtensionArchivo, getNombreProyecto
 from utilitarios import enumerados
 from obtenerConexionBD import consultaDatos
 
@@ -20,7 +20,7 @@ def generarArchivoException(nombreTabla):
 def generarClase(nombreTabla):
     claseEntity = ""
     claseEntity += generarCabeceraClase()
-    claseEntity += "namespace EP_AcademicMicroservice.Exceptions" + ENTER 
+    claseEntity += "namespace " + getNombreProyecto() + "Microservice.Exceptions" + ENTER 
     claseEntity += "{" + ENTER
     claseEntity += generarCuerpoClase(nombreTabla)
     claseEntity += "}" + ENTER 
@@ -40,10 +40,16 @@ def generarCuerpoClase(nombreTabla):
 
     cuerpoClaseEntity = cuerpoClaseEntity + TAB + "public class " + generarNombreArchivo(nombreTabla, enumerados.claseObjeto.exception) + " : CustomException" + ENTER
     cuerpoClaseEntity = cuerpoClaseEntity + TAB + "{" + ENTER 
-    cuerpoClaseEntity = cuerpoClaseEntity + 2*TAB + "public string ErrorCode { get; set; }" + ENTER 
+    cuerpoClaseEntity = cuerpoClaseEntity + 2*TAB + "public string ErrorCode { get; set; }" + 2*ENTER 
     cuerpoClaseEntity = cuerpoClaseEntity + 2*TAB + "private List<ErrorCodeEntityException> ErrorsList = new List<ErrorCodeEntityException>() {" + ENTER 
     cuerpoClaseEntity = cuerpoClaseEntity + 3*TAB + "new ErrorCodeEntityException { Code=\"not_found\", Message=\"No existe el objeto en la base de datos\" }" + ENTER 
-    cuerpoClaseEntity = cuerpoClaseEntity + 2*TAB + "};" + 2*ENTER     
+    cuerpoClaseEntity = cuerpoClaseEntity + 2*TAB + "};" + 2*ENTER    
+
+    cuerpoClaseEntity = cuerpoClaseEntity + 2*TAB + "public " + generarNombreArchivo(nombreTabla, enumerados.claseObjeto.exception) + " (string errorCode)" + ENTER
+    cuerpoClaseEntity = cuerpoClaseEntity + 2*TAB + "{" + ENTER
+    cuerpoClaseEntity = cuerpoClaseEntity + 3*TAB + "this.ErrorCode = errorCode; " + ENTER
+    cuerpoClaseEntity = cuerpoClaseEntity + 2*TAB + "}" + 2*ENTER
+
     cuerpoClaseEntity = cuerpoClaseEntity + 2*TAB + "public override List<string> CustomMessage" + ENTER
     cuerpoClaseEntity = cuerpoClaseEntity + 2*TAB + "{" + ENTER
     cuerpoClaseEntity = cuerpoClaseEntity + 3*TAB + "get" + ENTER

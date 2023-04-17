@@ -1,4 +1,4 @@
-from utilitarios import generarRutaArchivo, generarNombreArchivo, generarArchivo, generarExtensionArchivo
+from utilitarios import generarRutaArchivo, generarNombreArchivo, generarArchivo, generarExtensionArchivo, getNombreProyecto
 from utilitarios import enumerados
 
 TAB = "\t"
@@ -17,7 +17,7 @@ def generarArchivoRequestValidator(nombreTabla):
 def generarClase(nombreTabla):
     claseEntity = ""
     claseEntity += generarCabeceraClase()
-    claseEntity += "namespace EP_AcademicMicroservice.Service" + ENTER 
+    claseEntity += "namespace " + getNombreProyecto() + "Microservice.Service" + ENTER 
     claseEntity += "{"  + ENTER   
     claseEntity += generarCuerpoClase(nombreTabla)
     claseEntity += "}"

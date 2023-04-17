@@ -1,6 +1,6 @@
 import pyodbc as pyo
 import pandas as pd
-from utilitarios import generarRutaArchivo, generarNombreArchivo, generarArchivo, generarExtensionArchivo
+from utilitarios import generarRutaArchivo, generarNombreArchivo, generarArchivo, generarExtensionArchivo, getNombreProyecto
 from utilitarios import enumerados
 from obtenerConexionBD import consultaDatos
 
@@ -20,7 +20,7 @@ def generarArchivoFilter(nombreTabla):
 def generarClase(nombreTabla):
     clase = ""
     clase += generarCabeceraClase()
-    clase += "namespace EP_AcademicMicroservice.Entities" + ENTER 
+    clase += "namespace " + getNombreProyecto() + "Microservice.Entities" + ENTER 
     clase += "{" + ENTER
     clase += TAB + "public class " + generarNombreArchivo(nombreTabla, enumerados.claseObjeto.filter) + ENTER 
     clase += TAB + "{" + ENTER

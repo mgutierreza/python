@@ -1,2 +1,2 @@
-from utilitarios.util import extraerUltimoCaracter, generarRutaArchivo, generarNombreArchivo, generarExtensionArchivo, generarArchivo
+from utilitarios.util import extraerUltimoCaracter, generarRutaArchivo, generarNombreArchivo, generarExtensionArchivo, generarArchivo, getNombreProyecto
 from utilitarios import enumerados

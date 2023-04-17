@@ -2,6 +2,10 @@ import os
 from os import remove
 from utilitarios.enumerados import tipoObjeto, claseObjeto
 
+def getNombreProyecto():
+    nombreProyecto = 'APPACADEMICOAPI'
+    return nombreProyecto
+
 def extraerUltimoCaracter(texto):
     last_char_index = texto.rfind(",")
     texto = texto[:last_char_index]

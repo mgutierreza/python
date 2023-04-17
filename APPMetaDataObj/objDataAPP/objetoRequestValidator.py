@@ -22,7 +22,10 @@ class objetoRequestvalidator(iObjetoAplicacion):
         clase += self.__generarCabeceraClase()
         clase += "namespace EP_AcademicMicroservice.Service" + self.ENTER 
         clase += "{" + self.ENTER
+        clase += self.TAB + "public static class " + self.__nombreClase + self.ENTER
+        clase += self.TAB + "{" + self.ENTER 
         clase += self.__generarCuerpoClase()
+        clase +=  self.TAB + "}" + self.ENTER
         clase += "}" + self.ENTER
         return clase
  
@@ -39,9 +42,6 @@ class objetoRequestvalidator(iObjetoAplicacion):
     def __generarCuerpoClase(self):
         cuerpoClase = ""
 
-        cuerpoClase += self.TAB + "public static class " + self.__nombreClase + self.ENTER
-        cuerpoClase += self.TAB + "{" + self.ENTER 
-    
         cuerpoClase +=  2*self.TAB + "#region Validate" + self.ENTER
         cuerpoClase +=  2*self.TAB + "public static void ValidateRequest(this " + self.__nombreTabla + "Response response, " + self.__nombreTabla + "Request request)" + self.ENTER
         cuerpoClase +=  2*self.TAB + "{" + self.ENTER 
@@ -83,6 +83,5 @@ class objetoRequestvalidator(iObjetoAplicacion):
         cuerpoClase +=  3*self.TAB + "response.Pagination = request.Pagination;" + self.ENTER 
         cuerpoClase +=  2*self.TAB + "}" + self.ENTER             
         cuerpoClase +=  2*self.TAB + "#endregion" + self.ENTER
-        cuerpoClase +=  self.TAB + "}" + self.ENTER
-
+        
         return cuerpoClase

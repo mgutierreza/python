@@ -23,7 +23,10 @@ class objetoRepository(iObjetoAplicacion):
         clase += self.__generarCabeceraClase()
         clase += "namespace EP_AcademicMicroservice.Service" + self.ENTER 
         clase += "{"  + self.ENTER    
+        clase += self.TAB + "public class " + self.__nombreClase + self.ENTER
+        clase += self.TAB + "{" + self.ENTER         
         clase += self.__generarCuerpoClase()
+        clase += self.TAB + "}" + self.ENTER        
         clase += "}"
         
         return clase
@@ -43,14 +46,12 @@ class objetoRepository(iObjetoAplicacion):
     
     def __generarCuerpoClase(self):
         cuerpoClase = ""
-        cuerpoClase = cuerpoClase + self.TAB + "public class " + self.__nombreClase + self.ENTER
-        cuerpoClase = cuerpoClase + self.TAB + "{" + self.ENTER 
+
         cuerpoClase = cuerpoClase + 2*self.TAB + "#region Public Methods" + self.ENTER 
         cuerpoClase = cuerpoClase + self.__generarMetodoExecute() + 2*self.ENTER 
         cuerpoClase = cuerpoClase + self.__generarMetodoGet() + 2*self.ENTER 
         cuerpoClase = cuerpoClase + self.__generarMetodoLstItemResponse() + self.ENTER 
         cuerpoClase = cuerpoClase + 2*self.TAB + "#endregion" + 2*self.ENTER 
-        cuerpoClase = cuerpoClase + self.TAB + "}" + self.ENTER
         
         return cuerpoClase
     
@@ -61,7 +62,9 @@ class objetoRepository(iObjetoAplicacion):
         data = obtenerData(self.__nombreTabla)
         dictData = data.metaDataClavePrincipal()
         for valor in dictData:
-            campoClavePrincipal = valor["nombreCampo"]
+            campoClavePrincipal += "request.Item." + valor["nombreCampo"] + ","
+        
+        campoClavePrincipal = gestionArchivos.extraerUltimoCaracter(campoClavePrincipal)
 
         metodoExecute += 2*self.TAB + "public " + self.__nombreTabla + "Response Execute(" + self.__nombreTabla + "Request request)" + self.ENTER
         metodoExecute += 2*self.TAB + "{" + self.ENTER 
@@ -82,7 +85,7 @@ class objetoRepository(iObjetoAplicacion):
         metodoExecute += 7*self.TAB + "response.Item = new " + self.__nombreTabla + "Domain().Edit" + self.__nombreTabla + "(request.Item);" + self.ENTER 
         metodoExecute += 7*self.TAB + "break;" + self.ENTER 
         metodoExecute += 6*self.TAB + "case Operation.Delete:" + self.ENTER 
-        metodoExecute += 7*self.TAB + "response.Item = new " + self.__nombreTabla + "Domain().Delete" + self.__nombreTabla + "(request.Item." + campoClavePrincipal + ");" + self.ENTER 
+        metodoExecute += 7*self.TAB + "response.Item = new " + self.__nombreTabla + "Domain().Delete" + self.__nombreTabla + "(" + campoClavePrincipal + ");" + self.ENTER 
         metodoExecute += 7*self.TAB + "break;" + self.ENTER 
         metodoExecute += 6*self.TAB + "default:" + self.ENTER 
         metodoExecute += 7*self.TAB + "break;" + self.ENTER 
@@ -110,7 +113,9 @@ class objetoRepository(iObjetoAplicacion):
         data = obtenerData(self.__nombreTabla)
         dictData = data.metaDataClavePrincipal()
         for valor in dictData:
-            campoClavePrincipal = valor["nombreCampo"]
+            campoClavePrincipal += "request.Filter." + valor["nombreCampo"] + ","
+        
+        campoClavePrincipal = gestionArchivos.extraerUltimoCaracter(campoClavePrincipal)
 
         metodoGet += 2*self.TAB + "public " + self.__nombreTabla + "ItemResponse Get" + self.__nombreTabla + "(" + self.__nombreTabla + "ItemRequest request)" + self.ENTER
         metodoGet += 2*self.TAB + "{" + self.ENTER 
@@ -123,7 +128,7 @@ class objetoRepository(iObjetoAplicacion):
         metodoGet += 5*self.TAB + "switch (request.FilterType)" + self.ENTER
         metodoGet += 5*self.TAB + "{" + self.ENTER     
         metodoGet += 6*self.TAB + "case " + self.__nombreTabla + "FilterItemType.ById:" + self.ENTER     
-        metodoGet += 7*self.TAB + "response.Item = new " + self.__nombreTabla + "Domain().GetById(request.Filter." + campoClavePrincipal + ");" + self.ENTER
+        metodoGet += 7*self.TAB + "response.Item = new " + self.__nombreTabla + "Domain().GetById(" + campoClavePrincipal + ");" + self.ENTER
         metodoGet += 7*self.TAB + "break;" + self.ENTER 
         metodoGet += 6*self.TAB + "default:" + self.ENTER 
         metodoGet += 7*self.TAB + "break;" + self.ENTER 
