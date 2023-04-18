@@ -27,11 +27,13 @@ def getCarnetIdentificacion(usuario):
 def getDataCarnetIdentificacion():
     global cursor
 
-    script = "SELECT pe.codigousuario, ci.codigocarnet "
-    script += "FROM sgcoresys.personamast pe "
-    script += "INNER JOIN sgcoresys.as_carnetidentificacion ci ON pe.persona = ci.empleado "
-    script += "WHERE ci.estado = \'A\' "
-    script += "AND pe.codigousuario IS NOT NULL "
+    script = "SELECT COALESCE(p.codigousuario, UPPER(SUBSTR(e.correointerno,1,instr(e.correointerno,'@')-1))) CodigoUsuario, ci.codigocarnet "
+    script += "FROM sgcoresys.personamast p "
+    script += "INNER JOIN sgcoresys.empleadomast e ON p.persona = e.empleado "
+    script += "INNER JOIN sgcoresys.as_carnetidentificacion ci ON e.empleado = ci.empleado "
+    script += "WHERE p.estado = 'A' "
+    script += "AND e.estado = 'A' "
+    script += "AND ci.estado = 'A'"
 
     if not cursor:
         cursor = getConexionBD()
