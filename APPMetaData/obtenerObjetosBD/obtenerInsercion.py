@@ -62,7 +62,7 @@ def generarParametrosSalidaProcedimientoAlmacenado(nombreTabla):
         else:
             parametrosSalida += 2*TAB + "@"+ df["nombreCampo"][i] + espacioFaltante*ESPACIO + 4*TAB + df["tipoDatoBD"][i] + "(" + (df["tamanhoCampo"][i]).astype(str) + ") OUTPUT," + ENTER
 
-    #parametrosSalida = util.extraerUltimoCaracter(parametrosSalida) + ENTER
+    parametrosSalida = util.extraerUltimoCaracter(parametrosSalida) + ENTER
 
     return parametrosSalida
 
@@ -140,9 +140,9 @@ def obtenerParametrosParaInsercion(nombreTabla):
     df = consultaDatos.obtenerMetaDataTodosCampos(nombreTabla)
 
     numeroCampos = len(df.index)
-    rangoMenor = numeroCampos - 3
+    rangoMenor = numeroCampos
     rangoMayor = numeroCampos
-    df = df.drop(range(rangoMenor,rangoMayor))
+    #df = df.drop(range(rangoMenor,rangoMayor))
     numeroCampos = len(df.index)
 
     return df

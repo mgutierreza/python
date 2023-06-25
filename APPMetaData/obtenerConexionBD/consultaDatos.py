@@ -124,7 +124,7 @@ def __abrirConexionBD():
 
     if (conexionBD is None):
         cadenaConexion = (
-            r"Driver={SQL SERVER};Server=132.16.0.49;Database=BDDatos;UID=Prueba;PWD=Prueba"
+            r"Driver={SQL SERVER};Server=tcp:developerep.database.windows.net;Database=BDEpartners_Dev;UID=epartners;PWD=Peam41923m*"
             )
         conexionBD = pyo.connect(cadenaConexion)
 

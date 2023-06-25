@@ -1,5 +1,5 @@
 from objConexionBD.objetoConexion import gestionBaseDatos
-from consultasSQL import obtenerConsultaSQL
+from objConexionBD.consultasSQL import obtenerConsultaSQL
 from util.enumerados import tipoConsulta
 
 class obtenerData():

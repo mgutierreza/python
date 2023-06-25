@@ -270,7 +270,7 @@ def generarCamposInsertar(nombreTabla):
     numeroCampos = len(df.index)
     rangoMenor = numeroCampos - 3
     rangoMayor = numeroCampos
-    df = df.drop(range(rangoMenor,rangoMayor))
+    #df = df.drop(range(rangoMenor,rangoMayor))
     
     for i in df.index:
         tipoDato = df["tipoDatoNET"][i]
@@ -297,7 +297,7 @@ def generarCamposActualizar(nombreTabla):
     if(numeroCampos > 3):
         rangoMenor = numeroCampos - 6
         rangoMayor = numeroCampos - 3
-        df = df.drop(range(rangoMenor,rangoMayor))
+        #df = df.drop(range(rangoMenor,rangoMayor))
     
     for i in df.index:
         tipoDato = df["tipoDatoNET"][i]
