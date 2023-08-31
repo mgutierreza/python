@@ -1,6 +1,6 @@
 import pyodbc as pyo
 import pandas as pd
-from utilitarios import generarRutaArchivo, generarNombreArchivo, generarArchivo, generarExtensionArchivo
+from utilitarios import generarRutaArchivo, generarNombreArchivo, generarArchivo, generarExtensionArchivo 
 from utilitarios import enumerados
 from obtenerConexionBD import consultaDatos
 from utilitarios import util
@@ -9,7 +9,7 @@ TAB = "\t"
 ENTER = "\n"
 
 def generarProcedimientoAlmacenadoSelect(nombreTabla):
-    rutaArchivo = generarRutaArchivo(nombreTabla, enumerados.tipoObjeto.BaseDatos)
+    rutaArchivo = generarRutaArchivo('QUERY', enumerados.tipoObjeto.BaseDatos)
     nombreArchivo = generarNombreArchivo(nombreTabla, enumerados.claseObjeto.select)
     extensionArchivo = generarExtensionArchivo(enumerados.tipoObjeto.BaseDatos)
     contenidoArchivo = generarProcedimientoAlmacenado(nombreTabla)
@@ -28,7 +28,8 @@ def generarProcedimientoAlmacenado(nombreTabla):
     return procedimientoAlmacenado
 
 def generarLibreriasProcedimientoAlmacenado():
-    libreriasProcedimientoAlmacenado = ""
+    libreriasProcedimientoAlmacenado = "USE BDEpartners_DEV" + ENTER
+    libreriasProcedimientoAlmacenado += "GO" + ENTER 
     libreriasProcedimientoAlmacenado += "SET ANSI_NULLS ON" + ENTER 
     libreriasProcedimientoAlmacenado += "GO" + ENTER 
     libreriasProcedimientoAlmacenado += "SET QUOTED_IDENTIFIER ON" + ENTER
@@ -47,49 +48,62 @@ def generarCabeceraProcedimientoAlmacenado(nombreTabla):
 
     return cabeceraProcedimientoAlmacenado
 
-def generarCuerpoProcedimientoAlmacenado(nombreTabla):
-    cuerpoProcedimientoAlmacenado = TAB + "BEGIN" + ENTER
-    cuerpoProcedimientoAlmacenado += generarCondicionalProcedimientoAlmacenado(nombreTabla)
-    cuerpoProcedimientoAlmacenado += TAB + "END" + ENTER
-
-    return cuerpoProcedimientoAlmacenado
-
 def generarParametrosEntradaProcedimientoAlmacenado(nombreTabla):
     parametrosEntrada = ""
     parametrosEntradaPK = ""
-    parametrosEntradaFK = ""
 
-    df = consultaDatos.obtenerMetaDataClavePrincipal(nombreTabla)
-    numeroRegistroDiccionario = len(df)
+    numeroClaves = consultaDatos.obtenerNumeroMetaDataClaves()
     
-    if (numeroRegistroDiccionario > 0):
-        for i in df.index:
-                if (df["tipoDatoBD"][i] == 'INT' or df["tipoDatoBD"][i] == 'BIGINT'):
+    if (numeroClaves > 0):
+        df = consultaDatos.obtenerMetaDataClavePrincipal()
+       
+        if (len(df.index) > 0):
+            for i in df.index:
+                    if (df["tipoDatoBD"][i] == 'INT' or df["tipoDatoBD"][i] == 'BIGINT' or df["tipoDatoBD"][i] == 'SMALLINT' or df["tipoDatoBD"][i] == 'TINYINT'):
+                        parametrosEntradaPK += 2*TAB + "@"+ df["nombreCampo"][i] + TAB + df["tipoDatoBD"][i] + " = 0," + ENTER
+                    else:
+                        parametrosEntradaPK += 2*TAB + "@"+ df["nombreCampo"][i] + TAB + df["tipoDatoBD"][i] + "(" + str(df["tamanhoCampo"][i]) + ") = 'null'," + ENTER
+        else:
+            df = consultaDatos.obtenerMetaDataClaveForanea()
+            for i in df.index:
+                if (df["tipoDatoBD"][i] == 'INT' or df["tipoDatoBD"][i] == 'BIGINT' or df["tipoDatoBD"][i] == 'SMALLINT' or df["tipoDatoBD"][i] == 'TINYINT'):
                     parametrosEntradaPK += 2*TAB + "@"+ df["nombreCampo"][i] + TAB + df["tipoDatoBD"][i] + " = 0," + ENTER
                 else:
                     parametrosEntradaPK += 2*TAB + "@"+ df["nombreCampo"][i] + TAB + df["tipoDatoBD"][i] + "(" + str(df["tamanhoCampo"][i]) + ") = 'null'," + ENTER
+        parametrosEntrada = util.extraerUltimoCaracter(parametrosEntradaPK) + ENTER 
     else:
-        df = consultaDatos.obtenerMetaDataClaveForanea(nombreTabla)
-        for i in df.index:
-            if (df["tipoDatoBD"][i] == 'INT' or df["tipoDatoBD"][i] == 'BIGINT'):
-                parametrosEntradaPK += 2*TAB + "@"+ df["nombreCampo"][i] + TAB + df["tipoDatoBD"][i] + " = 0," + ENTER
-            else:
-                parametrosEntradaPK += 2*TAB + "@"+ df["nombreCampo"][i] + TAB + df["tipoDatoBD"][i] + "(" + str(df["tamanhoCampo"][i]) + ") = 'null'," + ENTER
-
-    parametrosEntrada = util.extraerUltimoCaracter(parametrosEntradaPK) + ENTER    
+        parametrosEntrada = ""
 
     return parametrosEntrada
 
+def generarCuerpoProcedimientoAlmacenado(nombreTabla):
+    
+    cuerpoProcedimientoAlmacenado = ""
+    numeroClaves = consultaDatos.obtenerNumeroMetaDataClaves()
+        
+    if (numeroClaves > 0):    
+        cuerpoProcedimientoAlmacenado = TAB + "BEGIN" + ENTER
+        cuerpoProcedimientoAlmacenado += generarCondicionalProcedimientoAlmacenado(nombreTabla)
+        cuerpoProcedimientoAlmacenado += TAB + "END" + ENTER
+    else:
+        cuerpoProcedimientoAlmacenado = TAB + "BEGIN" + ENTER
+        cuerpoProcedimientoAlmacenado += generarConsultaProcedimientoAlmacenado(nombreTabla)
+        cuerpoProcedimientoAlmacenado += TAB + "END" + ENTER
+
+    return cuerpoProcedimientoAlmacenado
+
 def generarCondicionalProcedimientoAlmacenado(nombreTabla):
-    df = consultaDatos.obtenerMetaDataClavePrincipal(nombreTabla)
-    condicionalProcedimientoAlmacenado = ""
+    df = consultaDatos.obtenerMetaDataClavePrincipal()
+    condicionalProcedimientoAlmacenado = 2*TAB + "IF ("
     
     for i in df.index:
-        if (df["tipoDatoBD"][i] == 'INT' or df["tipoDatoBD"][i] == 'BIGINT'):
-            condicionalProcedimientoAlmacenado += 2*TAB + "IF (@"+ df["nombreCampo"][i] +" > 0)" + ENTER
+        if (df["tipoDatoBD"][i] == 'INT' or df["tipoDatoBD"][i] == 'BIGINT' or df["tipoDatoBD"][i] == 'SMALLINT' or df["tipoDatoBD"][i] == 'TINYINT'):
+            condicionalProcedimientoAlmacenado += "@"+ df["nombreCampo"][i] +" > 0 AND " 
         else:
-            condicionalProcedimientoAlmacenado += 2*TAB + "IF (@"+ df["nombreCampo"][i] +" = 'null')" + ENTER
+            condicionalProcedimientoAlmacenado += "@"+ df["nombreCampo"][i] +" <> 'null' AND "
     
+    condicionalProcedimientoAlmacenado = util.extraerUltimaPalabra(condicionalProcedimientoAlmacenado, "AND") 
+    condicionalProcedimientoAlmacenado += ")" + ENTER
     condicionalProcedimientoAlmacenado += 3*TAB + "BEGIN" + ENTER
     condicionalProcedimientoAlmacenado += generarConsultaProcedimientoAlmacenado(nombreTabla)
     condicionalProcedimientoAlmacenado += generarFiltroConsulta(nombreTabla)
@@ -101,10 +115,9 @@ def generarCondicionalProcedimientoAlmacenado(nombreTabla):
 
     return condicionalProcedimientoAlmacenado
 
-
 def generarConsultaProcedimientoAlmacenado(nombreTabla):
     
-    df = consultaDatos.obtenerMetaDataTodosCampos(nombreTabla)
+    df = consultaDatos.obtenerMetaDataTodosCampos()
     lineaCodigoProcedimientoAlmacenado = ""
     consultaProcedimientoAlmacenado = 4*TAB + "SELECT" + ENTER
     
@@ -120,14 +133,14 @@ def generarFiltroConsulta(nombreTabla):
     filtroConsulta = 4*TAB + "WHERE " + ENTER
     filtroLineaConsulta = ""
 
-    dfClave = consultaDatos.obtenerMetaDataClavePrincipal(nombreTabla)
+    dfClave = consultaDatos.obtenerMetaDataClavePrincipal()
     numeroRegistroDiccionario = len(dfClave)
     
     if (numeroRegistroDiccionario > 0):    
         for i in dfClave.index:
             filtroLineaConsulta += 5*TAB + nombreTabla + "."+ dfClave["nombreCampo"][i] + TAB + "=" + TAB + "@" + dfClave["nombreCampo"][i] + " AND " + ENTER
     else:
-        dfClave = consultaDatos.obtenerMetaDataClaveForanea(nombreTabla)
+        dfClave = consultaDatos.obtenerMetaDataClaveForanea()
         for i in dfClave.index:
             filtroLineaConsulta += 5*TAB + nombreTabla + "."+ dfClave["nombreCampo"][i] + TAB + "=" + TAB + "@" + dfClave["nombreCampo"][i] + " AND " + ENTER
     

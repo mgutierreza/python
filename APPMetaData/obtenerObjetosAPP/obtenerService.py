@@ -3,13 +3,14 @@ import pandas as pd
 from obtenerObjetosBD import obtenerConsulta
 from utilitarios import generarRutaArchivo, generarNombreArchivo, generarArchivo, generarExtensionArchivo, getNombreProyecto
 from utilitarios import enumerados
+from utilitarios import util
 from obtenerConexionBD import consultaDatos
 
 TAB = "\t"
 ENTER = "\n"
 
 def generarArchivoService(nombreTabla):
-    rutaArchivo = generarRutaArchivo(nombreTabla, enumerados.tipoObjeto.Aplicacion)
+    rutaArchivo = generarRutaArchivo('11_SERVICE', enumerados.tipoObjeto.Aplicacion)
     nombreArchivo = generarNombreArchivo(nombreTabla, enumerados.claseObjeto.service)
     extensionArchivo = generarExtensionArchivo(enumerados.tipoObjeto.Aplicacion)
     contenidoArchivo = generarClase(nombreTabla)
@@ -30,9 +31,9 @@ def generarClase(nombreTabla):
 
 def generarCabeceraClase():
     cabeceraClase = ""
-    cabeceraClase += "using EP_AcademicMicroservice.Domain;" + ENTER 
-    cabeceraClase += "using EP_AcademicMicroservice.Entities;" + ENTER 
-    cabeceraClase += "using EP_AcademicMicroservice.Exceptions;" + ENTER
+    cabeceraClase += "using " + getNombreProyecto() + "Microservice.Domain;" + ENTER 
+    cabeceraClase += "using " + getNombreProyecto() + "Microservice.Entities;" + ENTER 
+    cabeceraClase += "using " + getNombreProyecto() + "Microservice.Exceptions;" + ENTER
     cabeceraClase += "using System;" + ENTER 
     cabeceraClase += "using System.Collections.Generic;" + ENTER
     cabeceraClase += "using System.Linq;" + ENTER
@@ -57,9 +58,11 @@ def generarMetodoExecute(nombreTabla):
     metodoExecute = ""
     campoClavePrincipal = ""
 
-    df = consultaDatos.obtenerMetaDataClavePrincipal(nombreTabla)
+    df = consultaDatos.obtenerMetaDataClavePrincipal()
     for i in df.index:
-        campoClavePrincipal = df["nombreCampo"][i]
+        campoClavePrincipal += "request.Item." + df["nombreCampo"][i] + "," 
+    
+    campoClavePrincipal = util.extraerUltimoCaracter(campoClavePrincipal)
 
     metodoExecute += 2*TAB + "public " + nombreTabla + "Response Execute(" + nombreTabla + "Request request)" + ENTER
     metodoExecute += 2*TAB + "{" + ENTER 
@@ -80,7 +83,7 @@ def generarMetodoExecute(nombreTabla):
     metodoExecute += 7*TAB + "response.Item = new " + nombreTabla + "Domain().Edit" + nombreTabla + "(request.Item);" + ENTER 
     metodoExecute += 7*TAB + "break;" + ENTER 
     metodoExecute += 6*TAB + "case Operation.Delete:" + ENTER 
-    metodoExecute += 7*TAB + "response.Item = new " + nombreTabla + "Domain().Delete" + nombreTabla + "(request.Item." + campoClavePrincipal + ");" + ENTER 
+    metodoExecute += 7*TAB + "response.Item = new " + nombreTabla + "Domain().Delete" + nombreTabla + "(" + campoClavePrincipal + ");" + ENTER 
     metodoExecute += 7*TAB + "break;" + ENTER 
     metodoExecute += 6*TAB + "default:" + ENTER 
     metodoExecute += 7*TAB + "break;" + ENTER 
@@ -105,9 +108,11 @@ def generarMetodoGet(nombreTabla):
     metodoGet = ""
     campoClavePrincipal = ""
 
-    df = consultaDatos.obtenerMetaDataClavePrincipal(nombreTabla)
+    df = consultaDatos.obtenerMetaDataClavePrincipal()
     for i in df.index:
-        campoClavePrincipal = df["nombreCampo"][i]
+        campoClavePrincipal += "request.Filter." + df["nombreCampo"][i] + "," 
+    
+    campoClavePrincipal = util.extraerUltimoCaracter(campoClavePrincipal)    
 
     metodoGet += 2*TAB + "public " + nombreTabla + "ItemResponse Get" + nombreTabla + "(" + nombreTabla + "ItemRequest request)" + ENTER
     metodoGet += 2*TAB + "{" + ENTER 
@@ -120,7 +125,7 @@ def generarMetodoGet(nombreTabla):
     metodoGet += 5*TAB + "switch (request.FilterType)" + ENTER
     metodoGet += 5*TAB + "{" + ENTER     
     metodoGet += 6*TAB + "case " + nombreTabla + "FilterItemType.ById:" + ENTER     
-    metodoGet += 7*TAB + "response.Item = new " + nombreTabla + "Domain().GetById(request.Filter." + campoClavePrincipal + ");" + ENTER
+    metodoGet += 7*TAB + "response.Item = new " + nombreTabla + "Domain().GetById(" + campoClavePrincipal + ");" + ENTER
     metodoGet += 7*TAB + "break;" + ENTER 
     metodoGet += 6*TAB + "default:" + ENTER 
     metodoGet += 7*TAB + "break;" + ENTER 

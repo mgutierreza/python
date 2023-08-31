@@ -31,7 +31,7 @@ def crearJSONInsercion(nombreTabla):
     json = ""
     valor = ""
 
-    df = consultaDatos.obtenerMetaDataTodosCampos(nombreTabla)
+    df = consultaDatos.obtenerMetaDataTodosCampos()
 
     json += "{" + ENTER
     

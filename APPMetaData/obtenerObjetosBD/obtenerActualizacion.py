@@ -11,7 +11,7 @@ ESPACIO = " "
 
 def generarProcedimientoAlmacenadoActualizacion(nombreTabla):
 
-    rutaArchivo = generarRutaArchivo(nombreTabla, enumerados.tipoObjeto.BaseDatos)
+    rutaArchivo = generarRutaArchivo('UPDATE', enumerados.tipoObjeto.BaseDatos)
     nombreArchivo = generarNombreArchivo(nombreTabla, enumerados.claseObjeto.update)
     extensionArchivo = generarExtensionArchivo(enumerados.tipoObjeto.BaseDatos)
     contenidoArchivo = generarProcedimientoAlmacenado(nombreTabla)
@@ -30,7 +30,8 @@ def generarProcedimientoAlmacenado(nombreTabla):
     return procedimientoAlmacenado
 
 def generarLibreriasProcedimientoAlmacenado():
-    libreriasProcedimientoAlmacenado = ""
+    libreriasProcedimientoAlmacenado = "USE BDEpartners_DEV" + ENTER
+    libreriasProcedimientoAlmacenado += "GO" + ENTER 
     libreriasProcedimientoAlmacenado += "SET ANSI_NULLS ON" + ENTER 
     libreriasProcedimientoAlmacenado += "GO" + ENTER 
     libreriasProcedimientoAlmacenado += "SET QUOTED_IDENTIFIER ON" + ENTER
@@ -49,15 +50,39 @@ def generarCabeceraProcedimientoAlmacenado(nombreTabla):
     
     return cabeceraProcedimientoAlmacenado
 
+def generarParametrosEntradaProcedimientoAlmacenado(nombreTabla):
+    parametrosEntrada = ""
+    espacioEstandar = 30
+    espacioFaltante = 0
+
+    df = obtenerParametrosParaActualizacion(nombreTabla)
+    for i in df.index:
+        if ((df["tipoDatoBD"][i] == 'DATETIME') and ("Update","Upd" in df["nombreCampo"][i])):
+            parametrosEntrada += ""
+        else:
+            espacioCampo = len(df["nombreCampo"][i])
+            espacioFaltante = espacioEstandar - espacioCampo
+            if (df["tamanhoCampo"][i] == 0):
+                parametrosEntrada += 5*TAB + "@"+ df["nombreCampo"][i] + espacioFaltante*ESPACIO + 2*TAB + df["tipoDatoBD"][i] + "," + ENTER
+            else:
+                parametrosEntrada += 5*TAB + "@"+ df["nombreCampo"][i] + espacioFaltante*ESPACIO + 2*TAB + df["tipoDatoBD"][i] + "(" + df["tamanhoCampo"][i].astype(str) + ")," + ENTER
+    
+    espacioCampo = 10
+    espacioFaltante = espacioEstandar - espacioCampo
+    parametrosEntrada += 5*TAB + "@errorCode" + espacioFaltante*ESPACIO + 2*TAB + "VARCHAR(150) = '' OUTPUT" + ENTER
+
+    return parametrosEntrada
+
+
 def generarCuerpoProcedimientoAlmacenado(nombreTabla):
     cuerpoProcedimientoAlmacenado = ""
     condicionesFK = ""
         
-    df = consultaDatos.obtenerMetaDataFK(nombreTabla)
+    df = consultaDatos.obtenerMetaDataFK()
     
     cantidadFK = len(df)
     
-    if (cantidadFK <= 0):
+    if (cantidadFK == 0):
         cuerpoProcedimientoAlmacenado += ""
     elif (cantidadFK == 1):
         for i in df.index:
@@ -94,7 +119,9 @@ def generarCuerpoProcedimientoAlmacenado(nombreTabla):
         
         cuerpoProcedimientoAlmacenado += util.extraerUltimaPalabra(condicionesFK, "AND") + ENTER
 
-    cuerpoProcedimientoAlmacenado += TAB + "BEGIN" + ENTER
+    if (cantidadFK != 0):
+        cuerpoProcedimientoAlmacenado += TAB + "BEGIN" + ENTER
+        
     cuerpoProcedimientoAlmacenado += 4*TAB + "UPDATE dbo." + nombreTabla + ENTER
     cuerpoProcedimientoAlmacenado += 4*TAB + "SET" + ENTER
     cuerpoProcedimientoAlmacenado += generarCamposParaActualizar(nombreTabla)
@@ -129,59 +156,32 @@ def generarCamposParaActualizar(nombreTabla):
 
 def generarCamposParaFiltro(nombreTabla):
     camposParaFiltro = ""
-    camposParaFiltroFK = ""
     espacioEstandar = 30
 
-    df =  consultaDatos.obtenerMetaDataClavePrincipal(nombreTabla)
+    df =  consultaDatos.obtenerMetaDataClavePrincipal()
     cantidadRegistros = len(df)
 
-    if (cantidadRegistros > 0):
+    if (cantidadRegistros <= 0):
+        df =  consultaDatos.obtenerMetaDataFK()
+    else:
         for i in df.index:
             espacioCampo = len(df["nombreCampo"][i])
             espacioFaltante = espacioEstandar - espacioCampo
             camposParaFiltro += 5*TAB + "dbo." + nombreTabla + "." + df["nombreCampo"][i] + espacioFaltante*ESPACIO + "=" + 2*TAB + "@" + df["nombreCampo"][i] + " AND " + ENTER
-    else:
-        df =  consultaDatos.obtenerMetaDataFK(nombreTabla)
-        for i in df.index:
-            espacioCampo = len(df["columnaDestino"][i])
-            espacioFaltante = espacioEstandar - espacioCampo
-            camposParaFiltroFK += 5*TAB + "dbo." + nombreTabla + "." + df["columnaDestino"][i] + espacioFaltante*ESPACIO + "=" + 2*TAB + "@" + df["columnaDestino"][i] + " AND " + ENTER
     
-    camposParaFiltro += util.extraerUltimaPalabra(camposParaFiltroFK, "AND") + ENTER
+    camposParaFiltro = util.extraerUltimaPalabra(camposParaFiltro, "AND") + ENTER
     
     return camposParaFiltro
 
-def generarParametrosEntradaProcedimientoAlmacenado(nombreTabla):
-    parametrosEntrada = ""
-    espacioEstandar = 30
-    espacioFaltante = 0
-
-    df = obtenerParametrosParaActualizacion(nombreTabla)
-    for i in df.index:
-        if ((df["tipoDatoBD"][i] == 'DATETIME') and ("Update","Upd" in df["nombreCampo"][i])):
-            parametrosEntrada += ""
-        else:
-            espacioCampo = len(df["nombreCampo"][i])
-            espacioFaltante = espacioEstandar - espacioCampo
-            if (df["tamanhoCampo"][i] == 0):
-                parametrosEntrada += 5*TAB + "@"+ df["nombreCampo"][i] + espacioFaltante*ESPACIO + 2*TAB + df["tipoDatoBD"][i] + "," + ENTER
-            else:
-                parametrosEntrada += 5*TAB + "@"+ df["nombreCampo"][i] + espacioFaltante*ESPACIO + 2*TAB + df["tipoDatoBD"][i] + "(" + df["tamanhoCampo"][i].astype(str) + ")," + ENTER
-    #parametrosEntrada = util.extraerUltimoCaracter(parametrosEntrada) + ENTER
-    espacioCampo = 10
-    espacioFaltante = espacioEstandar - espacioCampo
-    parametrosEntrada += 5*TAB + "@errorCode" + espacioFaltante*ESPACIO + 2*TAB + "VARCHAR(150) = '' OUTPUT" + ENTER
-
-    return parametrosEntrada
 
 def obtenerParametrosParaActualizacion(nombreTabla):
 
-    df = consultaDatos.obtenerMetaDataTodosCampos(nombreTabla)
+    df = consultaDatos.obtenerMetaDataTodosCampos()
 
     numeroCampos = len(df.index)
     rangoMenor = numeroCampos - 6
     rangoMayor = numeroCampos - 3
-    #df = df.drop(range(rangoMenor,rangoMayor))
+    df = df.drop(range(rangoMenor,rangoMayor))
     numeroCampos = len(df.index)
 
     return df

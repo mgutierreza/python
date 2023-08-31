@@ -3,7 +3,7 @@ from os import remove
 from utilitarios.enumerados import tipoObjeto, claseObjeto
 
 def getNombreProyecto():
-    nombreProyecto = 'APPACADEMICOAPI'
+    nombreProyecto = 'EP_Academic'
     return nombreProyecto
 
 def extraerUltimoCaracter(texto):
@@ -23,11 +23,11 @@ def generarRutaArchivo(nombreTabla, tipoObjeto):
     rutaCreacionArchivo = "d:\\Clases\\"
 
     if (tipoObjeto == tipoObjeto.BaseDatos):
-        rutaCreacionArchivo = rutaCreacionArchivo + nombreTabla + "\\BD"
+        rutaCreacionArchivo = rutaCreacionArchivo + nombreTabla 
     elif(tipoObjeto == tipoObjeto.Aplicacion):
-        rutaCreacionArchivo = rutaCreacionArchivo +nombreTabla + "\\AP"
+        rutaCreacionArchivo = rutaCreacionArchivo + nombreTabla 
     else:
-        rutaCreacionArchivo = rutaCreacionArchivo +nombreTabla + "\\JSON"
+        rutaCreacionArchivo = rutaCreacionArchivo + nombreTabla 
 
     if (not os.path.isdir(rutaCreacionArchivo)):
         os.makedirs(rutaCreacionArchivo)

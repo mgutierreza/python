@@ -5,7 +5,7 @@ TAB = "\t"
 ENTER = "\n"
 
 def generarArchivoRequest(nombreTabla):
-    rutaArchivo = generarRutaArchivo(nombreTabla, enumerados.tipoObjeto.Aplicacion)
+    rutaArchivo = generarRutaArchivo('4_REQUEST', enumerados.tipoObjeto.Aplicacion)
     nombreArchivo = generarNombreArchivo(nombreTabla, enumerados.claseObjeto.request)
     extensionArchivo = generarExtensionArchivo(enumerados.tipoObjeto.Aplicacion)
     contenidoArchivo = generarClase(nombreTabla)

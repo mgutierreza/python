@@ -31,4 +31,4 @@ class tipoConsulta(Enum):
     CamposSinPK = 2
     SoloPKFK = 3
     SoloPK = 4
-    SoloFK = 5
+    SoloFK = 5    

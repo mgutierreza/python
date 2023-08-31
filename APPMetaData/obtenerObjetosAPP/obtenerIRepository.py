@@ -9,7 +9,7 @@ TAB = "\t"
 ENTER = "\n"
 
 def generarArchivoIRepository(nombreTabla):
-    rutaArchivo = generarRutaArchivo(nombreTabla, enumerados.tipoObjeto.Aplicacion)
+    rutaArchivo = generarRutaArchivo('9_IREPOSITORY', enumerados.tipoObjeto.Aplicacion)
     nombreArchivo = generarNombreArchivo(nombreTabla, enumerados.claseObjeto.iRepository)
     extensionArchivo = generarExtensionArchivo(enumerados.tipoObjeto.Aplicacion)
     contenidoArchivo = generarClase(nombreTabla)
@@ -30,7 +30,7 @@ def generarClase(nombreTabla):
 
 def generarCabeceraClase():
     cabeceraClase = ""
-    cabeceraClase += "using EP_AcademicMicroservice.Entities;" + ENTER 
+    cabeceraClase += "using " + getNombreProyecto() + "Microservice.Entities;" + ENTER 
     cabeceraClase += "using System;" + ENTER 
     cabeceraClase += "using System.Collections.Generic;" + ENTER
     cabeceraClase += "using System.Linq;" + ENTER 
@@ -44,7 +44,7 @@ def generarCuerpoClase(nombreTabla):
     tipoDatoClavePrincipal = ""
     nombreCampoClavePrincipal = ""
 
-    df = consultaDatos.obtenerMetaDataClavePrincipal(nombreTabla)
+    df = consultaDatos.obtenerMetaDataClavePrincipal()
     for i in df.index:
         tipoDatoClavePrincipal = df["tipoDatoNET"][i]
         nombreCampoClavePrincipal = df["nombreCampo"][i]

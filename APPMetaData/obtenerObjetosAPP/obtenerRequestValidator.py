@@ -5,7 +5,7 @@ TAB = "\t"
 ENTER = "\n"
 
 def generarArchivoRequestValidator(nombreTabla):
-    rutaArchivo = generarRutaArchivo(nombreTabla, enumerados.tipoObjeto.Aplicacion)
+    rutaArchivo = generarRutaArchivo('12_REQUESTVALIDATION', enumerados.tipoObjeto.Aplicacion)
     nombreArchivo = generarNombreArchivo(nombreTabla, enumerados.claseObjeto.requestValidation)
     extensionArchivo = generarExtensionArchivo(enumerados.tipoObjeto.Aplicacion)
     contenidoArchivo = generarClase(nombreTabla)
@@ -26,7 +26,7 @@ def generarClase(nombreTabla):
 
 def generarCabeceraClase():
     cabeceraClase = ""
-    cabeceraClase += "using EP_AcademicMicroservice.Entities;" + ENTER 
+    cabeceraClase += "using " + getNombreProyecto() + "Microservice.Entities;" + ENTER 
     cabeceraClase += "using System;" + ENTER 
     cabeceraClase += "using System.Collections.Generic;" + ENTER
     cabeceraClase += "using System.Linq;" + ENTER 

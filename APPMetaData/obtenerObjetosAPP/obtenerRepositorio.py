@@ -3,12 +3,13 @@ import pandas as pd
 from utilitarios import generarRutaArchivo, generarNombreArchivo, generarArchivo, generarExtensionArchivo, getNombreProyecto
 from utilitarios import enumerados
 from obtenerConexionBD import consultaDatos
+from utilitarios import util
 
 TAB = "\t"
 ENTER = "\n"
 
 def generarArchivoRepository(nombreTabla):
-    rutaArchivo = generarRutaArchivo(nombreTabla, enumerados.tipoObjeto.Aplicacion)
+    rutaArchivo = generarRutaArchivo('10_REPOSITORY', enumerados.tipoObjeto.Aplicacion)
     nombreArchivo = generarNombreArchivo(nombreTabla, enumerados.claseObjeto.repository)
     extensionArchivo = generarExtensionArchivo(enumerados.tipoObjeto.Aplicacion)
     contenidoArchivo = generarClase(nombreTabla)
@@ -30,9 +31,9 @@ def generarClase(nombreTabla):
 def generarCabeceraClase():
     cabeceraClase = ""
     cabeceraClase += "using Dapper;" + ENTER 
-    cabeceraClase += "using EP_AcademicMicroservice.Entities;" + ENTER 
-    cabeceraClase += "using EP_AcademicMicroservice.Repository;" + ENTER
-    cabeceraClase += "using EP_AcademicMicroservice.Exceptions;" + ENTER
+    cabeceraClase += "using " + getNombreProyecto() + "Microservice.Entities;" + ENTER 
+    cabeceraClase += "using " + getNombreProyecto() + "Microservice.Repository;" + ENTER
+    cabeceraClase += "using " + getNombreProyecto() + "Microservice.Exceptions;" + ENTER
     cabeceraClase += "using System;" + ENTER 
     cabeceraClase += "using System.Collections.Generic;" + ENTER
     cabeceraClase += "using System.Composition;" + ENTER
@@ -79,23 +80,31 @@ def generarMetodoInsertar(nombreTabla):
     campoClavePrincipal = ""
     tipoDatoClavePrincipal = ""
 
-    df = consultaDatos.obtenerMetaDataClavePrincipal(nombreTabla)
-    for i in df.index:
-        campoClavePrincipal = df["nombreCampo"][i]
-        tipoDatoClavePrincipal = df["tipoDatoNET"][i]
-
     metodoInsertar += 2*TAB + "public int Insert" + nombreTabla + "(" + nombreTabla + "Entity item)" + ENTER
     metodoInsertar += 2*TAB + "{" + ENTER 
     metodoInsertar += 3*TAB + "int afect = 0;" + ENTER 
-    metodoInsertar += 3*TAB + tipoDatoClavePrincipal + " Resultado = 0;" + ENTER 
+    metodoInsertar += 3*TAB + "int Resultado = 0;" + ENTER 
     metodoInsertar += 3*TAB + "var query = \"" + nombreTabla + "_Insert\";" + ENTER 
     metodoInsertar += 3*TAB + "var param = new DynamicParameters();" + 2*ENTER 
     metodoInsertar += generarCamposInsertar(nombreTabla) + ENTER
     metodoInsertar += 3*TAB + "afect = SqlMapper.Execute(this._connectionFactory.GetConnection, query, param, commandType: CommandType.StoredProcedure);" + 2*ENTER
-    metodoInsertar += 3*TAB + "Resultado = param.Get<" + tipoDatoClavePrincipal + ">(\"@" + campoClavePrincipal + "\");" + 2*ENTER
+
+    df = consultaDatos.obtenerMetaDataClavePrincipal()
+    for i in df.index:
+        if (len(df.index) == 1):
+            if (df["EsIdentity"][i] == "SI"):
+                campoClavePrincipal = df["nombreCampo"][i]
+                tipoDatoClavePrincipal = df["tipoDatoNET"][i]
+                metodoInsertar += 3*TAB + "Resultado = param.Get<" + tipoDatoClavePrincipal + ">(\"@" + campoClavePrincipal + "\");" + 2*ENTER
+            else:
+                metodoInsertar += 3*TAB + "Resultado = afect > 0 ? 1 : 0;" + 2*ENTER
+        else:
+            metodoInsertar += 3*TAB + "Resultado = afect > 0 ? 1 : 0;" + 2*ENTER
+            break
+            
     metodoInsertar += 3*TAB + "return (int)Resultado;" + ENTER
     metodoInsertar += 2*TAB + "}" + ENTER 
-
+    
     return metodoInsertar
 
 def generarMetodoActualizar(nombreTabla):
@@ -124,19 +133,26 @@ def generarMetodoBorrar(nombreTabla):
     metodoBorrar = ""
     campoClavePrincipal = ""
     tipoDatoClavePrincipal = ""
+    camposClave = ""
+    camposParametros = ""
 
-    df = consultaDatos.obtenerMetaDataClavePrincipal(nombreTabla)
+    df = consultaDatos.obtenerMetaDataClavePrincipal()
+
     for i in df.index:
         campoClavePrincipal = df["nombreCampo"][i]
         tipoDatoClavePrincipal = df["tipoDatoNET"][i]
+        camposClave += tipoDatoClavePrincipal + " " + campoClavePrincipal + ","
+        camposParametros += 3*TAB + "param.Add(\"@" + campoClavePrincipal + "\", " + campoClavePrincipal + ", DbType." + tipoDatoClavePrincipal + ");" + ENTER 
     
-    metodoBorrar += 2*TAB + "public bool Delete" + nombreTabla + "(" + tipoDatoClavePrincipal + " " + campoClavePrincipal + ")" + ENTER
+    camposClave = util.extraerUltimoCaracter(camposClave)
+    
+    metodoBorrar += 2*TAB + "public bool Delete" + nombreTabla + "(" + camposClave + ")" + ENTER
     metodoBorrar += 2*TAB + "{" + ENTER 
     metodoBorrar += 3*TAB + "bool exito = false;" + ENTER 
     metodoBorrar += 3*TAB + "var afect = 0;" + ENTER 
     metodoBorrar += 3*TAB + "var query = \"" + nombreTabla + "_Delete\";" + ENTER 
-    metodoBorrar += 3*TAB + "var param = new DynamicParameters();" + 2*ENTER 
-    metodoBorrar += 3*TAB + "param.Add(\"@" + campoClavePrincipal + "\", " + campoClavePrincipal + ", DbType." + tipoDatoClavePrincipal + ");" + ENTER 
+    metodoBorrar += 3*TAB + "var param = new DynamicParameters();" + ENTER 
+    metodoBorrar += camposParametros
     metodoBorrar += 3*TAB + "afect = SqlMapper.Execute(this._connectionFactory.GetConnection, query, param, commandType: CommandType.StoredProcedure);" + ENTER 
     metodoBorrar += 3*TAB + "exito = afect > 0;" + 2*ENTER 
     metodoBorrar += 3*TAB + "return exito;" + ENTER 
@@ -146,11 +162,13 @@ def generarMetodoBorrar(nombreTabla):
 
 def generarMetodoObtenerItem(nombreTabla):
     metodoObtenerItem = ""
-    campoClavePrincipal = ""
+    filtros = ""
 
-    df = consultaDatos.obtenerMetaDataClavePrincipal(nombreTabla)
+    df = consultaDatos.obtenerMetaDataClavePrincipal()
     for i in df.index:
-        campoClavePrincipal = df["nombreCampo"][i]
+        filtros += "filter." + df["nombreCampo"][i] + ","
+    
+    filtros = util.extraerUltimoCaracter(filtros)
 
     metodoObtenerItem += 2*TAB + "public " + nombreTabla + "Entity GetItem" + nombreTabla + "(" + nombreTabla + "Filter filter, " + nombreTabla + "FilterItemType filterType)" + ENTER
     metodoObtenerItem += 2*TAB + "{" + ENTER 
@@ -158,7 +176,7 @@ def generarMetodoObtenerItem(nombreTabla):
     metodoObtenerItem += 3*TAB + "switch (filterType)" + ENTER 
     metodoObtenerItem += 3*TAB + "{" + ENTER 
     metodoObtenerItem += 4*TAB + "case " + nombreTabla + "FilterItemType.ById:" + ENTER 
-    metodoObtenerItem += 5*TAB + "ItemFound = this.GetById(filter." + campoClavePrincipal + ");" + ENTER 
+    metodoObtenerItem += 5*TAB + "ItemFound = this.GetById(" + filtros + ");" + ENTER 
     metodoObtenerItem += 5*TAB + "break;" + ENTER 
     metodoObtenerItem += 3*TAB + "}" + ENTER 
     metodoObtenerItem += 3*TAB + "return ItemFound;" + ENTER 
@@ -169,12 +187,12 @@ def generarMetodoObtenerItem(nombreTabla):
 def generarMetodoObtenerLstItem(nombreTabla):
     metodoObtenerLstItem = ""
     campoClavePrincipal = ""
-    tipoDatoClavePrincipal = ""
+    
+    df = consultaDatos.obtenerMetaDataClaves()
 
-    df = consultaDatos.obtenerMetaDataClavePrincipal(nombreTabla)
     for i in df.index:
-        campoClavePrincipal = df["nombreCampo"][i]
-        tipoDatoClavePrincipal = df["tipoDatoNET"][i]
+        if(df["EsIdentity"][i] == "NO" and df["tipoDatoNET"][i] != "Int32"):
+            campoClavePrincipal = "filter." + df["nombreCampo"][i]
 
     metodoObtenerLstItem += 2*TAB + "public IEnumerable<" + nombreTabla + "Entity> GetLstItem" + nombreTabla + "(" + nombreTabla + "Filter filter, " + nombreTabla + "FilterLstItemType filterType, Pagination pagination)" + ENTER
     metodoObtenerLstItem += 2*TAB + "{" + ENTER 
@@ -182,7 +200,7 @@ def generarMetodoObtenerLstItem(nombreTabla):
     metodoObtenerLstItem += 3*TAB + "switch (filterType)" + ENTER 
     metodoObtenerLstItem += 3*TAB + "{" + ENTER 
     metodoObtenerLstItem += 4*TAB + "case " + nombreTabla + "FilterLstItemType.ByPagination:" + ENTER 
-    metodoObtenerLstItem += 5*TAB + "lstItemFound = this.GetByPagination(filter." + campoClavePrincipal +");" + ENTER 
+    metodoObtenerLstItem += 5*TAB + "lstItemFound = this.GetByPagination(" + campoClavePrincipal + ");" + ENTER 
     metodoObtenerLstItem += 5*TAB + "break;" + ENTER 
     metodoObtenerLstItem += 4*TAB + "default:" + ENTER 
     metodoObtenerLstItem += 5*TAB + "break;" + ENTER 
@@ -221,18 +239,24 @@ def generarMetodosObtenerByID(nombreTabla):
     metodoObtenerByID = ""
     campoClavePrincipal = ""
     tipoDatoClavePrincipal = ""
+    camposClave = ""
+    parametrosClave = ""
 
-    df = consultaDatos.obtenerMetaDataClavePrincipal(nombreTabla)
+    df = consultaDatos.obtenerMetaDataClavePrincipal()
     for i in df.index:
         campoClavePrincipal = df["nombreCampo"][i]
         tipoDatoClavePrincipal = df["tipoDatoNET"][i]
+        camposClave += 3*TAB + "param.Add(\"@" + campoClavePrincipal + "\", " + campoClavePrincipal + ", DbType." + tipoDatoClavePrincipal + ");" + ENTER 
+        parametrosClave +=  tipoDatoClavePrincipal + " " + campoClavePrincipal + ","
     
-    metodoObtenerByID += 2*TAB + "private " + nombreTabla + "Entity GetById(" + tipoDatoClavePrincipal + " " + campoClavePrincipal + ")" + ENTER
+    parametrosClave = util.extraerUltimoCaracter(parametrosClave)
+
+    metodoObtenerByID += 2*TAB + "private " + nombreTabla + "Entity GetById(" + parametrosClave + ")" + ENTER
     metodoObtenerByID += 2*TAB + "{" + ENTER 
     metodoObtenerByID += 3*TAB + nombreTabla + "Entity itemFound = null;" + ENTER 
     metodoObtenerByID += 3*TAB + "var query =\"" + nombreTabla + "_Get\";" + ENTER 
     metodoObtenerByID += 3*TAB + "var param = new DynamicParameters();" + ENTER 
-    metodoObtenerByID += 3*TAB + "param.Add(\"@" + campoClavePrincipal + "\", " + campoClavePrincipal + ", DbType." + tipoDatoClavePrincipal + ");" + ENTER 
+    metodoObtenerByID += camposClave + ENTER 
     metodoObtenerByID += 3*TAB + "itemFound = SqlMapper.QueryFirstOrDefault<" + nombreTabla + "Entity>(this._connectionFactory.GetConnection, query, param, commandType: CommandType.StoredProcedure);" + 2*ENTER 
     metodoObtenerByID += 3*TAB + "return itemFound;" + ENTER 
     metodoObtenerByID += 2*TAB + "}" + ENTER 
@@ -241,13 +265,17 @@ def generarMetodosObtenerByID(nombreTabla):
 
 def generarMetodosObtenerByPagination(nombreTabla):
     metodoObtenerByPagination = ""
-    campoClavePrincipal = ""
     tipoDatoClavePrincipal = ""
-   
-    df = consultaDatos.obtenerMetaDataClavePrincipal(nombreTabla)
+
+    df = consultaDatos.obtenerMetaDataClaves()
+
     for i in df.index:
         campoClavePrincipal = df["nombreCampo"][i]
         tipoDatoClavePrincipal = df["tipoDatoNET"][i]
+        
+        if(df["tipoDatoNET"][i] != "Int32"):
+            campoClavePrincipal = df["nombreCampo"][i]
+            tipoDatoClavePrincipal = df["tipoDatoNET"][i]
 
     metodoObtenerByPagination += 2*TAB + "private IEnumerable<" + nombreTabla + "Entity> GetByPagination(" + tipoDatoClavePrincipal + " " + campoClavePrincipal + ")" + ENTER
     metodoObtenerByPagination += 2*TAB + "{" + ENTER 
@@ -265,16 +293,16 @@ def generarCamposInsertar(nombreTabla):
     campoInsertar = ""
     tipoDato = ""
 
-    df = consultaDatos.obtenerMetaDataTodosCampos(nombreTabla)
+    df = consultaDatos.obtenerMetaDataTodosCampos()
 
     numeroCampos = len(df.index)
     rangoMenor = numeroCampos - 3
     rangoMayor = numeroCampos
-    #df = df.drop(range(rangoMenor,rangoMayor))
+    df = df.drop(range(rangoMenor,rangoMayor))
     
     for i in df.index:
         tipoDato = df["tipoDatoNET"][i]
-        if (df["tipoCampo"][i] == 'PRIMARY KEY'):
+        if (df["tipoCampo"][i] == 'PRIMARY KEY' and df["EsIdentity"][i] == 'SI'):
             campoInsertar += 3*TAB + "param.Add(\"@" + df["nombreCampo"][i] + "\", item." + df["nombreCampo"][i] 
             campoInsertar += ", DbType." + tipoDato + ", direction: ParameterDirection.Output); " + ENTER
         else:
@@ -290,14 +318,14 @@ def generarCamposActualizar(nombreTabla):
     campoActualizar = ""
     tipoDato = ""
 
-    df = consultaDatos.obtenerMetaDataTodosCampos(nombreTabla)
+    df = consultaDatos.obtenerMetaDataTodosCampos()
 
     numeroCampos = len(df.index)
 
     if(numeroCampos > 3):
         rangoMenor = numeroCampos - 6
         rangoMayor = numeroCampos - 3
-        #df = df.drop(range(rangoMenor,rangoMayor))
+        df = df.drop(range(rangoMenor,rangoMayor))
     
     for i in df.index:
         tipoDato = df["tipoDatoNET"][i]
@@ -306,7 +334,7 @@ def generarCamposActualizar(nombreTabla):
         else:
             campoActualizar += 3*TAB + "param.Add(\"@" + df["nombreCampo"][i] + "\", item." + df["nombreCampo"][i] + ", DbType." + tipoDato + "); " + ENTER
         
-    campoActualizar +="param.Add(\"@errorCode\", \"\", DbType.String, direction: ParameterDirection.Output);" + ENTER
+    campoActualizar += 3*TAB + "param.Add(\"@errorCode\", \"\", DbType.String, direction: ParameterDirection.Output);" + ENTER
 
     return campoActualizar
 

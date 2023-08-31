@@ -8,7 +8,7 @@ TAB = "\t"
 ENTER = "\n"
 
 def generarArchivoFilterType(nombreTabla):
-    rutaArchivo = generarRutaArchivo(nombreTabla, enumerados.tipoObjeto.Aplicacion)
+    rutaArchivo = generarRutaArchivo('3_FILTERTYPE', enumerados.tipoObjeto.Aplicacion)
     nombreArchivo = generarNombreArchivo(nombreTabla, enumerados.claseObjeto.filterType)
     extensionArchivo = generarExtensionArchivo(enumerados.tipoObjeto.Aplicacion)
     contenidoArchivo = generarClase(nombreTabla)
@@ -29,7 +29,7 @@ def generarClase(nombreTabla):
 
 def generarCabeceraClase():
     cabeceraClase = "using System;" + ENTER 
-    cabeceraClase = cabeceraClase +"using System.Collections.Generic;" + ENTER
+    cabeceraClase = cabeceraClase + "using System.Collections.Generic;" + ENTER
     cabeceraClase = cabeceraClase + "using System.Linq;" + ENTER 
     cabeceraClase = cabeceraClase + "using System.Text;" + ENTER
     cabeceraClase = cabeceraClase + "using System.Threading.Tasks;" + 2*ENTER

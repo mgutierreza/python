@@ -5,7 +5,7 @@ TAB = "\t"
 ENTER = "\n"
 
 def generarArchivoResponse(nombreTabla):
-    rutaArchivo = generarRutaArchivo(nombreTabla, enumerados.tipoObjeto.Aplicacion)
+    rutaArchivo = generarRutaArchivo('6_RESPONSE', enumerados.tipoObjeto.Aplicacion)
     nombreArchivo = generarNombreArchivo(nombreTabla, enumerados.claseObjeto.response)
     extensionArchivo = generarExtensionArchivo(enumerados.tipoObjeto.Aplicacion)
     contenidoArchivo = generarClase(nombreTabla)
@@ -27,7 +27,7 @@ def generarClase(nombreTabla):
 def generarCabeceraClase():
     cabeceraClase = ""
     cabeceraClase += "using System;" + ENTER 
-    cabeceraClase +="using System.Collections.Generic;" + ENTER
+    cabeceraClase += "using System.Collections.Generic;" + ENTER
     cabeceraClase += "using System.Linq;" + ENTER 
     cabeceraClase += "using System.Text;" + ENTER
     cabeceraClase += "using System.Threading.Tasks;" + 2*ENTER

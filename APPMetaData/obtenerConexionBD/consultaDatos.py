@@ -3,61 +3,84 @@ import pandas as pd
 from utilitarios import enumerados
 
 conexionBD = None
+nombreTablaGeneral = ""
+dfCampos = pd.DataFrame()
+#dfClaveFK = pd.DataFrame()
 
-def obtenerMetaDataTodosCampos(nombreTabla):
+def establecerNombreTabla(nombreTabla):
+    global nombreTablaGeneral
+    global dfCampos
+    #global dfClaveFK
+    nombreTablaGeneral = nombreTabla
+    dfCampos = realizarConsulta()
+    #dfClaveFK = obtenerMetaDataFK()
+    return
+    
+def obtenerMetaDataTodosCampos():
+    
+    return dfCampos
 
-    df = realizarConsulta(nombreTabla, enumerados.tipoConsulta.TodosCampos)
+def obtenerMetaDataClavePrincipal():
+    
+    dfFiltro = dfCampos['tipoCampo']=='PRIMARY KEY'
+    dfFiltrado = dfCampos[dfFiltro]
+    #df = realizarConsulta(NombreTablaGeneral, enumerados.tipoConsulta.SoloPK)
+    return dfFiltrado
 
-    return df
+def obtenerMetaDataClaveForanea():
+    dfFiltro = dfCampos['tipoCampo']=='FOREIGN KEY'
+    dfFiltrado = dfCampos[dfFiltro]
+    #df = realizarConsulta(NombreTablaGeneral, enumerados.tipoConsulta.SoloFK)
+    return dfFiltrado
 
-def obtenerMetaDataClavePrincipal(nombreTabla):
+def obtenerMetaDataCamposSinClavePrincipal():
+    dfFiltro = dfCampos['EsIdentity']=='NO' 
+    dfFiltrado = dfCampos[dfFiltro]
+    #df = realizarConsulta(NombreTablaGeneral, enumerados.tipoConsulta.CamposSinPK)
+    return dfFiltrado
 
-    df = realizarConsulta(nombreTabla, enumerados.tipoConsulta.SoloPK)
+def obtenerMetaDataClaves():
+    dfFiltro = dfCampos['tipoCampo']!='CAMPO' 
+    dfFiltrado = dfCampos[dfFiltro]
 
-    return df
+    if (obtenerNumeroMetaDataClaves() == 0):
+        dfFiltro = dfCampos['NroOrden'] == 1
+        dfFiltrado = dfCampos[dfFiltro]
+            
+    return dfFiltrado
 
-def obtenerMetaDataClaveForanea(nombreTabla):
+def obtenerNumeroMetaDataClaves():
+    dfFiltro = dfCampos['tipoCampo']!='CAMPO' 
+    dfFiltrado = dfCampos[dfFiltro]
 
-    df = realizarConsulta(nombreTabla, enumerados.tipoConsulta.SoloFK)
-
-    return df
-
-def obtenerMetaDataCamposSinClavePrincipal(nombreTabla):
-
-    df = realizarConsulta(nombreTabla, enumerados.tipoConsulta.CamposSinPK)
-
-    return df
-
-def obtenerMetaDataClaves(nombreTabla):
-
-    df = realizarConsulta(nombreTabla, enumerados.tipoConsulta.SoloPKFK)
-
-    return df
-
-def obtenerMetaDataFK(nombreTabla):
+    return len(dfFiltrado.index)
+    
+def obtenerMetaDataFK():
     global conexionBD
 
     conexionBD = __abrirConexionBD()
-    consultaSQL = __consultaMetaDatosFK(nombreTabla)
+    consultaSQL = __consultaMetaDatosFK()
     df = pd.read_sql(consultaSQL, conexionBD)
     __cerrarConexionBD()
 
     return df
 
-def realizarConsulta(nombreTabla, tipoConsulta):
+def realizarConsulta():
     global conexionBD
 
     conexionBD = __abrirConexionBD()
-    consultaSQL = __consultaMetaDatos(nombreTabla, tipoConsulta)
+    consultaSQL = __consultaMetaDatos()
     df = pd.read_sql(consultaSQL, conexionBD)
     __cerrarConexionBD()
 
     return df
 
-def __consultaMetaDatos(nombreTabla, tipoConsulta):
+def __consultaMetaDatos():
+    
+    
     sql = ""
-
     sql += "SELECT "
+    sql += "a.ORDINAL_POSITION NroOrden, "
     sql += "a.COLUMN_NAME nombreCampo, "
     sql += "UPPER(a.DATA_TYPE) tipoDatoBD, "
     sql += "ISNULL(a.CHARACTER_MAXIMUM_LENGTH,0) tamanhoCampo, "
@@ -77,12 +100,16 @@ def __consultaMetaDatos(nombreTabla, tipoConsulta):
     sql += "WHEN 'REAL' THEN 'Single' "
     sql += "WHEN 'FLOAT' THEN 'Double' "
     sql += "ELSE 'DateTime' "
-    sql += "END tipoDatoNET "
+    sql += "END tipoDatoNET, "
+    sql += "CASE d.is_identity WHEN 1 THEN 'SI' ELSE 'NO' END EsIdentity "
     sql += "FROM information_schema.columns a "    
     sql += "LEFT JOIN information_schema.key_column_usage b ON a.COLUMN_NAME = b.COLUMN_NAME AND a.TABLE_NAME = b.TABLE_NAME AND a.TABLE_SCHEMA = b.TABLE_SCHEMA "    
     sql += "LEFT JOIN information_schema.table_constraints c ON b.CONSTRAINT_NAME = c.CONSTRAINT_NAME AND b.TABLE_NAME = c.TABLE_NAME AND b.TABLE_SCHEMA = c.TABLE_SCHEMA "    
-    sql += "WHERE a.table_name = '" + nombreTabla + "' "    
-    
+    sql += "LEFT JOIN sys.all_objects x ON x.name = a.TABLE_NAME "
+    sql += "LEFT JOIN sys.identity_columns d ON a.COLUMN_NAME = d.name AND x.object_id = d.object_id "
+    sql += "WHERE a.table_name = '" + nombreTablaGeneral + "' "    
+ 	
+    '''
     if (tipoConsulta == enumerados.tipoConsulta.SoloPK):
         sql += "AND c.CONSTRAINT_TYPE = 'PRIMARY KEY' "        
     elif(tipoConsulta == enumerados.tipoConsulta.CamposSinPK):
@@ -90,15 +117,17 @@ def __consultaMetaDatos(nombreTabla, tipoConsulta):
     elif(tipoConsulta == enumerados.tipoConsulta.SoloPKFK):
         sql += "AND c.CONSTRAINT_TYPE IN ('PRIMARY KEY','FOREIGN KEY') "    
     elif(tipoConsulta == enumerados.tipoConsulta.SoloFK):
-        sql += "AND c.CONSTRAINT_TYPE IN ('FOREIGN KEY') "            
+        sql += "AND c.CONSTRAINT_TYPE IN ('FOREIGN KEY') "    
+    '''
 
     sql += "ORDER BY a.ORDINAL_POSITION "    				 
 
     return sql
 
-def __consultaMetaDatosFK(nombreTabla):
-    sql = ""
+def __consultaMetaDatosFK():
+    
 
+    sql = ""
     sql += "SELECT "
     sql += "foreign_keys.name AS nombreFK, "
     sql += "FOREIGN_KEY_TABLE.name AS tablaDestino, "
@@ -113,7 +142,7 @@ def __consultaMetaDatosFK(nombreTabla):
     sql += "INNER JOIN sys.columns REFERENECD_COLUMN ON foreign_key_columns.referenced_object_id = REFERENECD_COLUMN.object_id "
     sql += "AND foreign_key_columns.referenced_column_id = REFERENECD_COLUMN.column_id "
     sql += "INNER JOIN sys.tables REFERENCED_TABLE ON REFERENCED_TABLE.object_id = foreign_key_columns.referenced_object_id "
-    sql += "WHERE FOREIGN_KEY_TABLE.name = '" + nombreTabla + "' "    
+    sql += "WHERE FOREIGN_KEY_TABLE.name = '" + nombreTablaGeneral + "' "    
     sql += "ORDER BY foreign_key_columns.constraint_column_id, FOREIGN_KEY_TABLE.name ; "    				 
 
     return sql

@@ -8,7 +8,7 @@ TAB = "\t"
 ENTER = "\n"
 
 def generarArchivoFilter(nombreTabla):
-    rutaArchivo = generarRutaArchivo(nombreTabla, enumerados.tipoObjeto.Aplicacion)
+    rutaArchivo = generarRutaArchivo('2_FILTER', enumerados.tipoObjeto.Aplicacion)
     nombreArchivo = generarNombreArchivo(nombreTabla, enumerados.claseObjeto.filter)
     extensionArchivo = generarExtensionArchivo(enumerados.tipoObjeto.Aplicacion)
     contenidoArchivo = generarClase(nombreTabla)
@@ -31,7 +31,7 @@ def generarClase(nombreTabla):
     return clase
 
 def generarCabeceraClase():
-    cabeceraClase = "using System;" + ENTER 
+    cabeceraClase =  "using System;" + ENTER 
     cabeceraClase += "using System.Collections.Generic;" + ENTER
     cabeceraClase += "using System.Linq;" + ENTER 
     cabeceraClase += "using System.Text;" + ENTER
@@ -43,7 +43,7 @@ def generarCuerpoClase(nombreTabla):
     cuerpoClase = ""
     textoGetSet = " { get; set; }"
     tipoDato = ""
-    df = consultaDatos.obtenerMetaDataClaves(nombreTabla)
+    df = consultaDatos.obtenerMetaDataClaves()
 
     for i in df.index:
         tipoDato = df["tipoDatoNET"][i]

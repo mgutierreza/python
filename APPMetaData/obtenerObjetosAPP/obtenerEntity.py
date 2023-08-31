@@ -8,7 +8,7 @@ TAB = "\t"
 ENTER = "\n"
 
 def generarArchivoEntity(nombreTabla):
-    rutaArchivo = generarRutaArchivo(nombreTabla, enumerados.tipoObjeto.Aplicacion)
+    rutaArchivo = generarRutaArchivo('1_ENTITY', enumerados.tipoObjeto.Aplicacion)
     nombreArchivo = generarNombreArchivo(nombreTabla, enumerados.claseObjeto.entity)
     extensionArchivo = generarExtensionArchivo(enumerados.tipoObjeto.Aplicacion)
     contenidoArchivo = generarClase(nombreTabla)
@@ -47,7 +47,7 @@ def generarCuerpoClase(nombreTabla):
     datamember =  "[DataMember(EmitDefaultValue = false)]"
     textoGetSet = " { get; set; }"
     
-    df = consultaDatos.obtenerMetaDataTodosCampos(nombreTabla)
+    df = consultaDatos.obtenerMetaDataTodosCampos()
 
     for i in df.index:
         cuerpoClaseEntity += 2*TAB + datamember + ENTER 

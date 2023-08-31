@@ -3,13 +3,14 @@ import pandas as pd
 from obtenerObjetosBD import obtenerConsulta
 from utilitarios import generarRutaArchivo, generarNombreArchivo, generarArchivo, generarExtensionArchivo, getNombreProyecto
 from utilitarios import enumerados
+from utilitarios import util
 from obtenerConexionBD import consultaDatos
 
 TAB = "\t"
 ENTER = "\n"
 
 def generarArchivoController(nombreTabla):
-    rutaArchivo = generarRutaArchivo(nombreTabla, enumerados.tipoObjeto.Aplicacion)
+    rutaArchivo = generarRutaArchivo('13_CONTROLLER', enumerados.tipoObjeto.Aplicacion)
     nombreArchivo = generarNombreArchivo(nombreTabla, enumerados.claseObjeto.controller)
     extensionArchivo = generarExtensionArchivo(enumerados.tipoObjeto.Aplicacion)
     contenidoArchivo = generarClase(nombreTabla)
@@ -30,8 +31,8 @@ def generarClase(nombreTabla):
 
 def generarCabeceraClase():
     cabeceraClase = ""
-    cabeceraClase += "using EP_AcademicMicroservice.Service;" + ENTER 
-    cabeceraClase += "using EP_AcademicMicroservice.Entities;" + ENTER 
+    cabeceraClase += "using " + getNombreProyecto() + "Microservice.Service;" + ENTER 
+    cabeceraClase += "using " + getNombreProyecto() + "Microservice.Entities;" + ENTER 
     cabeceraClase += "using Microsoft.AspNetCore.Mvc;" + ENTER
     cabeceraClase += "using System;" + ENTER 
     cabeceraClase += "using System.Collections.Generic;" + ENTER
@@ -44,9 +45,10 @@ def generarCuerpoClase(nombreTabla):
     cuerpoClase = ""
     nombreCampoClavePrincipal = ""
 
-    df = consultaDatos.obtenerMetaDataClavePrincipal(nombreTabla)
+    df = consultaDatos.obtenerMetaDataClavePrincipal()
     for i in df.index:
-        nombreCampoClavePrincipal = df["nombreCampo"][i]
+        if(df["tipoDatoNET"][i] != "Int32"):
+            nombreCampoClavePrincipal = df["nombreCampo"][i]
 
     cuerpoClase += TAB + "[Route(\"api/[controller]\")]" + ENTER
     cuerpoClase += TAB + "[ApiController]" + ENTER
@@ -64,9 +66,9 @@ def generarCuerpoClase(nombreTabla):
     cuerpoClase += generarMetodoObtenerByID(nombreTabla) + 2*ENTER
     cuerpoClase += 2*TAB + "[HttpPost(\"Insert\")]" + ENTER
     cuerpoClase += generarMetodoPost(nombreTabla) + 2*ENTER
-    cuerpoClase += 2*TAB + "[HttpPost(\"update\")]" + ENTER
+    cuerpoClase += 2*TAB + "[HttpPut(\"update\")]" + ENTER
     cuerpoClase += generarMetodoUpdate(nombreTabla) + 2*ENTER
-    cuerpoClase += 2*TAB + "[HttpPost(\"Delete\")]" + ENTER
+    cuerpoClase += 2*TAB + "[HttpDelete(\"Delete\")]" + ENTER
     cuerpoClase += generarMetodoDelete(nombreTabla) + 2*ENTER
     cuerpoClase += 2*TAB + "#endregion" + ENTER 
     cuerpoClase += TAB + "}" + ENTER
@@ -78,17 +80,18 @@ def generarMetodoObtenerByPagination(nombreTabla):
     tipoDatoClavePrincipal = ""
     nombreCampoClavePrincipal = ""
 
-    df = consultaDatos.obtenerMetaDataClavePrincipal(nombreTabla)
+    df = consultaDatos.obtenerMetaDataClavePrincipal()
     for i in df.index:
-        tipoDatoClavePrincipal = df["tipoDatoNET"][i]
-        nombreCampoClavePrincipal = df["nombreCampo"][i]
+        if(df["tipoDatoNET"][i] != "Int32"):
+            tipoDatoClavePrincipal = df["tipoDatoNET"][i]
+            nombreCampoClavePrincipal = df["nombreCampo"][i]
 
     MetodoObtenerByPagination += 2*TAB + "public IActionResult GetByPagination(" + tipoDatoClavePrincipal + " " + nombreCampoClavePrincipal + ")" + ENTER
     MetodoObtenerByPagination += 2*TAB + "{" + ENTER 
     MetodoObtenerByPagination += 3*TAB + nombreTabla + "LstItemResponse response = null;" + ENTER
     MetodoObtenerByPagination += 3*TAB + nombreTabla + "LstItemRequest request = new " + nombreTabla + "LstItemRequest()" + ENTER
     MetodoObtenerByPagination += 3*TAB + "{" + ENTER
-    MetodoObtenerByPagination += 4*TAB + "Filter = new " + nombreTabla + "Filter() { }," + ENTER
+    MetodoObtenerByPagination += 4*TAB + "Filter = new " + nombreTabla + "Filter() {" + nombreCampoClavePrincipal + " = " + nombreCampoClavePrincipal + "}," + ENTER
     MetodoObtenerByPagination += 4*TAB + "FilterType = " + nombreTabla + "FilterLstItemType.ByPagination" + ENTER
     MetodoObtenerByPagination += 3*TAB + "};" + 2*ENTER
     MetodoObtenerByPagination += 3*TAB + "try" + ENTER
@@ -109,19 +112,25 @@ def generarMetodoObtenerByPagination(nombreTabla):
 def generarMetodoObtenerByID(nombreTabla):
     metodoObtenerByID = ""
     tipoDatoClavePrincipal = ""
-    nombreCampoClavePrincipal = ""
-
-    df = consultaDatos.obtenerMetaDataClavePrincipal(nombreTabla)
+    parametroClavePrincipal = "" 
+    campoClavePrincipal = ""
+    
+    df = consultaDatos.obtenerMetaDataClavePrincipal()
     for i in df.index:
         tipoDatoClavePrincipal = df["tipoDatoNET"][i]
-        nombreCampoClavePrincipal = df["nombreCampo"][i]
+        clavePrincipal = df["nombreCampo"][i]
+        parametroClavePrincipal += tipoDatoClavePrincipal + " " + clavePrincipal + "," 
+        campoClavePrincipal += clavePrincipal + " = " + clavePrincipal + ","  
+
+    parametroClavePrincipal = util.extraerUltimoCaracter(parametroClavePrincipal)
+    campoClavePrincipal = util.extraerUltimoCaracter(campoClavePrincipal)
     
-    metodoObtenerByID += 2*TAB + "public IActionResult GetById(" + tipoDatoClavePrincipal + " " + nombreCampoClavePrincipal + ")" + ENTER
+    metodoObtenerByID += 2*TAB + "public IActionResult GetById(" + parametroClavePrincipal + ")" + ENTER
     metodoObtenerByID += 2*TAB + "{" + ENTER 
     metodoObtenerByID += 3*TAB + nombreTabla + "ItemResponse response = null;" + ENTER
     metodoObtenerByID += 3*TAB + nombreTabla + "ItemRequest request = new " + nombreTabla + "ItemRequest()" + ENTER
     metodoObtenerByID += 3*TAB + "{" + ENTER
-    metodoObtenerByID += 4*TAB + "Filter = new " + nombreTabla + "Filter() { " + nombreCampoClavePrincipal + " = " + nombreCampoClavePrincipal + " }," + ENTER
+    metodoObtenerByID += 4*TAB + "Filter = new " + nombreTabla + "Filter() { " + campoClavePrincipal + " }," + ENTER
     metodoObtenerByID += 4*TAB + "FilterType = " + nombreTabla + "FilterItemType.ById" + ENTER
     metodoObtenerByID += 3*TAB + "};" + 2*ENTER
     metodoObtenerByID += 3*TAB + "try" + ENTER
@@ -193,20 +202,26 @@ def generarMetodoUpdate(nombreTabla):
 
 def generarMetodoDelete(nombreTabla):
     metodoDelete = ""
-    tipoDatoClavePrincipal = ""
-    nombreCampoClavePrincipal = ""
+    parametroClavePrincipal = ""
+    campoClavePrincipal = ""
 
-    df = consultaDatos.obtenerMetaDataClavePrincipal(nombreTabla)
+    df = consultaDatos.obtenerMetaDataClavePrincipal()
+
     for i in df.index:
         tipoDatoClavePrincipal = df["tipoDatoNET"][i]
-        nombreCampoClavePrincipal = df["nombreCampo"][i]
+        clavePrincipal = df["nombreCampo"][i]
+        parametroClavePrincipal += tipoDatoClavePrincipal + " " + clavePrincipal + "," 
+        campoClavePrincipal += clavePrincipal + " = " + clavePrincipal + ","  
 
-    metodoDelete += 2*TAB + "public IActionResult Delete(" + tipoDatoClavePrincipal + " " + nombreCampoClavePrincipal + ")" + ENTER
+    parametroClavePrincipal = util.extraerUltimoCaracter(parametroClavePrincipal)
+    campoClavePrincipal = util.extraerUltimoCaracter(campoClavePrincipal)
+
+    metodoDelete += 2*TAB + "public IActionResult Delete(" + parametroClavePrincipal + ")" + ENTER
     metodoDelete += 2*TAB + "{" + ENTER 
     metodoDelete += 3*TAB + nombreTabla + "Response response = null;" + ENTER
     metodoDelete += 3*TAB + nombreTabla + "Request request = new " + nombreTabla + "Request()" + ENTER
     metodoDelete += 3*TAB + "{" + ENTER
-    metodoDelete += 4*TAB + "Item = new " + nombreTabla + "Entity() { " + nombreCampoClavePrincipal + " = " + nombreCampoClavePrincipal + " }," + ENTER
+    metodoDelete += 4*TAB + "Item = new " + nombreTabla + "Entity() { " + campoClavePrincipal + " }," + ENTER
     metodoDelete += 4*TAB + "Operation = Operation.Delete" + ENTER
     metodoDelete += 3*TAB + "};" + 2*ENTER
     metodoDelete += 3*TAB + "try" + ENTER

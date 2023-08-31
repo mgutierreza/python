@@ -8,7 +8,7 @@ TAB = "\t"
 ENTER = "\n"
 
 def generarArchivoException(nombreTabla):
-    rutaArchivo = generarRutaArchivo(nombreTabla, enumerados.tipoObjeto.Aplicacion)
+    rutaArchivo = generarRutaArchivo('7_EXCEPTION', enumerados.tipoObjeto.Aplicacion)
     nombreArchivo = generarNombreArchivo(nombreTabla, enumerados.claseObjeto.exception)
     extensionArchivo = generarExtensionArchivo(enumerados.tipoObjeto.Aplicacion)
     contenidoArchivo = generarClase(nombreTabla)
@@ -28,7 +28,7 @@ def generarClase(nombreTabla):
     return claseEntity
 
 def generarCabeceraClase():
-    cabeceraClase = "using System;" + ENTER 
+    cabeceraClase =  "using System;" + ENTER 
     cabeceraClase += "using System.Collections.Generic;" + ENTER
     cabeceraClase += "using System.Linq;" + ENTER 
     cabeceraClase += "using System.Text;" + ENTER

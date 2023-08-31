@@ -3,13 +3,14 @@ import pandas as pd
 from obtenerObjetosBD import obtenerConsulta
 from utilitarios import generarRutaArchivo, generarNombreArchivo, generarArchivo, generarExtensionArchivo, getNombreProyecto
 from utilitarios import enumerados
+from utilitarios import util
 from obtenerConexionBD import consultaDatos
 
 TAB = "\t"
 ENTER = "\n"
 
 def generarArchivoDomain(nombreTabla):
-    rutaArchivo = generarRutaArchivo(nombreTabla, enumerados.tipoObjeto.Aplicacion)
+    rutaArchivo = generarRutaArchivo('8_DOMAIN', enumerados.tipoObjeto.Aplicacion)
     nombreArchivo = generarNombreArchivo(nombreTabla, enumerados.claseObjeto.domain)
     extensionArchivo = generarExtensionArchivo(enumerados.tipoObjeto.Aplicacion)
     contenidoArchivo = generarClase(nombreTabla)
@@ -30,8 +31,8 @@ def generarClase(nombreTabla):
 
 def generarCabeceraClase():
     cabeceraClase = ""
-    cabeceraClase += "using EP_AcademicMicroservice.Repository;" + ENTER 
-    cabeceraClase += "using EP_AcademicMicroservice.Entities;" + ENTER 
+    cabeceraClase += "using " + getNombreProyecto() + "Microservice.Repository;" + ENTER 
+    cabeceraClase += "using " + getNombreProyecto() + "Microservice.Entities;" + ENTER 
     cabeceraClase += "using System;" + ENTER 
     cabeceraClase += "using System.Collections.Generic;" + ENTER
     cabeceraClase += "using System.Composition;" + ENTER
@@ -111,17 +112,23 @@ def generarMetodoDelete(nombreTabla):
     metodoDelete = ""
     tipoDatoClavePrincipal = ""
     clavePrincipal = ""
-    tipoDato = ""
+    campoClavePrincipal = ""
+    parametroClavePrincipal = ""
 
-    df = consultaDatos.obtenerMetaDataClavePrincipal(nombreTabla)
+    df = consultaDatos.obtenerMetaDataClavePrincipal()
     for i in df.index:
         tipoDatoClavePrincipal = df["tipoDatoNET"][i]
         clavePrincipal = df["nombreCampo"][i]
+        parametroClavePrincipal += tipoDatoClavePrincipal + " " + clavePrincipal + "," 
+        campoClavePrincipal += clavePrincipal + "," 
 
-    metodoDelete += 2*TAB + "public bool Delete" + nombreTabla + "(" + tipoDatoClavePrincipal + " " + clavePrincipal + ")" + ENTER
+    parametroClavePrincipal = util.extraerUltimoCaracter(parametroClavePrincipal)
+    campoClavePrincipal = util.extraerUltimoCaracter(campoClavePrincipal)
+
+    metodoDelete += 2*TAB + "public bool Delete" + nombreTabla + "(" + parametroClavePrincipal + ")" + ENTER
     metodoDelete += 2*TAB + "{" + ENTER 
     metodoDelete += 3*TAB + "bool exito = false;" + ENTER 
-    metodoDelete += 3*TAB + "exito = _" + nombreTabla + "Repository.Delete" + nombreTabla + "("+ clavePrincipal +");" + ENTER 
+    metodoDelete += 3*TAB + "exito = _" + nombreTabla + "Repository.Delete" + nombreTabla + "("+ campoClavePrincipal +");" + ENTER 
     metodoDelete += 3*TAB + "return exito;" + ENTER 
     metodoDelete += 2*TAB + "}" + ENTER
 
@@ -130,17 +137,24 @@ def generarMetodoDelete(nombreTabla):
 def generarMetodoObtenerByID(nombreTabla):
     metodoObtenerByID = ""
     tipoDatoClavePrincipal = ""
-    nombreCampoClavePrincipal = ""
+    campoClavePrincipal = ""
+    parametroClavePrincipal = ""
 
-    df = consultaDatos.obtenerMetaDataClavePrincipal(nombreTabla)
+    df = consultaDatos.obtenerMetaDataClavePrincipal()
+    
     for i in df.index:
         tipoDatoClavePrincipal = df["tipoDatoNET"][i]
-        nombreCampoClavePrincipal = df["nombreCampo"][i]
+        clavePrincipal = df["nombreCampo"][i]
+        parametroClavePrincipal += tipoDatoClavePrincipal + " " + clavePrincipal + "," 
+        campoClavePrincipal += clavePrincipal + " = " + clavePrincipal + "," 
+
+    parametroClavePrincipal = util.extraerUltimoCaracter(parametroClavePrincipal)
+    campoClavePrincipal = util.extraerUltimoCaracter(campoClavePrincipal)
     
-    metodoObtenerByID += 2*TAB + "public " + nombreTabla + "Entity GetById(" + tipoDatoClavePrincipal + " " + nombreCampoClavePrincipal + ")" + ENTER
+    metodoObtenerByID += 2*TAB + "public " + nombreTabla + "Entity GetById(" + parametroClavePrincipal + ")" + ENTER
     metodoObtenerByID += 2*TAB + "{" + ENTER 
     metodoObtenerByID += 3*TAB + nombreTabla + "Entity " + nombreTabla + " = null;" + ENTER 
-    metodoObtenerByID += 3*TAB + nombreTabla + " = _" + nombreTabla + "Repository.GetItem" + nombreTabla + "(new " + nombreTabla + "Filter() { " + nombreCampoClavePrincipal + " =  " + nombreCampoClavePrincipal + " }, " + nombreTabla + "FilterItemType.ById);" + ENTER 
+    metodoObtenerByID += 3*TAB + nombreTabla + " = _" + nombreTabla + "Repository.GetItem" + nombreTabla + "(new " + nombreTabla + "Filter() { " + campoClavePrincipal + " }, " + nombreTabla + "FilterItemType.ById);" + ENTER 
     metodoObtenerByID += 3*TAB + "return "+ nombreTabla +";" + ENTER 
     metodoObtenerByID += 2*TAB + "}" + ENTER
 
