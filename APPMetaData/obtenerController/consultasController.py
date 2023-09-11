@@ -1,0 +1,2 @@
+from obtenerConexionBD import consultaDatos
+

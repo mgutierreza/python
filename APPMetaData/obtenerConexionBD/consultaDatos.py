@@ -76,8 +76,7 @@ def realizarConsulta():
     return df
 
 def __consultaMetaDatos():
-    
-    
+        
     sql = ""
     sql += "SELECT "
     sql += "a.ORDINAL_POSITION NroOrden, "
@@ -94,6 +93,7 @@ def __consultaMetaDatos():
     sql += "WHEN 'TINYINT' THEN 'Byte' "
     sql += "WHEN 'SMALLINT' THEN 'Int16' "
     sql += "WHEN 'NCHAR' THEN 'String' "
+    sql += "WHEN 'XML' THEN 'XML' "
     sql += "WHEN 'DECIMAL' THEN 'Decimal' "
     sql += "WHEN 'MONEY' THEN 'Decimal' "
     sql += "WHEN 'NUMERIC' THEN 'Decimal' "
@@ -124,8 +124,8 @@ def __consultaMetaDatos():
 
     return sql
 
+
 def __consultaMetaDatosFK():
-    
 
     sql = ""
     sql += "SELECT "
@@ -146,6 +146,8 @@ def __consultaMetaDatosFK():
     sql += "ORDER BY foreign_key_columns.constraint_column_id, FOREIGN_KEY_TABLE.name ; "    				 
 
     return sql
+
+
 
 def __abrirConexionBD():
     cadenaConexion = ""
