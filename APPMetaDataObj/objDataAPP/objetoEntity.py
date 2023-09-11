@@ -1,18 +1,18 @@
 from objDataAPP.iObjetoAplicacion import iObjetoAplicacion
 from objConexionBD.consultasBD import obtenerData
 from util.utilitario import gestionArchivos
+from util.enumerados import claseObjeto
 
 class objetoEntity:
 
-    def __init__(self, nombreTabla : str, claseObjeto : int):
+    def __init__(self, nombreTabla):
         self.__nombreTabla = nombreTabla
-        self.__claseObjeto = claseObjeto
+        self.__claseObjeto = claseObjeto.entity
         self.__nombreClase = ''
         self.TAB = '\t'
         self.ENTER = '\n'
         self.ESPACIO = ' '
 
-    @property
     def generarArchivo(self):
         nuevoArchivo = gestionArchivos(self.__nombreTabla, self.__claseObjeto)
         self.__nombreClase = nuevoArchivo.generarNombreArchivo()

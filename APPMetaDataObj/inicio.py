@@ -1,5 +1,5 @@
-from inicioObjetos import generarObjetos
+from inicioObjetos import GenerarObjetos
 
-generaObjetos = generarObjetos("Adm_BankQuestion")
+generaObjetos = GenerarObjetos("Ven_CouHead")
 generaObjetos.generarObjetosBackEnd()
 

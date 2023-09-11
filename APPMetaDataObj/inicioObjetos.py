@@ -1,15 +1,27 @@
 from objDataAPP import *
 from objDataBD import *
 from util.enumerados import claseObjeto
+from objDataAPP.objetoEntity import objetoEntity
+from objDataAPP.objetoException import objetoException
+from objDataAPP.objetoFilterType import objetoFilterType
+from objDataAPP.objetoRequest import objetoRequest
+from objDataAPP.objetoResponse import objetoResponse
+from objDataAPP.objetoRequestValidator import objetoRequestValidator
+from objDataAPP.objetoIRepository import objetoIRepository
+from objDataAPP.objetoRepository import objetoRepository
+from objDataAPP.objetoDomain import objetoDomain
+from objDataAPP.objetoController import objetoController
+from objDataAPP.objetoService import objetoService
+from objDataBD.objetoInsertar import objetoInsertar
 
 #nombreTabla = "Adm_BankQuestion"
-class generarObjetos:
+class GenerarObjetos():
 
-    def __init__(self, nombreTabla : str):
+    def __init__(self, nombreTabla):
         self.nombreTabla = nombreTabla
 
     def generarObjetosBackEnd(self):
-        clase = objetoEntity(self.nombreTabla, claseObjeto.entity)
+        clase = objetoEntity(self.nombreTabla)
         clase.generarArchivo()
 
         clase = objetoException(self.nombreTabla, claseObjeto.exception)
